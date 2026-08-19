@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Importador de Produtos</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+    <main class="min-h-screen p-4 sm:p-8">
+
+        <div class="mx-auto max-w-3xl bg-white rounded-3xl shadow-xl overflow-hidden ring-1 ring-slate-200">
+
+            <!-- CABEÇALHO -->
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-8 text-white">
+
+                <div class="flex flex-col gap-3">
+
+                    <div class="flex items-center gap-3">
+
+                        <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-shop"></i>
+                        </div>
+
+                        <div>
+                            <h1 class="text-2xl font-bold">
+                                Painel Administrativo
+                            </h1>
+
+                            <p class="text-sm text-orange-100">
+                                Importe produtos de marketplaces para sua loja.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <p class="text-sm text-orange-100 max-w-2xl leading-relaxed">
+                        Cole o link de um produto e o sistema tentará identificar
+                        automaticamente título, descrição, imagens, preços,
+                        variações, categoria, vídeo e informações do produto.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FORMULÁRIO -->
+            <section class="p-6">
+
+                <form id="importForm" class="space-y-4">
+
+                    <input
+                        type="hidden"
+                        name="usuario_id"
+                        value="<%= usuarioId %>"
+                    >
+
+
+                    <!-- LINK DO PRODUTO -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Link do produto
+                        </label>
+
+                        <input
+                            id="shopeeUrl"
+                            name="shopee_url"
+                            type="url"
+                            placeholder="https://..."
+                            class="mt-2 block w-full rounded-3xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- INFORMAÇÃO -->
+                    <div class="rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-4 py-4">
+
+                        <p class="text-sm text-slate-600">
+
+                            <i class="fa-solid fa-circle-info text-orange-500 mr-1"></i>
+
+                            O sistema identifica automaticamente a plataforma
+                            através do endereço informado.
+
+                        </p>
+
+                        <p class="text-xs text-slate-500 mt-2">
+
+                            Inicialmente estamos trabalhando com a Shopee.
+                            A arquitetura será preparada para Amazon,
+                            Mercado Livre, Magazine Luiza e outras plataformas.
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- LINK AFILIADO -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Link Afiliado
+                            <span class="font-normal text-slate-400">
+                                (opcional)
+                            </span>
+                        </label>
+
+                        <input
+                            id="linkAfiliado"
+                            name="link_afiliado"
+                            type="url"
+                            placeholder="https://..."
+                            class="mt-2 block w-full rounded-3xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+                        >
+
+                        <p class="text-xs text-slate-400 mt-2">
+                            Se informado, será utilizado como destino do clique
+                            no produto.
+                        </p>
+
+                    </div>
+
+
+                    <!-- BOTÕES -->
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+
+                        <button
+                            id="importButton"
+                            type="submit"
+                            class="inline-flex items-center justify-center gap-2 rounded-3xl bg-orange-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-200/50 transition hover:bg-orange-600"
+                        >
+
+                            <i class="fa-solid fa-cloud-arrow-down"></i>
+
+                            Importar produto
+
+                        </button>
+
+
+                        <button
+                            id="importAdButton"
+                            type="button"
+                            class="inline-flex items-center justify-center gap-2 rounded-3xl bg-slate-900 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-slate-300/30 transition hover:bg-slate-800"
+                        >
+
+                            <i class="fa-solid fa-bullhorn"></i>
+
+                            Importar para propaganda
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <!-- STATUS -->
+                <div
+                    id="status"
+                    class="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4 hidden"
+                ></div>
+
+
+                <!-- PREVIEW -->
+                <div
+                    id="productPreview"
+                    class="mt-6 hidden rounded-3xl border border-slate-200 bg-white shadow-sm p-4"
+                >
+
+                    <h2 class="text-lg font-bold text-slate-900">
+                        Pré-visualização do produto
+                    </h2>
+
+
+                    <div class="mt-4 grid gap-4 md:grid-cols-[180px_minmax(0,1fr)]">
+
+                        <!-- IMAGEM -->
+                        <img
+                            id="previewImage"
+                            class="h-44 w-full rounded-3xl object-cover bg-slate-100"
+                            src=""
+                            alt="Imagem do produto"
+                        >
+
+
+                        <div class="space-y-3">
+
+                            <!-- TÍTULO -->
+                            <p class="text-sm text-slate-600">
+
+                                Título:
+
+                                <span
+                                    id="previewTitle"
+                                    class="font-semibold text-slate-900"
+                                ></span>
+
+                            </p>
+
+
+                            <!-- PREÇO -->
+                            <p class="text-sm text-slate-600">
+
+                                Preço:
+
+                                <span
+                                    id="previewPrice"
+                                    class="font-semibold text-slate-900"
+                                ></span>
+
+                            </p>
+
+
+                            <!-- VARIAÇÕES -->
+                            <div
+                                id="previewVariationsContainer"
+                                class="hidden rounded-2xl bg-slate-50 border border-slate-200 p-3"
+                            >
+
+                                <p class="text-sm font-semibold text-slate-700">
+                                    Variações e preços
+                                </p>
+
+                                <div
+                                    id="previewVariations"
+                                    class="mt-2 space-y-1"
+                                ></div>
+
+                            </div>
+
+
+                            <!-- LINK AFILIADO -->
+                            <p class="text-sm text-slate-600">
+
+                                Link afiliado:
+
+                                <a
+                                    id="previewAffiliate"
+                                    href="#"
+                                    class="text-orange-600 hover:underline break-all"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                ></a>
+
+                            </p>
+
+
+                            <!-- DESCRIÇÃO -->
+                            <p
+                                id="previewDescription"
+                                class="text-sm leading-relaxed text-slate-700"
+                            ></p>
+
+
+                            <!-- VÍDEO -->
+                            <div
+                                id="previewVideoContainer"
+                                class="hidden"
+                            >
+
+                                <p class="text-sm font-semibold text-slate-700">
+                                    Vídeo detectado
+                                </p>
+
+                                <video
+                                    id="previewVideo"
+                                    controls
+                                    class="w-full rounded-3xl bg-slate-950/5"
+                                ></video>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <script>
+
+        /*
+         * ============================================================
+         * ELEMENTOS DA INTERFACE
+         * ============================================================
+         */
+
+        const form = document.getElementById('importForm');
+
+        const status = document.getElementById('status');
+
+        const preview = document.getElementById('productPreview');
+
+        const previewImage = document.getElementById('previewImage');
+
+        const previewTitle = document.getElementById('previewTitle');
+
+        const previewPrice = document.getElementById('previewPrice');
+
+        const previewDescription =
+            document.getElementById('previewDescription');
+
+        const previewAffiliate =
+            document.getElementById('previewAffiliate');
+
+        const previewVideoContainer =
+            document.getElementById('previewVideoContainer');
+
+        const previewVideo =
+            document.getElementById('previewVideo');
+
+        const previewVariationsContainer =
+            document.getElementById('previewVariationsContainer');
+
+        const previewVariations =
+            document.getElementById('previewVariations');
+
+        const importAdButton =
+            document.getElementById('importAdButton');
+
+
+        /*
+         * ============================================================
+         * MODO DE IMPORTAÇÃO
+         * ============================================================
+         *
+         * normal     = produto para a loja
+         * propaganda = produto para propaganda
+         *
+         * IMPORTANTE:
+         * O modo é resetado depois de cada operação.
+         * Assim o botão de propaganda não "contamina" a próxima
+         * importação normal.
+         */
+
+        let importMode = 'normal';
+
+
+        /*
+         * ============================================================
+         * BOTÃO DE PROPAGANDA
+         * ============================================================
+         */
+
+        importAdButton.addEventListener('click', () => {
+
+            importMode = 'propaganda';
+
+            form.requestSubmit();
+
+        });
+
+
+        /*
+         * ============================================================
+         * FORMULÁRIO PRINCIPAL
+         * ============================================================
+         */
+
+        form.addEventListener('submit', async (event) => {
+
+            event.preventDefault();
+
+
+            /*
+             * Define o endpoint somente neste momento.
+             * Não deixamos um endpoint persistente no formulário.
+             */
+
+            const activeEndpoint =
+                importMode === 'propaganda'
+                    ? '/api/produtos/import-propaganda'
+                    : '/api/produtos/import';
+
+
+            const activeActionLabel =
+                importMode === 'propaganda'
+                    ? 'produto para propaganda'
+                    : 'produto';
+
+
+            /*
+             * Limpa estado visual anterior.
+             */
+
+            status.className =
+                'mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4';
+
+            status.classList.add('hidden');
+
+            preview.classList.add('hidden');
+
+
+            /*
+             * Obtém os dados do formulário.
+             */
+
+            const formData = new FormData(form);
+
+            const payload = Object.fromEntries(
+                formData.entries()
+            );
+
+
+            /*
+             * Mostra status.
+             */
+
+            status.classList.remove('hidden');
+
+            status.innerHTML = `
+                <p class="text-sm text-slate-600">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                    Importando ${activeActionLabel}...
+                    aguarde.
+                </p>
+            `;
+
+
+            /*
+             * Desabilita os botões durante a importação.
+             */
+
+            const buttons = form.querySelectorAll('button');
+
+            buttons.forEach(button => {
+                button.disabled = true;
+                button.classList.add('opacity-60', 'cursor-not-allowed');
+            });
+
+
+            try {
+
+                /*
+                 * ====================================================
+                 * ENVIA PARA O BACKEND
+                 * ====================================================
+                 */
+
+                const response = await fetch(activeEndpoint, {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify(payload)
+
+                });
+
+
+                /*
+                 * Tenta interpretar JSON.
+                 */
+
+                const result = await response.json();
+
+
+                /*
+                 * Trata erros HTTP.
+                 */
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.error ||
+                        (
+                            result.errors
+                                ? result.errors.join(', ')
+                                : 'Falha na importação'
+                        )
+                    );
+
+                }
+
+
+                /*
+                 * ====================================================
+                 * SUCESSO
+                 * ====================================================
+                 */
+
+                status.className =
+                    'mt-6 rounded-3xl border border-green-200 bg-emerald-50 p-4';
+
+                status.classList.remove('hidden');
+
+
+                status.innerHTML = `
+
+                    <p class="text-sm font-semibold text-emerald-700">
+
+                        <i class="fa-solid fa-circle-check mr-1"></i>
+
+                        Produto importado com sucesso!
+
+                    </p>
+
+                    <p class="text-sm text-slate-600 mt-2">
+
+                        ID:
+                        <strong>${result.id ?? '—'}</strong>
+
+                    </p>
+
+                    <p class="text-sm text-slate-600 mt-1">
+
+                        ${
+                            result.propaganda
+                                ? 'Produto marcado para propaganda.'
+                                : 'Produto disponível na lojinha.'
+                        }
+
+                    </p>
+
+                `;
+
+
+                /*
+                 * ====================================================
+                 * PREVIEW
+                 * ====================================================
+                 */
+
+                previewImage.src =
+                    result.imagem_url || '';
+
+
+                previewTitle.textContent =
+                    result.titulo || '—';
+
+
+                /*
+                 * Preço principal.
+                 *
+                 * A arquitetura futura poderá enviar:
+                 *
+                 * preco_minimo
+                 * preco_maximo
+                 * variacoes
+                 *
+                 * Por enquanto também aceitamos o campo antigo
+                 * "preco".
+                 */
+
+                if (
+                    result.preco_minimo !== undefined &&
+                    result.preco_maximo !== undefined
+                ) {
+
+                    const min =
+                        Number(result.preco_minimo);
+
+                    const max =
+                        Number(result.preco_maximo);
+
+
+                    if (
+                        Number.isFinite(min) &&
+                        Number.isFinite(max)
+                    ) {
+
+                        if (min === max) {
+
+                            previewPrice.textContent =
+                                'R$ ' +
+                                min
+                                    .toFixed(2)
+                                    .replace('.', ',');
+
+                        } else {
+
+                            previewPrice.textContent =
+                                'R$ ' +
+                                min
+                                    .toFixed(2)
+                                    .replace('.', ',') +
+                                ' a R$ ' +
+                                max
+                                    .toFixed(2)
+                                    .replace('.', ',');
+
+                        }
+
+                    } else {
+
+                        previewPrice.textContent = '—';
+
+                    }
+
+                } else if (result.preco) {
+
+                    previewPrice.textContent =
+                        'R$ ' +
+                        Number(result.preco)
+                            .toFixed(2)
+                            .replace('.', ',');
+
+                } else {
+
+                    previewPrice.textContent = '—';
+
+                }
+
+
+                /*
+                 * ====================================================
+                 * VARIAÇÕES
+                 * ====================================================
+                 */
+
+                previewVariations.innerHTML = '';
+
+                const variations =
+                    Array.isArray(result.variacoes)
+                        ? result.variacoes
+                        : [];
+
+
+                if (variations.length > 0) {
+
+                    previewVariationsContainer
+                        .classList
+                        .remove('hidden');
+
+
+                    variations.forEach((variation) => {
+
+                        const item =
+                            document.createElement('div');
+
+                        item.className =
+                            'flex items-center justify-between gap-3 text-xs text-slate-600';
+
+
+                        let variationName =
+                            variation.nome ||
+                            variation.name ||
+                            'Variação';
+
+
+                        let variationPrice =
+                            variation.preco ??
+                            variation.price;
+
+
+                        if (
+                            variationPrice !== undefined &&
+                            variationPrice !== null &&
+                            variationPrice !== ''
+                        ) {
+
+                            const numericPrice =
+                                Number(variationPrice);
+
+
+                            if (
+                                Number.isFinite(numericPrice)
+                            ) {
+
+                                variationPrice =
+                                    'R$ ' +
+                                    numericPrice
+                                        .toFixed(2)
+                                        .replace('.', ',');
+
+                            }
+
+                        } else {
+
+                            variationPrice = '—';
+
+                        }
+
+
+                        item.innerHTML = `
+
+                            <span class="font-medium">
+                                ${escapeHtml(variationName)}
+                            </span>
+
+                            <span class="font-bold text-orange-600">
+                                ${escapeHtml(String(variationPrice))}
+                            </span>
+
+                        `;
+
+
+                        previewVariations.appendChild(item);
+
+                    });
+
+                } else {
+
+                    previewVariationsContainer
+                        .classList
+                        .add('hidden');
+
+                }
+
+
+                /*
+                 * DESCRIÇÃO
+                 */
+
+                previewDescription.textContent =
+                    result.descricao ||
+                    'Sem descrição extra.';
+
+
+                /*
+                 * LINK AFILIADO
+                 */
+
+                previewAffiliate.textContent =
+                    result.link_afiliado ||
+                    '—';
+
+
+                previewAffiliate.href =
+                    result.link_afiliado ||
+                    '#';
+
+
+                /*
+                 * VÍDEO
+                 */
+
+                if (result.video_url) {
+
+                    previewVideoContainer
+                        .classList
+                        .remove('hidden');
+
+                    previewVideo.src =
+                        result.video_url;
+
+                } else {
+
+                    previewVideoContainer
+                        .classList
+                        .add('hidden');
+
+                    previewVideo.src = '';
+
+                }
+
+
+                /*
+                 * Mostra preview.
+                 */
+
+                preview.classList.remove('hidden');
+
+
+                /*
+                 * Limpa o formulário para o próximo produto.
+                 */
+
+                form.reset();
+
+
+            } catch (err) {
+
+                /*
+                 * ====================================================
+                 * ERRO
+                 * ====================================================
+                 */
+
+                status.className =
+                    'mt-6 rounded-3xl border border-red-200 bg-red-50 p-4';
+
+                status.classList.remove('hidden');
+
+
+                status.innerHTML = `
+
+                    <p class="text-sm font-semibold text-red-700">
+
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i>
+
+                        Erro na importação
+
+                    </p>
+
+                    <p class="text-sm text-red-600 mt-2">
+
+                        ${escapeHtml(err.message)}
+
+                    </p>
+
+                `;
+
+
+                console.error(
+                    'Erro na importação:',
+                    err
+                );
+
+            } finally {
+
+                /*
+                 * ====================================================
+                 * RESTAURA INTERFACE
+                 * ====================================================
+                 */
+
+                buttons.forEach(button => {
+
+                    button.disabled = false;
+
+                    button.classList.remove(
+                        'opacity-60',
+                        'cursor-not-allowed'
+                    );
+
+                });
+
+
+                /*
+                 * MUITO IMPORTANTE:
+                 *
+                 * Toda operação termina no modo normal.
+                 *
+                 * Assim:
+                 *
+                 * propaganda → termina
+                 * próxima importação → normal
+                 */
+
+                importMode = 'normal';
+
+            }
+
+        });
+
+
+        /*
+         * ============================================================
+         * FUNÇÃO DE SEGURANÇA PARA TEXTO INSERIDO NO HTML
+         * ============================================================
+         */
+
+        function escapeHtml(value) {
+
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+
+        }
+
+    </script>
+
+</body>
+</html>
