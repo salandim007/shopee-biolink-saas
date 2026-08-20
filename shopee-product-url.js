@@ -1,15 +1,23 @@
 const crypto = require('crypto');
 
+const {
+    createCatalogProduct
+} = require('./product-normalizer');
+
 const SHOPEE_API_ENDPOINT =
     'https://open-api.affiliate.shopee.com.br/graphql';
+
 
 // ============================================================
 // CONFIGURAÇÃO
 // ============================================================
 
 function getShopeeCredentials() {
-    const appId = process.env.SHOPEE_AFFILIATE_APP_ID;
-    const secret = process.env.SHOPEE_AFFILIATE_SECRET;
+    const appId =
+        process.env.SHOPEE_AFFILIATE_APP_ID;
+
+    const secret =
+        process.env.SHOPEE_AFFILIATE_SECRET;
 
     if (!appId) {
         throw new Error(
@@ -35,9 +43,15 @@ function getShopeeCredentials() {
 // ============================================================
 
 function createShopeeAuthorization(payload) {
-    const { appId, secret } = getShopeeCredentials();
+    const {
+        appId,
+        secret
+    } = getShopeeCredentials();
 
-    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const timestamp =
+        Math.floor(
+            Date.now() / 1000
+        ).toString();
 
     const signatureBase =
         appId +
@@ -45,10 +59,11 @@ function createShopeeAuthorization(payload) {
         payload +
         secret;
 
-    const signature = crypto
-        .createHash('sha256')
-        .update(signatureBase)
-        .digest('hex');
+    const signature =
+        crypto
+            .createHash('sha256')
+            .update(signatureBase)
+            .digest('hex');
 
     const authorization =
         `SHA256 Credential=${appId}, ` +
@@ -67,8 +82,13 @@ function createShopeeAuthorization(payload) {
 // ============================================================
 
 function normalizeUrl(url) {
-    if (!url || typeof url !== 'string') {
-        throw new Error('URL da Shopee não informada.');
+    if (
+        !url ||
+        typeof url !== 'string'
+    ) {
+        throw new Error(
+            'URL da Shopee não informada.'
+        );
     }
 
     return url.trim();
@@ -80,28 +100,25 @@ function normalizeUrl(url) {
 // ============================================================
 
 function extractShopeeIds(url) {
-    const cleanUrl = normalizeUrl(url);
+    const cleanUrl =
+        normalizeUrl(url);
 
     const patterns = [
-        // Formato:
-        // https://shopee.com.br/Produto-i.840395204.23697718715
         /-i\.(\d+)\.(\d+)/i,
-
-        // Formato:
-        // https://shopee.com.br/product/840395204/23697718715
         /\/product\/(\d+)\/(\d+)/i,
-
-        // Alguns links podem conter:
-        // shop_id=123&item_id=456
         /shop_id=(\d+).*item_id=(\d+)/i,
-
-        // Ordem inversa:
-        // item_id=456&shop_id=123
         /item_id=(\d+).*shop_id=(\d+)/i
     ];
 
-    for (let index = 0; index < patterns.length; index++) {
-        const match = cleanUrl.match(patterns[index]);
+    for (
+        let index = 0;
+        index < patterns.length;
+        index++
+    ) {
+        const match =
+            cleanUrl.match(
+                patterns[index]
+            );
 
         if (!match) {
             continue;
@@ -132,17 +149,23 @@ function extractShopeeIds(url) {
 // ============================================================
 
 async function resolveShopeeUrl(url) {
-    const cleanUrl = normalizeUrl(url);
+    const cleanUrl =
+        normalizeUrl(url);
 
     let parsedUrl;
 
     try {
-        parsedUrl = new URL(cleanUrl);
+        parsedUrl =
+            new URL(cleanUrl);
     } catch {
-        throw new Error('URL inválida.');
+        throw new Error(
+            'URL inválida.'
+        );
     }
 
-    const host = parsedUrl.hostname.toLowerCase();
+    const host =
+        parsedUrl.hostname
+            .toLowerCase();
 
     const isShortLink =
         host === 's.shopee.com.br' ||
@@ -152,18 +175,27 @@ async function resolveShopeeUrl(url) {
         return cleanUrl;
     }
 
-    console.log('Link curto detectado.');
-    console.log('Resolvendo redirecionamento...');
+    console.log(
+        'Link curto detectado.'
+    );
 
-    const response = await fetch(cleanUrl, {
-        method: 'GET',
-        redirect: 'follow',
-        headers: {
-            'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
-                'AppleWebKit/537.36 Chrome/151 Safari/537.36'
-        }
-    });
+    console.log(
+        'Resolvendo redirecionamento...'
+    );
+
+    const response =
+        await fetch(
+            cleanUrl,
+            {
+                method: 'GET',
+                redirect: 'follow',
+                headers: {
+                    'User-Agent':
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+                        'AppleWebKit/537.36 Chrome/151 Safari/537.36'
+                }
+            }
+        );
 
     if (!response.ok) {
         throw new Error(
@@ -179,9 +211,13 @@ async function resolveShopeeUrl(url) {
 // CONSULTA GRAPHQL
 // ============================================================
 
-async function fetchProductOfferByItemId(itemId) {
+async function fetchProductOfferByItemId(
+    itemId
+) {
     if (!itemId) {
-        throw new Error('itemId não informado.');
+        throw new Error(
+            'itemId não informado.'
+        );
     }
 
     const query = `
@@ -212,27 +248,37 @@ async function fetchProductOfferByItemId(itemId) {
         query
     };
 
-    const payload = JSON.stringify(body);
+    const payload =
+        JSON.stringify(body);
 
     const {
         authorization
-    } = createShopeeAuthorization(payload);
+    } =
+        createShopeeAuthorization(
+            payload
+        );
 
-    const response = await fetch(
-        SHOPEE_API_ENDPOINT,
-        {
-            method: 'POST',
+    const response =
+        await fetch(
+            SHOPEE_API_ENDPOINT,
+            {
+                method: 'POST',
 
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: authorization
-            },
+                headers: {
+                    'Content-Type':
+                        'application/json',
 
-            body: payload
-        }
-    );
+                    Authorization:
+                        authorization
+                },
 
-    const responseText = await response.text();
+                body:
+                    payload
+            }
+        );
+
+    const responseText =
+        await response.text();
 
     if (!response.ok) {
         throw new Error(
@@ -243,17 +289,27 @@ async function fetchProductOfferByItemId(itemId) {
     let json;
 
     try {
-        json = JSON.parse(responseText);
+        json =
+            JSON.parse(
+                responseText
+            );
     } catch {
         throw new Error(
             'Resposta da Shopee não é um JSON válido.'
         );
     }
 
-    if (json.errors && json.errors.length > 0) {
-        const messages = json.errors
-            .map(error => error.message)
-            .join(' | ');
+    if (
+        json.errors &&
+        json.errors.length > 0
+    ) {
+        const messages =
+            json.errors
+                .map(
+                    error =>
+                        error.message
+                )
+                .join(' | ');
 
         throw new Error(
             `Erro GraphQL: ${messages}`
@@ -261,7 +317,8 @@ async function fetchProductOfferByItemId(itemId) {
     }
 
     const offer =
-        json?.data?.productOfferV2;
+        json?.data
+            ?.productOfferV2;
 
     if (!offer) {
         throw new Error(
@@ -270,25 +327,32 @@ async function fetchProductOfferByItemId(itemId) {
     }
 
     const products =
-        Array.isArray(offer.nodes)
+        Array.isArray(
+            offer.nodes
+        )
             ? offer.nodes
             : [];
 
-    if (products.length === 0) {
+    if (
+        products.length === 0
+    ) {
         throw new Error(
             `Nenhum produto encontrado para itemId ${itemId}.`
         );
     }
 
     return {
-        product: products[0],
-        pageInfo: offer.pageInfo || null
+        product:
+            products[0],
+
+        pageInfo:
+            offer.pageInfo || null
     };
 }
 
 
 // ============================================================
-// NORMALIZA RETORNO PARA MODELO INTERNO
+// ADAPTADOR API SHOPEE -> MODELO DE CATÁLOGO
 // ============================================================
 
 function normalizeApiProduct({
@@ -304,96 +368,116 @@ function normalizeApiProduct({
         );
     }
 
-    const price = Number(apiProduct.price);
+    return createCatalogProduct({
+        source:
+            'shopee_api',
 
-    const commissionRate =
-        apiProduct.commissionRate === null ||
-        apiProduct.commissionRate === undefined
-            ? null
-            : Number(apiProduct.commissionRate);
-
-    return {
-        source: 'shopee_api',
-
-        marketplace: 'shopee',
+        marketplace:
+            'shopee',
 
         itemId:
-            String(apiProduct.itemId || itemId),
+            apiProduct.itemId ||
+            itemId,
 
         shopId:
-            shopId
-                ? String(shopId)
-                : null,
+            shopId,
 
         title:
-            apiProduct.productName || '',
+            apiProduct.productName,
+
+        description:
+            null,
 
         price:
-            Number.isFinite(price)
-                ? price
-                : null,
+            apiProduct.price,
 
-        originalPrice: null,
+        originalPrice:
+            null,
 
         minPrice:
-            Number.isFinite(price)
-                ? price
-                : null,
+            apiProduct.price,
 
         maxPrice:
-            Number.isFinite(price)
-                ? price
-                : null,
+            apiProduct.price,
 
-        currency: 'BRL',
+        currency:
+            'BRL',
 
         image:
-            apiProduct.imageUrl || '',
+            apiProduct.imageUrl,
 
-        video: null,
+        video:
+            null,
 
         shopName:
-            apiProduct.shopName || '',
+            apiProduct.shopName,
 
         commissionRate:
-            Number.isFinite(commissionRate)
-                ? commissionRate
-                : null,
+            apiProduct.commissionRate,
 
-        category1: null,
-        category2: null,
-        category3: null,
+        category1:
+            null,
 
-        originalUrl,
+        category2:
+            null,
 
-        resolvedUrl,
+        category3:
+            null,
+
+        originalUrl:
+            originalUrl,
+
+        resolvedUrl:
+            resolvedUrl,
 
         affiliateLink:
-            apiProduct.offerLink || '',
+            apiProduct.offerLink,
 
-        available: null
-    };
+        available:
+            null,
+
+        metadata: {
+            provider:
+                'Shopee Affiliate Open API',
+
+            operation:
+                'productOfferV2'
+        }
+    });
 }
 
 
 // ============================================================
 // FLUXO COMPLETO
-// URL -> IDs -> API -> NORMALIZAÇÃO
+// URL -> IDs -> API -> CATÁLOGO NORMALIZADO
 // ============================================================
 
-async function getShopeeProductFromUrl(inputUrl) {
-    const originalUrl = normalizeUrl(inputUrl);
+async function getShopeeProductFromUrl(
+    inputUrl
+) {
+    const originalUrl =
+        normalizeUrl(
+            inputUrl
+        );
 
-    let resolvedUrl = originalUrl;
+    let resolvedUrl =
+        originalUrl;
 
-    let ids = extractShopeeIds(resolvedUrl);
+    let ids =
+        extractShopeeIds(
+            resolvedUrl
+        );
 
     if (!ids.itemId) {
         resolvedUrl =
-            await resolveShopeeUrl(originalUrl);
+            await resolveShopeeUrl(
+                originalUrl
+            );
 
         ids =
-            extractShopeeIds(resolvedUrl);
+            extractShopeeIds(
+                resolvedUrl
+            );
     }
 
     if (!ids.itemId) {
@@ -403,22 +487,46 @@ async function getShopeeProductFromUrl(inputUrl) {
     }
 
     console.log('');
-    console.log('========================================');
-    console.log('SHOPEE URL -> API');
-    console.log('========================================');
+    console.log(
+        '========================================'
+    );
 
-    console.log(`URL ORIGINAL: ${originalUrl}`);
+    console.log(
+        'SHOPEE URL -> API -> CATÁLOGO'
+    );
 
-    if (resolvedUrl !== originalUrl) {
-        console.log(`URL RESOLVIDA: ${resolvedUrl}`);
+    console.log(
+        '========================================'
+    );
+
+    console.log(
+        `URL ORIGINAL: ${originalUrl}`
+    );
+
+    if (
+        resolvedUrl !==
+        originalUrl
+    ) {
+        console.log(
+            `URL RESOLVIDA: ${resolvedUrl}`
+        );
     }
 
     console.log('');
-    console.log(`SHOP ID: ${ids.shopId || 'não identificado'}`);
-    console.log(`ITEM ID: ${ids.itemId}`);
+
+    console.log(
+        `SHOP ID: ${ids.shopId || 'não identificado'}`
+    );
+
+    console.log(
+        `ITEM ID: ${ids.itemId}`
+    );
 
     console.log('');
-    console.log('Consultando productOfferV2...');
+
+    console.log(
+        'Consultando productOfferV2...'
+    );
 
     const result =
         await fetchProductOfferByItemId(
@@ -427,16 +535,26 @@ async function getShopeeProductFromUrl(inputUrl) {
 
     const normalized =
         normalizeApiProduct({
-            apiProduct: result.product,
+            apiProduct:
+                result.product,
+
             originalUrl,
+
             resolvedUrl,
-            shopId: ids.shopId,
-            itemId: ids.itemId
+
+            shopId:
+                ids.shopId,
+
+            itemId:
+                ids.itemId
         });
 
     return {
-        product: normalized,
-        pageInfo: result.pageInfo
+        product:
+            normalized,
+
+        pageInfo:
+            result.pageInfo
     };
 }
 
@@ -455,9 +573,11 @@ async function main() {
     if (!inputUrl) {
         console.log('');
         console.log('Uso:');
+
         console.log(
             'node shopee-product-url.js "URL_DO_PRODUTO_SHOPEE"'
         );
+
         console.log('');
 
         process.exitCode = 1;
@@ -471,9 +591,17 @@ async function main() {
             );
 
         console.log('');
-        console.log('========================================');
-        console.log('PRODUTO NORMALIZADO');
-        console.log('========================================');
+        console.log(
+            '========================================'
+        );
+
+        console.log(
+            'PRODUTO DO CATÁLOGO'
+        );
+
+        console.log(
+            '========================================'
+        );
 
         console.dir(
             result.product,
@@ -484,7 +612,9 @@ async function main() {
         );
 
         console.log('');
-        console.log('PAGE INFO:');
+        console.log(
+            'PAGE INFO:'
+        );
 
         console.dir(
             result.pageInfo,
@@ -495,17 +625,56 @@ async function main() {
         );
 
         console.log('');
-        console.log('========================================');
-        console.log('TESTE CONCLUÍDO');
-        console.log('========================================');
+        console.log(
+            '========================================'
+        );
+
+        console.log(
+            'TESTE CONCLUÍDO'
+        );
+
+        console.log(
+            '========================================'
+        );
     } catch (error) {
         console.error('');
-        console.error('========================================');
-        console.error('ERRO');
-        console.error('========================================');
         console.error(
-            error.message || error
+            '========================================'
         );
+
+        console.error(
+            'ERRO'
+        );
+
+        console.error(
+            '========================================'
+        );
+
+        console.error(
+            error.message ||
+            error
+        );
+
+        if (
+            Array.isArray(
+                error.validationErrors
+            )
+        ) {
+            console.error('');
+
+            console.error(
+                'ERROS DE VALIDAÇÃO:'
+            );
+
+            for (
+                const validationError
+                of error.validationErrors
+            ) {
+                console.error(
+                    `- ${validationError}`
+                );
+            }
+        }
 
         process.exitCode = 1;
     }
@@ -513,7 +682,7 @@ async function main() {
 
 
 // ============================================================
-// EXPORTS PARA FUTURA INTEGRAÇÃO DA VITRINE 2
+// EXPORTS
 // ============================================================
 
 module.exports = {
@@ -525,6 +694,8 @@ module.exports = {
 };
 
 
-if (require.main === module) {
+if (
+    require.main === module
+) {
     main();
 }
