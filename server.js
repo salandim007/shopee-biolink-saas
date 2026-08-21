@@ -7,6 +7,8 @@ const http = require('http');
 const puppeteer = require('puppeteer-core');
 const { URL } = require('url');
 
+const { defaultVitrine2Router } = require('./vitrine2-routes');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const CHROME_EXECUTABLE_PATH = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
@@ -14,6 +16,9 @@ const CHROME_EXECUTABLE_PATH = process.env.CHROME_PATH || 'C:\\Program Files\\Go
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/api/vitrine2', defaultVitrine2Router);
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -1124,7 +1129,7 @@ async function fetchPriceWithPuppeteer(pageUrl) {
 
         defaultViewport: null,
 
-        userDataDir: path.join(__dirname, 'chrome-shopee-profile'),
+        userDataDir: path.join(__dirname, 'chrome-shopee-profile-test'),
 
         args: [
             '--no-sandbox',
@@ -1137,6 +1142,21 @@ async function fetchPriceWithPuppeteer(pageUrl) {
     try {
 
         const page = await browser.newPage();
+        page.on('console', msg => {
+    console.log('BROWSER CONSOLE:', msg.type(), msg.text());
+});
+
+page.on('pageerror', error => {
+    console.log('BROWSER PAGE ERROR:', error.message);
+});
+
+page.on('requestfailed', request => {
+    console.log(
+        'REQUEST FAILED:',
+        request.url(),
+        request.failure()?.errorText
+    );
+});
 
         await page.setViewport({
             width: 1366,
@@ -1159,7 +1179,20 @@ async function fetchPriceWithPuppeteer(pageUrl) {
     timeout: 60000
 });
 
-await new Promise(resolve => setTimeout(resolve, 8000));
+console.log('\n========================================');
+console.log('ESTADO VISUAL DA PÁGINA');
+console.log('URL FINAL:', page.url());
+console.log('TÍTULO:', await page.title());
+console.log(
+    'BODY:',
+    await page.evaluate(() =>
+        document.body?.innerText?.substring(0, 1000) || ''
+    )
+);
+console.log('========================================\n');
+
+await new Promise(resolve => setTimeout(resolve, 15000));
+
 
 console.log('\n========================================');
 console.log('DIAGNÓSTICO DE NAVEGAÇÃO');
@@ -1406,6 +1439,302 @@ console.log('========================================\n');
         await browser.close();
     }
 }
+// ============================================================
+// CAPTURA AUTOMÁTICA DO JSON REAL DA SHOPEE VIA CHROME
+// ============================================================
+
+async function captureShopeeProductWithBrowser(productUrl) {
+    const { shopId, itemId } = extractShopeeIds(productUrl);
+
+    console.log('\n========================================');
+    console.log('CAPTURA AUTOMÁTICA SHOPEE');
+    console.log('SHOP ID:', shopId);
+    console.log('ITEM ID:', itemId);
+    console.log('URL:', productUrl);
+    console.log('========================================');
+
+    const browser = await puppeteer.launch({
+        executablePath: CHROME_EXECUTABLE_PATH,
+
+        headless: false,
+
+        defaultViewport: null,
+
+        userDataDir: path.join(
+    __dirname,
+    'chrome-shopee-profile-test'
+),
+
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--start-maximized',
+            '--lang=pt-BR'
+        ]
+    });
+
+    let page;
+
+    try {
+        page = await browser.newPage();
+
+        await page.setViewport({
+            width: 1366,
+            height: 900
+        });
+
+        await page.setUserAgent(
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+            'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+            'Chrome/131.0.0.0 Safari/537.36'
+        );
+
+        let capturedJson = null;
+        let capturedUrl = null;
+
+        const capturePromise = new Promise((resolve) => {
+            const timeout = setTimeout(() => {
+                resolve(null);
+            }, 30000);
+
+            page.on('response', async (response) => {
+                try {
+                    const responseUrl = response.url();
+
+                    if (responseUrl.includes('/api/v4/pdp/get_pc')) {
+    console.log('\nGET_PC INTERCEPTADO:');
+    console.log(responseUrl);
+    console.log(
+    'HORÁRIO:',
+    new Date().toISOString()
+);
+}
+
+                    if (
+                        !responseUrl.includes(
+                            '/api/v4/pdp/get_pc'
+                        )
+                    ) {
+                        return;
+                    }
+
+                    console.log('\n----------------------------------------');
+                console.log('GET_PC - RESPOSTA INTERCEPTADA');
+                console.log('STATUS:', response.status());
+                console.log(
+            'CONTENT-TYPE:',
+            response.headers()['content-type']
+);
+console.log('URL:', responseUrl);
+console.log('----------------------------------------');
+
+                    const parsedUrl =
+                        new URL(responseUrl);
+
+                    const responseItemId =
+                        parsedUrl.searchParams.get(
+                            'item_id'
+                        );
+
+                    const responseShopId =
+                        parsedUrl.searchParams.get(
+                            'shop_id'
+                        );
+
+                    if (
+                        String(responseItemId) !==
+                            String(itemId) ||
+                        String(responseShopId) !==
+                            String(shopId)
+                    ) {
+                        return;
+                    }
+
+                    if (response.status() !== 200) {
+                        console.log(
+                            'get_pc encontrado, mas HTTP:',
+                            response.status()
+                        );
+
+                        return;
+                    }
+
+let json;
+
+try {
+    json = await response.json();
+} catch (jsonError) {
+    console.log('\n========================================');
+    console.log('GET_PC NÃO PÔDE SER CONVERTIDO EM JSON');
+    console.log('========================================');
+    console.log('ERRO:', jsonError.message);
+
+    try {
+        const body = await response.text();
+
+        console.log(
+            'CORPO RECEBIDO:',
+            body.substring(0, 2000)
+        );
+    } catch (bodyError) {
+        console.log(
+            'Também não foi possível ler o corpo:',
+            bodyError.message
+        );
+    }
+
+    console.log('========================================\n');
+
+    return;
+}
+                if (
+                   !json ||
+                   !json.data ||
+                   !json.data.item
+) {
+    console.log('\n========================================');
+    console.log('GET_PC RECEBIDO, MAS ESTRUTURA DIFERENTE');
+    console.log('========================================');
+
+    console.log(
+        'CHAVES PRINCIPAIS:',
+        json ? Object.keys(json) : []
+    );
+
+    console.log(
+        'CHAVES DE DATA:',
+        json?.data ? Object.keys(json.data) : []
+    );
+
+    console.log(
+        'ERROR:',
+        json?.error
+    );
+
+    console.log(
+        'ERROR_MSG:',
+        json?.error_msg
+    );
+
+    console.log(
+        'MESSAGE:',
+        json?.message
+    );
+
+    console.log('JSON RESUMIDO:');
+
+    console.dir(json, {
+        depth: 3,
+        colors: true,
+        maxArrayLength: 10
+    });
+
+    console.log('========================================\n');
+
+    return;
+}
+
+                    capturedJson = json;
+                    capturedUrl = responseUrl;
+
+                    clearTimeout(timeout);
+
+                    resolve({
+                        raw: capturedJson,
+                        sourceUrl: capturedUrl
+                    });
+
+                } catch (error) {
+                    console.error(
+                        'Erro ao analisar resposta get_pc:',
+                        error.message
+                    );
+                }
+            });
+        });
+
+        console.log(
+            'Abrindo produto no Chrome...'
+        );
+
+        await page.goto(productUrl, {
+            waitUntil: 'domcontentloaded',
+            timeout: 60000
+        });
+
+        console.log('\n========================================');
+console.log('ESTADO VISUAL DA PÁGINA');
+console.log('URL FINAL:', page.url());
+console.log('TÍTULO:', await page.title());
+console.log(
+    'BODY:',
+    await page.evaluate(() =>
+        document.body?.innerText?.substring(0, 1000) || ''
+    )
+);
+console.log('========================================\n');
+
+await new Promise(resolve => setTimeout(resolve, 15000));
+
+        const captured =
+            await capturePromise;
+
+        if (!captured?.raw) {
+            throw new Error(
+                'A Shopee não retornou o JSON get_pc válido para este produto.'
+            );
+        }
+
+        console.log('\n========================================');
+        console.log('GET_PC CAPTURADO COM SUCESSO');
+        console.log('========================================');
+        console.log('SHOP ID:', shopId);
+        console.log('ITEM ID:', itemId);
+        console.log('HTTP/API:', captured.sourceUrl);
+        console.log('========================================\n');
+
+        return {
+            shopId,
+            itemId,
+            sourceUrl: captured.sourceUrl,
+            raw: captured.raw
+        };
+
+    } finally {
+        console.log('TESTE: navegador mantido aberto para verificar sessão/login da Shopee.');
+    // await browser.close();
+    }
+}
+
+app.get('/teste-captura-shopee', async (req, res) => {
+    try {
+        const url = req.query.url;
+
+        if (!url) {
+            return res.status(400).json({
+                error: 'Informe ?url=URL_DO_PRODUTO'
+            });
+        }
+
+        const result = await captureShopeeProductWithBrowser(url);
+
+        res.json({
+            ok: true,
+            shopId: result.shopId,
+            itemId: result.itemId,
+            sourceUrl: result.sourceUrl,
+            hasItem: !!result.raw?.data?.item
+        });
+
+    } catch (error) {
+        console.error('Erro no teste de captura:', error);
+
+        res.status(500).json({
+            ok: false,
+            error: error.message
+        });
+    }
+});
 
 // Configuração inicial do banco de dados
 db.serialize(() => {
@@ -1668,6 +1997,13 @@ try {
     );
 }
 
+const precoValido = parseFloat(product.preco);
+
+if (!precoValido || precoValido <= 0) {
+    return res.status(422).json({
+        error: 'Produto sem preço confiável. Importação cancelada.'
+    });
+}
             ensureCategory(product.categoria_nome, (err, categoryId) => {
                 if (err) {
                     console.error(err);
@@ -1675,7 +2011,7 @@ try {
                 }
                 db.run(
                     `INSERT INTO produtos (usuario_id, categoria_id, titulo, preco_original, preco_oferta, imagem_url, video_url, link_afiliado, url_original, propaganda_importado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
-                    [usuario_id, categoryId, product.titulo, null, parseFloat(product.preco) || 0, product.imagem_url, product.video_url || null, product.link_afiliado, normalizedUrl],
+                    [usuario_id, categoryId, product.titulo, null, precoValido, product.imagem_url, product.video_url || null, product.link_afiliado, normalizedUrl],
                     function (err) {
                         if (err) {
                             console.error(err);
@@ -1720,6 +2056,13 @@ app.post('/api/produtos/import-propaganda', async (req, res) => {
                 console.error('Puppeteer error:', puErr.message || puErr);
             }
         }
+const precoValido = parseFloat(product.preco);
+
+if (!precoValido || precoValido <= 0) {
+    return res.status(422).json({
+        error: 'Produto sem preço confiável. Importação cancelada.'
+    });
+}
 
         ensureCategory(product.categoria_nome, (err, categoryId) => {
             if (err) {
@@ -1728,7 +2071,7 @@ app.post('/api/produtos/import-propaganda', async (req, res) => {
             }
             db.run(
                 `INSERT INTO produtos (usuario_id, categoria_id, titulo, preco_original, preco_oferta, imagem_url, video_url, link_afiliado, propaganda_importado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-                [usuario_id, categoryId, product.titulo, null, parseFloat(product.preco) || 0, product.imagem_url, product.video_url || null, product.link_afiliado],
+                [usuario_id, categoryId, product.titulo, null, precoValido, product.imagem_url, product.video_url || null, product.link_afiliado],
                 function (err) {
                     if (err) {
                         console.error(err);
