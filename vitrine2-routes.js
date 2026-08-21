@@ -4,12 +4,13 @@ const {
     defaultVitrine2Service
 } = require('./vitrine2-service');
 
+const {
+    toPublicCatalogEntries
+} = require('./vitrine2-public-product');
 
-function createVitrine2Router(
-    options = {}
-) {
-    const router =
-        express.Router();
+
+function createVitrine2Router(options = {}) {
+    const router = express.Router();
 
     const service =
         options.service ||
@@ -17,55 +18,62 @@ function createVitrine2Router(
 
 
     /*
+     * ============================================================
+     * ADMIN
+     * ============================================================
+     *
      * GET /api/vitrine2/products
      *
-     * Lista todos os produtos do catálogo.
+     * Lista todos os produtos com os dados internos completos.
      *
-     * Uso futuro:
-     * Admin da Vitrine 2.
+     * Esta rota é destinada ao futuro painel Admin.
+     *
+     * commissionRate pode existir aqui.
      */
-    router.get(
-        '/products',
-        (req, res) => {
-            try {
-                const products =
-                    service.listAll();
+    router.get('/products', (req, res) => {
+        try {
+            const products =
+                service.listAll();
 
-                res.json({
-                    success: true,
-                    count: products.length,
-                    products
-                });
-            } catch (error) {
-                console.error(
-                    '[VITRINE2] Erro ao listar produtos:',
-                    error
-                );
+            res.json({
+                success: true,
+                count: products.length,
+                products
+            });
+        } catch (error) {
+            console.error(
+                '[VITRINE2] Erro ao listar produtos:',
+                error
+            );
 
-                res.status(500).json({
-                    success: false,
-                    error:
-                        'Não foi possível listar os produtos.'
-                });
-            }
+            res.status(500).json({
+                success: false,
+                error:
+                    'Não foi possível listar os produtos.'
+            });
         }
-    );
+    });
 
 
     /*
+     * ============================================================
+     * VITRINE PÚBLICA
+     * ============================================================
+     *
      * GET /api/vitrine2/products/published
      *
-     * Lista somente produtos publicados.
+     * Somente produtos publicados.
      *
-     * Uso futuro:
-     * Vitrine pública.
+     * Dados privados são removidos antes da resposta.
      */
     router.get(
         '/products/published',
         (req, res) => {
             try {
                 const products =
-                    service.listPublished();
+                    toPublicCatalogEntries(
+                        service.listPublished()
+                    );
 
                 res.json({
                     success: true,
@@ -91,15 +99,18 @@ function createVitrine2Router(
     /*
      * GET /api/vitrine2/products/featured
      *
-     * Lista somente os produtos publicados
-     * que também estão marcados como destaque.
+     * Produtos publicados e destacados.
+     *
+     * Também usa o filtro público.
      */
     router.get(
         '/products/featured',
         (req, res) => {
             try {
                 const products =
-                    service.listFeatured();
+                    toPublicCatalogEntries(
+                        service.listFeatured()
+                    );
 
                 res.json({
                     success: true,
@@ -125,9 +136,13 @@ function createVitrine2Router(
     /*
      * GET /api/vitrine2/collections/:collection
      *
-     * Exemplo:
+     * Exemplos:
      *
      * /api/vitrine2/collections/promocoes
+     * /api/vitrine2/collections/novidades
+     * /api/vitrine2/collections/tendencias
+     *
+     * Também usa o filtro público.
      */
     router.get(
         '/collections/:collection',
@@ -150,8 +165,10 @@ function createVitrine2Router(
                 }
 
                 const products =
-                    service.listByCollection(
-                        collection
+                    toPublicCatalogEntries(
+                        service.listByCollection(
+                            collection
+                        )
                     );
 
                 res.json({
@@ -177,9 +194,14 @@ function createVitrine2Router(
 
 
     /*
+     * ============================================================
+     * IMPORTAÇÃO
+     * ============================================================
+     *
      * POST /api/vitrine2/import/api
      *
-     * Importa produto pela Shopee Affiliate API.
+     * Importa produto diretamente pela
+     * Shopee Affiliate Open API.
      *
      * Body:
      *
@@ -247,7 +269,12 @@ function createVitrine2Router(
 
 
     /*
-     * PATCH /api/vitrine2/products/:marketplace/:itemId/published
+     * ============================================================
+     * PUBLICAÇÃO
+     * ============================================================
+     *
+     * PATCH
+     * /api/vitrine2/products/:marketplace/:itemId/published
      *
      * Body:
      *
@@ -308,7 +335,12 @@ function createVitrine2Router(
 
 
     /*
-     * PATCH /api/vitrine2/products/:marketplace/:itemId/featured
+     * ============================================================
+     * DESTAQUE
+     * ============================================================
+     *
+     * PATCH
+     * /api/vitrine2/products/:marketplace/:itemId/featured
      *
      * Body:
      *
@@ -369,7 +401,12 @@ function createVitrine2Router(
 
 
     /*
-     * PATCH /api/vitrine2/products/:marketplace/:itemId/position
+     * ============================================================
+     * POSIÇÃO
+     * ============================================================
+     *
+     * PATCH
+     * /api/vitrine2/products/:marketplace/:itemId/position
      *
      * Body:
      *
@@ -419,7 +456,12 @@ function createVitrine2Router(
 
 
     /*
-     * POST /api/vitrine2/products/:marketplace/:itemId/collections
+     * ============================================================
+     * COLEÇÕES
+     * ============================================================
+     *
+     * POST
+     * /api/vitrine2/products/:marketplace/:itemId/collections
      *
      * Body:
      *
@@ -481,7 +523,8 @@ function createVitrine2Router(
 
 
     /*
-     * DELETE /api/vitrine2/products/:marketplace/:itemId/collections/:collection
+     * DELETE
+     * /api/vitrine2/products/:marketplace/:itemId/collections/:collection
      */
     router.delete(
         '/products/:marketplace/:itemId/collections/:collection',
@@ -529,7 +572,12 @@ function createVitrine2Router(
 
 
     /*
-     * DELETE /api/vitrine2/products/:marketplace/:itemId
+     * ============================================================
+     * REMOVER PRODUTO
+     * ============================================================
+     *
+     * DELETE
+     * /api/vitrine2/products/:marketplace/:itemId
      */
     router.delete(
         '/products/:marketplace/:itemId',
