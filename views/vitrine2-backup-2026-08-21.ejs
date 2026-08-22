@@ -1,0 +1,2904 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Vitrine de ofertas, achadinhos e produtos selecionados."
+    >
+
+    <title>Vitrine 2 | Ofertas e Achadinhos</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <!-- Google Fonts -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                linear-gradient(
+                    180deg,
+                    #f4f8ff 0,
+                    #ffffff 260px
+                );
+            color: #172033;
+        }
+
+        .container-main {
+            width: min(1380px, calc(100% - 32px));
+            margin-inline: auto;
+        }
+
+        .hide-scrollbar {
+            scrollbar-width: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .topbar-gradient {
+            background:
+                linear-gradient(
+                    90deg,
+                    #1d4ed8,
+                    #2563eb
+                );
+        }
+
+        .hero-gradient {
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(147, 197, 253, .34),
+                    transparent 42%
+                ),
+                linear-gradient(
+                    135deg,
+                    #1e40af 0%,
+                    #2563eb 52%,
+                    #3b82f6 100%
+                );
+        }
+
+        .product-card {
+            transition:
+                transform .22s ease,
+                box-shadow .22s ease,
+                border-color .22s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 18px 38px rgba(15, 23, 42, .10);
+            border-color: #bfdbfe;
+        }
+
+        .product-image {
+            transition: transform .35s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.04);
+        }
+
+        .section-title::before {
+            content: "";
+            width: 6px;
+            height: 28px;
+            border-radius: 999px;
+            background: #2563eb;
+            display: inline-block;
+            margin-right: 12px;
+        }
+
+        .skeleton {
+            background:
+                linear-gradient(
+                    90deg,
+                    #f1f5f9 25%,
+                    #e2e8f0 37%,
+                    #f1f5f9 63%
+                );
+            background-size: 400% 100%;
+            animation: skeleton-loading 1.3s ease infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0 50%;
+            }
+        }
+
+        .category-chip {
+            transition: all .2s ease;
+        }
+
+        .category-chip:hover {
+            transform: translateY(-1px);
+        }
+
+        .category-chip.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+            box-shadow:
+                0 8px 20px rgba(37, 99, 235, .20);
+        }
+
+        .hero-product-image {
+            filter:
+                drop-shadow(
+                    0 30px 40px rgba(30, 64, 175, .20)
+                );
+        }
+
+        .floating-search {
+            box-shadow:
+                0 12px 35px rgba(15, 23, 42, .08);
+        }
+
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform .25s ease;
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ====================================================== -->
+    <!-- TOP BAR                                                -->
+    <!-- ====================================================== -->
+
+    <div class="topbar-gradient text-white">
+
+        <div
+            class="
+                container-main
+                min-h-[38px]
+                flex
+                items-center
+                justify-center
+                md:justify-between
+                gap-4
+                text-xs
+                md:text-sm
+                font-medium
+            "
+        >
+
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i>
+
+                <span>
+                    Ofertas escolhidas para você
+                </span>
+            </div>
+
+            <div
+                class="
+                    hidden
+                    md:flex
+                    items-center
+                    gap-6
+                    opacity-95
+                "
+            >
+                <span>
+                    <i class="fa-solid fa-shield-halved mr-1"></i>
+                    Compra pela Shopee
+                </span>
+
+                <span>
+                    <i class="fa-solid fa-tags mr-1"></i>
+                    Achadinhos todos os dias
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- HEADER                                                 -->
+    <!-- ====================================================== -->
+
+    <header
+        class="
+            bg-white/95
+            backdrop-blur
+            sticky
+            top-0
+            z-40
+            border-b
+            border-slate-100
+        "
+    >
+
+        <div
+            class="
+                container-main
+                h-[64px]
+                flex
+                items-center
+                gap-5
+            "
+        >
+
+            <!-- LOGO -->
+
+            <a
+                href="/vitrine2"
+                class="
+                    flex
+                    items-center
+                    gap-3
+                    shrink-0
+                "
+            >
+
+                <div
+                    class="
+                        w-11
+                        h-11
+                        rounded-2xl
+                        bg-blue-500
+                        text-white
+                        flex
+                        items-center
+                        justify-center
+                        shadow-lg
+                        shadow-blue-200
+                    "
+                >
+                    <i class="fa-solid fa-bag-shopping text-xl"></i>
+                </div>
+
+                <div class="hidden sm:block">
+
+                    <div
+                        class="
+                            text-lg
+                            font-extrabold
+                            leading-none
+                            tracking-tight
+                        "
+                    >
+                        Minha Vitrine
+                    </div>
+
+                    <div
+                        class="
+                            text-[11px]
+                            text-slate-500
+                            mt-1
+                        "
+                    >
+                        Ofertas & Achadinhos
+                    </div>
+
+                </div>
+
+            </a>
+
+
+            <!-- SEARCH -->
+
+            <div
+                class="
+                    hidden
+                    md:flex
+                    flex-1
+                    max-w-3xl
+                    mx-auto
+                    relative
+                "
+            >
+
+                <i
+                    class="
+                        fa-solid
+                        fa-magnifying-glass
+                        absolute
+                        left-5
+                        top-1/2
+                        -translate-y-1/2
+                        text-slate-400
+                    "
+                ></i>
+
+                <input
+                    id="desktopSearch"
+                    type="search"
+                    placeholder="Buscar produtos e categorias..."
+                    autocomplete="off"
+                    class="
+                        floating-search
+                        w-full
+                        h-12
+                        rounded-full
+                        border
+                        border-slate-200
+                        bg-slate-50
+                        pl-12
+                        pr-5
+                        outline-none
+                        focus:bg-white
+                        focus:border-blue-400
+                        transition
+                    "
+                >
+
+            </div>
+
+
+            <!-- DESKTOP NAV -->
+
+            <div
+                class="
+                    hidden
+                    lg:flex
+                    items-center
+                    gap-5
+                    text-sm
+                    font-semibold
+                    text-slate-600
+                    shrink-0
+                "
+            >
+
+                <button
+                    onclick="scrollToSection('ofertas')"
+                    class="hover:text-blue-700 transition"
+                >
+                    Ofertas
+                </button>
+
+                <button
+                    onclick="scrollToSection('destaques')"
+                    class="hover:text-blue-700 transition"
+                >
+                    Destaques
+                </button>
+
+                <button
+                    onclick="scrollToSection('todos')"
+                    class="hover:text-blue-700 transition"
+                >
+                    Produtos
+                </button>
+
+            </div>
+
+
+            <!-- MOBILE MENU BUTTON -->
+
+            <button
+                id="mobileMenuButton"
+                class="
+                    lg:hidden
+                    ml-auto
+                    w-11
+                    h-11
+                    rounded-xl
+                    border
+                    border-slate-200
+                    flex
+                    items-center
+                    justify-center
+                    text-slate-600
+                "
+                aria-label="Abrir menu"
+            >
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+
+        </div>
+
+
+        <!-- MOBILE SEARCH -->
+
+        <div
+            class="
+                md:hidden
+                container-main
+                pb-4
+            "
+        >
+
+            <div class="relative">
+
+                <i
+                    class="
+                        fa-solid
+                        fa-magnifying-glass
+                        absolute
+                        left-4
+                        top-1/2
+                        -translate-y-1/2
+                        text-slate-400
+                    "
+                ></i>
+
+                <input
+                    id="mobileSearch"
+                    type="search"
+                    placeholder="O que você está procurando?"
+                    autocomplete="off"
+                    class="
+                        w-full
+                        h-11
+                        rounded-full
+                        border
+                        border-slate-200
+                        bg-slate-50
+                        pl-11
+                        pr-4
+                        outline-none
+                        focus:border-blue-400
+                    "
+                >
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ====================================================== -->
+    <!-- MOBILE MENU                                            -->
+    <!-- ====================================================== -->
+
+    <div
+        id="mobileMenu"
+        class="
+            mobile-menu
+            fixed
+            inset-y-0
+            right-0
+            z-50
+            w-[82%]
+            max-w-sm
+            bg-white
+            shadow-2xl
+            p-6
+        "
+    >
+
+        <div
+            class="
+                flex
+                items-center
+                justify-between
+                mb-8
+            "
+        >
+
+            <strong class="text-xl">
+                Menu
+            </strong>
+
+            <button
+                id="mobileMenuClose"
+                class="
+                    w-10
+                    h-10
+                    rounded-full
+                    bg-slate-100
+                "
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <div class="space-y-2">
+
+            <button
+                onclick="mobileNavigate('ofertas')"
+                class="
+                    w-full
+                    text-left
+                    px-4
+                    py-4
+                    rounded-xl
+                    hover:bg-blue-50
+                    font-semibold
+                "
+            >
+                <i class="fa-solid fa-fire mr-3 text-blue-500"></i>
+                Ofertas
+            </button>
+
+            <button
+                onclick="mobileNavigate('destaques')"
+                class="
+                    w-full
+                    text-left
+                    px-4
+                    py-4
+                    rounded-xl
+                    hover:bg-blue-50
+                    font-semibold
+                "
+            >
+                <i class="fa-solid fa-star mr-3 text-blue-500"></i>
+                Destaques
+            </button>
+
+            <button
+                onclick="mobileNavigate('todos')"
+                class="
+                    w-full
+                    text-left
+                    px-4
+                    py-4
+                    rounded-xl
+                    hover:bg-blue-50
+                    font-semibold
+                "
+            >
+                <i class="fa-solid fa-store mr-3 text-blue-500"></i>
+                Todos os produtos
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="mobileOverlay"
+        class="
+            hidden
+            fixed
+            inset-0
+            bg-slate-950/40
+            z-40
+            backdrop-blur-sm
+        "
+    ></div>
+
+
+    <!-- ====================================================== -->
+    <!-- MAIN                                                   -->
+    <!-- ====================================================== -->
+
+    <main>
+
+
+        <!-- ================================================== -->
+        <!-- HERO                                               -->
+        <!-- ================================================== -->
+
+        <section class="container-main pt-4 md:pt-6">
+
+            <div
+                id="hero"
+                class="
+                    hero-gradient
+                    rounded-[24px]
+                    md:rounded-[30px]
+                    overflow-hidden
+                    relative
+                    text-white
+                "
+            >
+
+                <div
+                    class="
+                        px-6
+                        py-7
+                        sm:px-8
+                        md:px-10
+                        md:py-9
+                        relative
+                        z-10
+                    "
+                >
+
+                    <div
+                        class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            bg-white/15
+                            border
+                            border-white/20
+                            px-3
+                            py-1.5
+                            rounded-full
+                            text-xs
+                            sm:text-sm
+                            font-semibold
+                            mb-4
+                        "
+                    >
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        Achadinhos & ofertas
+                    </div>
+
+                    <h1
+                        class="
+                            text-[27px]
+                            sm:text-3xl
+                            md:text-4xl
+                            font-extrabold
+                            tracking-tight
+                            leading-tight
+                            max-w-3xl
+                        "
+                    >
+                        Achadinhos escolhidos para você
+                    </h1>
+
+                    <p
+                        class="
+                            mt-3
+                            text-sm
+                            sm:text-base
+                            text-blue-50
+                            leading-relaxed
+                            max-w-2xl
+                        "
+                    >
+                        Produtos úteis, ofertas e novidades selecionadas
+                        para você encontrar mais rápido o que vale a pena.
+                    </p>
+
+                    <div
+                        class="
+                            mt-4
+                            flex
+                            items-start
+                            gap-2
+                            text-[12px]
+                            sm:text-sm
+                            text-blue-100
+                            max-w-2xl
+                        "
+                    >
+                        <i class="fa-solid fa-circle-check mt-0.5"></i>
+
+                        <span>
+                            Ao abrir uma oferta, você será direcionado para a Shopee
+                            para conferir preço, disponibilidade e finalizar a compra.
+                        </span>
+                    </div>
+
+                    <button
+                        onclick="scrollToSection('ofertas')"
+                        class="
+                            mt-5
+                            inline-flex
+                            items-center
+                            justify-center
+                            gap-2
+                            bg-white
+                            text-blue-700
+                            font-bold
+                            px-5
+                            py-3
+                            rounded-full
+                            active:scale-[.98]
+                            transition
+                            shadow-lg
+                            shadow-blue-950/10
+                        "
+                    >
+                        Ver ofertas
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </button>
+
+                </div>
+
+                <div
+                    class="
+                        absolute
+                        -right-12
+                        -bottom-20
+                        w-56
+                        h-56
+                        rounded-full
+                        bg-white/10
+                        blur-sm
+                    "
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================== -->
+        <!-- TRUST                                              -->
+        <!-- ================================================== -->
+
+        <section class="container-main py-7">
+
+            <div
+                class="
+                    grid
+                    grid-cols-2
+                    lg:grid-cols-4
+                    gap-3
+                "
+            >
+
+                <div
+                    class="
+                        bg-white
+                        border
+                        border-slate-100
+                        rounded-2xl
+                        p-4
+                        flex
+                        items-center
+                        gap-3
+                    "
+                >
+                    <div
+                        class="
+                            w-10
+                            h-10
+                            rounded-xl
+                            bg-blue-50
+                            text-blue-500
+                            flex
+                            items-center
+                            justify-center
+                        "
+                    >
+                        <i class="fa-solid fa-tags"></i>
+                    </div>
+
+                    <div>
+                        <strong class="block text-sm">
+                            Boas ofertas
+                        </strong>
+
+                        <span class="text-xs text-slate-500">
+                            Seleção da vitrine
+                        </span>
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        bg-white
+                        border
+                        border-slate-100
+                        rounded-2xl
+                        p-4
+                        flex
+                        items-center
+                        gap-3
+                    "
+                >
+                    <div
+                        class="
+                            w-10
+                            h-10
+                            rounded-xl
+                            bg-blue-50
+                            text-blue-500
+                            flex
+                            items-center
+                            justify-center
+                        "
+                    >
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+
+                    <div>
+                        <strong class="block text-sm">
+                            Compra segura
+                        </strong>
+
+                        <span class="text-xs text-slate-500">
+                            Finalizada na Shopee
+                        </span>
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        bg-white
+                        border
+                        border-slate-100
+                        rounded-2xl
+                        p-4
+                        flex
+                        items-center
+                        gap-3
+                    "
+                >
+                    <div
+                        class="
+                            w-10
+                            h-10
+                            rounded-xl
+                            bg-blue-50
+                            text-blue-500
+                            flex
+                            items-center
+                            justify-center
+                        "
+                    >
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+
+                    <div>
+                        <strong class="block text-sm">
+                            Destaques
+                        </strong>
+
+                        <span class="text-xs text-slate-500">
+                            Produtos selecionados
+                        </span>
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        bg-white
+                        border
+                        border-slate-100
+                        rounded-2xl
+                        p-4
+                        flex
+                        items-center
+                        gap-3
+                    "
+                >
+                    <div
+                        class="
+                            w-10
+                            h-10
+                            rounded-xl
+                            bg-blue-50
+                            text-blue-500
+                            flex
+                            items-center
+                            justify-center
+                        "
+                    >
+                        <i class="fa-solid fa-mobile-screen"></i>
+                    </div>
+
+                    <div>
+                        <strong class="block text-sm">
+                            Feita para celular
+                        </strong>
+
+                        <span class="text-xs text-slate-500">
+                            Rápida e responsiva
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================== -->
+        <!-- CATEGORIES                                         -->
+        <!-- ================================================== -->
+
+        <section class="container-main">
+
+            <div
+                class="
+                    flex
+                    items-center
+                    justify-between
+                    gap-4
+                    mb-4
+                "
+            >
+
+                <div>
+
+                    <h2
+                        class="
+                            text-xl
+                            md:text-2xl
+                            font-extrabold
+                            tracking-tight
+                        "
+                    >
+                        Explore por categoria
+                    </h2>
+
+                    <p
+                        class="
+                            text-sm
+                            text-slate-500
+                            mt-1
+                        "
+                    >
+                        Encontre o que combina com você
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="categoryChips"
+                class="
+                    flex
+                    gap-2
+                    overflow-x-auto
+                    hide-scrollbar
+                    pb-3
+                "
+            >
+
+                <button
+                    data-category=""
+                    class="
+                        category-chip
+                        active
+                        whitespace-nowrap
+                        px-5
+                        py-2.5
+                        rounded-full
+                        border
+                        border-slate-200
+                        bg-white
+                        text-sm
+                        font-semibold
+                    "
+                >
+                    Todos
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================== -->
+        <!-- PROMOTIONS                                         -->
+        <!-- ================================================== -->
+
+        <section
+            id="ofertas"
+            class="container-main py-10"
+        >
+
+            <div
+                class="
+                    flex
+                    items-end
+                    justify-between
+                    gap-4
+                    mb-6
+                "
+            >
+
+                <div>
+
+                    <div class="flex items-center">
+
+                        <h2
+                            class="
+                                section-title
+                                flex
+                                items-center
+                                text-2xl
+                                md:text-3xl
+                                font-extrabold
+                                tracking-tight
+                            "
+                        >
+                            Ofertas e Promoções
+                        </h2>
+
+                    </div>
+
+                    <p
+                        class="
+                            text-sm
+                            md:text-base
+                            text-slate-500
+                            mt-2
+                        "
+                    >
+                        Achadinhos que merecem sua atenção
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="promotionProducts"
+                class="
+                    flex
+                    gap-4
+                    overflow-x-auto
+                    hide-scrollbar
+                    pb-5
+                "
+            ></div>
+
+        </section>
+
+
+        <!-- ================================================== -->
+        <!-- FEATURED                                           -->
+        <!-- ================================================== -->
+
+        <section
+            id="destaques"
+            class="
+                bg-slate-50
+                border-y
+                border-slate-100
+                py-12
+            "
+        >
+
+            <div class="container-main">
+
+                <div class="mb-7">
+
+                    <div class="flex items-center">
+
+                        <h2
+                            class="
+                                section-title
+                                flex
+                                items-center
+                                text-2xl
+                                md:text-3xl
+                                font-extrabold
+                                tracking-tight
+                            "
+                        >
+                            Escolhas da Vitrine
+                        </h2>
+
+                    </div>
+
+                    <p
+                        class="
+                            text-slate-500
+                            mt-2
+                        "
+                    >
+                        Produtos que selecionamos para ficar em destaque
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="featuredProducts"
+                    class="
+                        grid
+                        grid-cols-2
+                        md:grid-cols-3
+                        lg:grid-cols-4
+                        xl:grid-cols-5
+                        gap-3
+                        md:gap-5
+                    "
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================== -->
+        <!-- ALL PRODUCTS                                       -->
+        <!-- ================================================== -->
+
+        <section
+            id="todos"
+            class="container-main py-12"
+        >
+
+            <div
+                class="
+                    flex
+                    flex-col
+                    sm:flex-row
+                    sm:items-end
+                    sm:justify-between
+                    gap-4
+                    mb-7
+                "
+            >
+
+                <div>
+
+                    <div class="flex items-center">
+
+                        <h2
+                            class="
+                                section-title
+                                flex
+                                items-center
+                                text-2xl
+                                md:text-3xl
+                                font-extrabold
+                                tracking-tight
+                            "
+                        >
+                            Todos os produtos
+                        </h2>
+
+                    </div>
+
+                    <p
+                        id="productCounter"
+                        class="
+                            text-slate-500
+                            mt-2
+                        "
+                    >
+                        Carregando produtos...
+                    </p>
+
+                </div>
+
+
+                <select
+                    id="sortProducts"
+                    class="
+                        bg-white
+                        border
+                        border-slate-200
+                        rounded-xl
+                        px-4
+                        py-3
+                        text-sm
+                        font-medium
+                        outline-none
+                        focus:border-blue-400
+                    "
+                >
+                    <option value="position">
+                        Recomendados
+                    </option>
+
+                    <option value="price-asc">
+                        Menor preço
+                    </option>
+
+                    <option value="price-desc">
+                        Maior preço
+                    </option>
+
+                    <option value="name">
+                        Nome A-Z
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ERROR -->
+
+            <div
+                id="errorState"
+                class="
+                    hidden
+                    bg-red-50
+                    border
+                    border-red-100
+                    rounded-3xl
+                    p-8
+                    text-center
+                    mb-8
+                "
+            >
+
+                <div
+                    class="
+                        w-14
+                        h-14
+                        mx-auto
+                        rounded-full
+                        bg-red-100
+                        text-red-500
+                        flex
+                        items-center
+                        justify-center
+                        mb-4
+                    "
+                >
+                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                </div>
+
+                <h3 class="font-bold text-lg">
+                    Não conseguimos carregar os produtos
+                </h3>
+
+                <p
+                    class="
+                        text-slate-500
+                        text-sm
+                        mt-2
+                    "
+                >
+                    Tente atualizar a página daqui a pouco.
+                </p>
+
+            </div>
+
+
+            <!-- EMPTY -->
+
+            <div
+                id="emptyState"
+                class="
+                    hidden
+                    bg-slate-50
+                    border
+                    border-slate-100
+                    rounded-3xl
+                    p-10
+                    text-center
+                "
+            >
+
+                <div
+                    class="
+                        w-16
+                        h-16
+                        mx-auto
+                        rounded-full
+                        bg-white
+                        text-slate-400
+                        flex
+                        items-center
+                        justify-center
+                        shadow-sm
+                        mb-4
+                    "
+                >
+                    <i class="fa-solid fa-magnifying-glass text-xl"></i>
+                </div>
+
+                <h3
+                    class="
+                        text-lg
+                        font-bold
+                    "
+                >
+                    Nenhum produto encontrado
+                </h3>
+
+                <p
+                    class="
+                        text-sm
+                        text-slate-500
+                        mt-2
+                    "
+                >
+                    Tente outra busca ou selecione outra categoria.
+                </p>
+
+            </div>
+
+
+            <!-- PRODUCTS -->
+
+            <div
+                id="allProducts"
+                class="
+                    grid
+                    grid-cols-2
+                    md:grid-cols-3
+                    lg:grid-cols-4
+                    xl:grid-cols-5
+                    gap-3
+                    md:gap-5
+                "
+            ></div>
+
+        </section>
+
+
+
+
+        <!-- ================================================== -->
+        <!-- WHATSAPP                                           -->
+        <!-- ================================================== -->
+
+        <section class="container-main pb-10">
+
+            <div
+                class="
+                    rounded-[24px]
+                    border
+                    border-emerald-100
+                    bg-emerald-50
+                    p-5
+                    sm:p-6
+                    flex
+                    flex-col
+                    sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                    gap-4
+                "
+            >
+
+                <div class="flex items-start gap-3">
+
+                    <div
+                        class="
+                            w-11
+                            h-11
+                            rounded-2xl
+                            bg-emerald-500
+                            text-white
+                            flex
+                            items-center
+                            justify-center
+                            shrink-0
+                        "
+                    >
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                    </div>
+
+                    <div>
+                        <h2 class="font-extrabold text-lg text-slate-900">
+                            Grupo de ofertas no WhatsApp
+                        </h2>
+
+                        <p class="text-sm text-slate-600 mt-1 max-w-xl">
+                            Uma forma rápida de receber novidades e achadinhos
+                            sem precisar procurar toda hora.
+                        </p>
+                    </div>
+
+                </div>
+
+                <a
+                    id="whatsappGroupButton"
+                    href="#"
+                    class="
+                        inline-flex
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-full
+                        px-5
+                        py-3
+                        bg-slate-200
+                        text-slate-500
+                        font-bold
+                        text-sm
+                        cursor-not-allowed
+                        shrink-0
+                    "
+                    aria-disabled="true"
+                >
+                    <i class="fa-brands fa-whatsapp"></i>
+                    Grupo em breve
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================== -->
+        <!-- BOTTOM BANNER                                      -->
+        <!-- ================================================== -->
+
+        <section class="container-main pb-12">
+
+            <div
+                class="
+                    rounded-[30px]
+                    bg-slate-950
+                    text-white
+                    p-7
+                    md:p-10
+                    overflow-hidden
+                    relative
+                "
+            >
+
+                <div
+                    class="
+                        absolute
+                        -right-20
+                        -top-24
+                        w-72
+                        h-72
+                        bg-blue-500/20
+                        rounded-full
+                        blur-3xl
+                    "
+                ></div>
+
+                <div
+                    class="
+                        relative
+                        z-10
+                        flex
+                        flex-col
+                        md:flex-row
+                        md:items-center
+                        md:justify-between
+                        gap-6
+                    "
+                >
+
+                    <div>
+
+                        <span
+                            class="
+                                text-blue-400
+                                text-sm
+                                font-bold
+                                uppercase
+                                tracking-widest
+                            "
+                        >
+                            Sempre tem novidade
+                        </span>
+
+                        <h2
+                            class="
+                                mt-2
+                                text-2xl
+                                md:text-3xl
+                                font-extrabold
+                            "
+                        >
+                            Volte para conferir novos achadinhos
+                        </h2>
+
+                        <p
+                            class="
+                                text-slate-400
+                                mt-2
+                                max-w-2xl
+                            "
+                        >
+                            A vitrine será atualizada com novas ofertas,
+                            promoções e produtos selecionados.
+                        </p>
+
+                    </div>
+
+                    <button
+                        onclick="scrollToSection('todos')"
+                        class="
+                            shrink-0
+                            bg-blue-500
+                            hover:bg-blue-700
+                            transition
+                            px-6
+                            py-3.5
+                            rounded-full
+                            font-bold
+                        "
+                    >
+                        Explorar produtos
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ====================================================== -->
+    <!-- FOOTER                                                 -->
+    <!-- ====================================================== -->
+
+    <footer
+        class="
+            bg-white
+            border-t
+            border-slate-100
+            mt-4
+        "
+    >
+
+        <div
+            class="
+                container-main
+                py-10
+                flex
+                flex-col
+                md:flex-row
+                md:items-center
+                md:justify-between
+                gap-6
+            "
+        >
+
+            <div class="flex items-center gap-3">
+
+                <div
+                    class="
+                        w-10
+                        h-10
+                        rounded-xl
+                        bg-blue-500
+                        text-white
+                        flex
+                        items-center
+                        justify-center
+                    "
+                >
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+
+                <div>
+
+                    <strong class="block">
+                        Minha Vitrine
+                    </strong>
+
+                    <span
+                        class="
+                            text-xs
+                            text-slate-500
+                        "
+                    >
+                        Seleção de produtos e ofertas
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="
+                    text-xs
+                    md:text-sm
+                    text-slate-500
+                    max-w-xl
+                "
+            >
+                Os preços e a disponibilidade podem mudar na Shopee.
+                A compra é concluída diretamente na plataforma do marketplace.
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ====================================================== -->
+    <!-- JAVASCRIPT                                             -->
+    <!-- ====================================================== -->
+
+    <script>
+
+        /*
+         * =====================================================
+         * ESTADO DA VITRINE
+         * =====================================================
+         */
+
+        const WHATSAPP_GROUP_URL = '';
+
+        function setupWhatsAppGroup() {
+
+            const button =
+                document.getElementById(
+                    'whatsappGroupButton'
+                );
+
+            if (!button) {
+                return;
+            }
+
+            if (!WHATSAPP_GROUP_URL) {
+                return;
+            }
+
+            button.href =
+                WHATSAPP_GROUP_URL;
+
+            button.target =
+                '_blank';
+
+            button.rel =
+                'noopener noreferrer';
+
+            button.removeAttribute(
+                'aria-disabled'
+            );
+
+            button.classList.remove(
+                'bg-slate-200',
+                'text-slate-500',
+                'cursor-not-allowed'
+            );
+
+            button.classList.add(
+                'bg-emerald-500',
+                'hover:bg-emerald-600',
+                'text-white',
+                'transition'
+            );
+
+            button.innerHTML =
+                '<i class="fa-brands fa-whatsapp"></i> Entrar no grupo';
+        }
+
+
+        let catalogProducts = [];
+
+        let currentSearch = '';
+
+        let currentCategory = '';
+
+        let currentSort = 'position';
+
+
+        /*
+         * =====================================================
+         * ELEMENTOS
+         * =====================================================
+         */
+
+        const allProductsElement =
+            document.getElementById('allProducts');
+
+        const featuredProductsElement =
+            document.getElementById('featuredProducts');
+
+        const promotionProductsElement =
+            document.getElementById('promotionProducts');
+
+        const categoryChipsElement =
+            document.getElementById('categoryChips');
+
+        const productCounterElement =
+            document.getElementById('productCounter');
+
+        const emptyStateElement =
+            document.getElementById('emptyState');
+
+        const errorStateElement =
+            document.getElementById('errorState');
+
+        const desktopSearch =
+            document.getElementById('desktopSearch');
+
+        const mobileSearch =
+            document.getElementById('mobileSearch');
+
+        const sortProducts =
+            document.getElementById('sortProducts');
+
+
+        /*
+         * =====================================================
+         * FORMATAÇÃO
+         * =====================================================
+         */
+
+        function formatCurrency(value) {
+
+            const number =
+                Number(value);
+
+            if (!Number.isFinite(number)) {
+                return 'Consulte';
+            }
+
+            return new Intl.NumberFormat(
+                'pt-BR',
+                {
+                    style: 'currency',
+                    currency: 'BRL'
+                }
+            ).format(number);
+        }
+
+
+        function escapeHtml(value) {
+
+            const text =
+                String(
+                    value ?? ''
+                );
+
+            return text
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+
+        function normalizeText(value) {
+
+            return String(
+                value ?? ''
+            )
+                .normalize('NFD')
+                .replace(
+                    /[\u0300-\u036f]/g,
+                    ''
+                )
+                .toLowerCase();
+        }
+
+
+        /*
+         * =====================================================
+         * DESCONTO
+         * =====================================================
+         */
+
+        function getDiscountPercent(product) {
+
+            const current =
+                Number(
+                    product.price
+                );
+
+            const original =
+                Number(
+                    product.originalPrice
+                );
+
+            if (
+                !Number.isFinite(current) ||
+                !Number.isFinite(original) ||
+                original <= current ||
+                original <= 0
+            ) {
+                return null;
+            }
+
+            return Math.round(
+                (
+                    (
+                        original -
+                        current
+                    ) /
+                    original
+                ) * 100
+            );
+        }
+
+
+        /*
+         * =====================================================
+         * CARD DO PRODUTO
+         * =====================================================
+         */
+
+        function createProductCard(
+            entry,
+            horizontal = false
+        ) {
+
+            const product =
+                entry.product || {};
+
+            const discount =
+                getDiscountPercent(
+                    product
+                );
+
+            const originalPrice =
+                Number(
+                    product.originalPrice
+                );
+
+            const showOriginalPrice =
+                Number.isFinite(
+                    originalPrice
+                ) &&
+                originalPrice >
+                Number(product.price);
+
+
+            const widthClass =
+                horizontal
+                    ? 'min-w-[220px] sm:min-w-[250px] lg:min-w-[270px]'
+                    : '';
+
+
+            return `
+                <article
+                    class="
+                        product-card
+                        ${widthClass}
+                        bg-white
+                        border
+                        border-slate-100
+                        rounded-2xl
+                        md:rounded-3xl
+                        overflow-hidden
+                        flex
+                        flex-col
+                    "
+                >
+
+                    <div
+                        class="
+                            relative
+                            aspect-square
+                            bg-slate-50
+                            overflow-hidden
+                        "
+                    >
+
+                        ${
+                            discount
+                                ? `
+                                    <div
+                                        class="
+                                            absolute
+                                            top-3
+                                            left-3
+                                            z-10
+                                            bg-red-500
+                                            text-white
+                                            text-xs
+                                            font-bold
+                                            px-2.5
+                                            py-1.5
+                                            rounded-full
+                                            shadow-sm
+                                        "
+                                    >
+                                        -${discount}%
+                                    </div>
+                                `
+                                : ''
+                        }
+
+                        ${
+                            entry.visibility?.featured
+                                ? `
+                                    <div
+                                        class="
+                                            absolute
+                                            top-3
+                                            right-3
+                                            z-10
+                                            w-8
+                                            h-8
+                                            rounded-full
+                                            bg-white/95
+                                            shadow-sm
+                                            text-blue-500
+                                            flex
+                                            items-center
+                                            justify-center
+                                        "
+                                        title="Destaque"
+                                    >
+                                        <i class="fa-solid fa-star"></i>
+                                    </div>
+                                `
+                                : ''
+                        }
+
+                        <img
+                            src="${escapeHtml(product.image)}"
+                            alt="${escapeHtml(product.title)}"
+                            loading="lazy"
+                            class="
+                                product-image
+                                w-full
+                                h-full
+                                object-cover
+                            "
+                            onerror="
+                                this.style.display='none';
+                                this.parentElement.classList.add(
+                                    'flex',
+                                    'items-center',
+                                    'justify-center'
+                                );
+                            "
+                        >
+
+                    </div>
+
+
+                    <div
+                        class="
+                            p-3.5
+                            md:p-4
+                            flex
+                            flex-col
+                            flex-1
+                        "
+                    >
+
+
+                        <h3
+                            class="
+                                text-sm
+                                md:text-[15px]
+                                font-semibold
+                                text-slate-800
+                                leading-snug
+                                line-clamp-2
+                                min-h-[40px]
+                                md:min-h-[44px]
+                            "
+                            title="${escapeHtml(product.title)}"
+                        >
+                            ${escapeHtml(product.title)}
+                        </h3>
+
+
+                        <div class="mt-3">
+
+                            ${
+                                showOriginalPrice
+                                    ? `
+                                        <div
+                                            class="
+                                                text-xs
+                                                text-slate-400
+                                                line-through
+                                            "
+                                        >
+                                            ${formatCurrency(product.originalPrice)}
+                                        </div>
+                                    `
+                                    : `
+                                        <div class="h-[16px]"></div>
+                                    `
+                            }
+
+
+                            <div
+                                class="
+                                    text-lg
+                                    md:text-xl
+                                    font-extrabold
+                                    text-slate-950
+                                    leading-tight
+                                "
+                            >
+                                ${formatCurrency(product.price)}
+                            </div>
+
+                        </div>
+
+
+                        <div class="mt-auto pt-4">
+
+                            <a
+                                href="${escapeHtml(product.affiliateLink)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="
+                                    w-full
+                                    bg-blue-500
+                                    hover:bg-blue-700
+                                    active:scale-[.98]
+                                    transition
+                                    text-white
+                                    rounded-xl
+                                    md:rounded-2xl
+                                    py-2.5
+                                    md:py-3
+                                    text-xs
+                                    md:text-sm
+                                    font-bold
+                                    flex
+                                    items-center
+                                    justify-center
+                                    gap-2
+                                "
+                            >
+                                Ver oferta
+
+                                <i
+                                    class="
+                                        fa-solid
+                                        fa-arrow-up-right-from-square
+                                        text-[11px]
+                                    "
+                                ></i>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+            `;
+        }
+
+
+        /*
+         * =====================================================
+         * CATEGORIAS
+         * =====================================================
+         */
+
+        function getProductCategories(
+            product
+        ) {
+
+            return [
+                product.category1,
+                product.category2,
+                product.category3
+            ]
+                .filter(Boolean)
+                .map(
+                    item =>
+                        String(item).trim()
+                )
+                .filter(Boolean);
+        }
+
+
+        function renderCategories() {
+
+            const categories =
+                new Set();
+
+
+            catalogProducts.forEach(
+                entry => {
+
+                    getProductCategories(
+                        entry.product || {}
+                    ).forEach(
+                        category =>
+                            categories.add(
+                                category
+                            )
+                    );
+                }
+            );
+
+
+            const sorted =
+                [...categories]
+                    .sort(
+                        (a, b) =>
+                            a.localeCompare(
+                                b,
+                                'pt-BR'
+                            )
+                    );
+
+
+            categoryChipsElement
+                .querySelectorAll(
+                    '[data-generated="true"]'
+                )
+                .forEach(
+                    element =>
+                        element.remove()
+                );
+
+
+            sorted.forEach(
+                category => {
+
+                    const button =
+                        document.createElement(
+                            'button'
+                        );
+
+                    button.dataset.category =
+                        category;
+
+                    button.dataset.generated =
+                        'true';
+
+                    button.className =
+                        `
+                            category-chip
+                            whitespace-nowrap
+                            px-5
+                            py-2.5
+                            rounded-full
+                            border
+                            border-slate-200
+                            bg-white
+                            text-sm
+                            font-semibold
+                            text-slate-600
+                        `;
+
+                    button.textContent =
+                        category;
+
+                    categoryChipsElement.appendChild(
+                        button
+                    );
+                }
+            );
+
+
+            categoryChipsElement
+                .querySelectorAll(
+                    '[data-category]'
+                )
+                .forEach(
+                    button => {
+
+                        button.addEventListener(
+                            'click',
+                            () => {
+
+                                currentCategory =
+                                    button.dataset.category ||
+                                    '';
+
+                                categoryChipsElement
+                                    .querySelectorAll(
+                                        '[data-category]'
+                                    )
+                                    .forEach(
+                                        item =>
+                                            item.classList.remove(
+                                                'active'
+                                            )
+                                    );
+
+                                button.classList.add(
+                                    'active'
+                                );
+
+                                renderAllProducts();
+                            }
+                        );
+                    }
+                );
+        }
+
+
+        /*
+         * =====================================================
+         * FILTROS
+         * =====================================================
+         */
+
+        function getFilteredProducts() {
+
+            let items =
+                [...catalogProducts];
+
+
+            if (currentSearch) {
+
+                const search =
+                    normalizeText(
+                        currentSearch
+                    );
+
+                items =
+                    items.filter(
+                        entry => {
+
+                            const product =
+                                entry.product || {};
+
+                            const searchable =
+                                normalizeText(
+                                    [
+                                        product.title,
+                                        product.category1,
+                                        product.category2,
+                                        product.category3
+                                    ]
+                                        .filter(Boolean)
+                                        .join(' ')
+                                );
+
+                            return searchable.includes(
+                                search
+                            );
+                        }
+                    );
+            }
+
+
+            if (currentCategory) {
+
+                const category =
+                    normalizeText(
+                        currentCategory
+                    );
+
+                items =
+                    items.filter(
+                        entry => {
+
+                            const categories =
+                                getProductCategories(
+                                    entry.product || {}
+                                )
+                                    .map(
+                                        normalizeText
+                                    );
+
+                            return categories.includes(
+                                category
+                            );
+                        }
+                    );
+            }
+
+
+            switch (currentSort) {
+
+                case 'price-asc':
+
+                    items.sort(
+                        (a, b) =>
+                            Number(
+                                a.product?.price ?? 0
+                            ) -
+                            Number(
+                                b.product?.price ?? 0
+                            )
+                    );
+
+                    break;
+
+
+                case 'price-desc':
+
+                    items.sort(
+                        (a, b) =>
+                            Number(
+                                b.product?.price ?? 0
+                            ) -
+                            Number(
+                                a.product?.price ?? 0
+                            )
+                    );
+
+                    break;
+
+
+                case 'name':
+
+                    items.sort(
+                        (a, b) =>
+                            String(
+                                a.product?.title ?? ''
+                            ).localeCompare(
+                                String(
+                                    b.product?.title ?? ''
+                                ),
+                                'pt-BR'
+                            )
+                    );
+
+                    break;
+
+
+                default:
+
+                    items.sort(
+                        (a, b) => {
+
+                            const positionA =
+                                a.visibility?.position ??
+                                Number.MAX_SAFE_INTEGER;
+
+                            const positionB =
+                                b.visibility?.position ??
+                                Number.MAX_SAFE_INTEGER;
+
+                            return (
+                                positionA -
+                                positionB
+                            );
+                        }
+                    );
+            }
+
+
+            return items;
+        }
+
+
+        /*
+         * =====================================================
+         * TODOS OS PRODUTOS
+         * =====================================================
+         */
+
+        function renderAllProducts() {
+
+            const products =
+                getFilteredProducts();
+
+
+            productCounterElement.textContent =
+                products.length === 1
+                    ? '1 produto encontrado'
+                    : `${products.length} produtos encontrados`;
+
+
+            if (
+                products.length === 0
+            ) {
+
+                allProductsElement.innerHTML =
+                    '';
+
+                emptyStateElement.classList.remove(
+                    'hidden'
+                );
+
+                return;
+            }
+
+
+            emptyStateElement.classList.add(
+                'hidden'
+            );
+
+
+            allProductsElement.innerHTML =
+                products
+                    .map(
+                        entry =>
+                            createProductCard(
+                                entry
+                            )
+                    )
+                    .join('');
+        }
+
+
+        /*
+         * =====================================================
+         * DESTAQUES
+         * =====================================================
+         */
+
+        function renderFeaturedProducts() {
+
+            const featured =
+                catalogProducts.filter(
+                    entry =>
+                        entry.visibility?.featured
+                );
+
+
+            const products =
+                featured.length
+                    ? featured
+                    : catalogProducts.slice(
+                        0,
+                        5
+                    );
+
+
+            featuredProductsElement.innerHTML =
+                products
+                    .slice(0, 10)
+                    .map(
+                        entry =>
+                            createProductCard(
+                                entry
+                            )
+                    )
+                    .join('');
+        }
+
+
+        /*
+         * =====================================================
+         * PROMOÇÕES
+         * =====================================================
+         */
+
+        function renderPromotions() {
+
+            let promotions =
+                catalogProducts.filter(
+                    entry =>
+                        Array.isArray(
+                            entry.collections
+                        ) &&
+                        entry.collections.some(
+                            collection =>
+                                normalizeText(
+                                    collection
+                                ) ===
+                                'promocoes'
+                        )
+                );
+
+
+            if (
+                promotions.length === 0
+            ) {
+
+                promotions =
+                    catalogProducts.filter(
+                        entry =>
+                            getDiscountPercent(
+                                entry.product || {}
+                            )
+                    );
+            }
+
+
+            if (
+                promotions.length === 0
+            ) {
+
+                promotions =
+                    catalogProducts.slice(
+                        0,
+                        8
+                    );
+            }
+
+
+            promotionProductsElement.innerHTML =
+                promotions
+                    .map(
+                        entry =>
+                            createProductCard(
+                                entry,
+                                true
+                            )
+                    )
+                    .join('');
+        }
+
+
+        /*
+         * =====================================================
+         * BUSCA
+         * =====================================================
+         */
+
+        function updateSearch(
+            value
+        ) {
+
+            currentSearch =
+                String(value || '')
+                    .trim();
+
+            desktopSearch.value =
+                currentSearch;
+
+            mobileSearch.value =
+                currentSearch;
+
+            renderAllProducts();
+        }
+
+
+        desktopSearch.addEventListener(
+            'input',
+            event => {
+
+                updateSearch(
+                    event.target.value
+                );
+            }
+        );
+
+
+        mobileSearch.addEventListener(
+            'input',
+            event => {
+
+                updateSearch(
+                    event.target.value
+                );
+            }
+        );
+
+
+        /*
+         * =====================================================
+         * ORDENAÇÃO
+         * =====================================================
+         */
+
+        sortProducts.addEventListener(
+            'change',
+            event => {
+
+                currentSort =
+                    event.target.value;
+
+                renderAllProducts();
+            }
+        );
+
+
+        /*
+         * =====================================================
+         * MENU MOBILE
+         * =====================================================
+         */
+
+        const mobileMenu =
+            document.getElementById(
+                'mobileMenu'
+            );
+
+        const mobileOverlay =
+            document.getElementById(
+                'mobileOverlay'
+            );
+
+
+        function openMobileMenu() {
+
+            mobileMenu.classList.add(
+                'open'
+            );
+
+            mobileOverlay.classList.remove(
+                'hidden'
+            );
+
+            document.body.style.overflow =
+                'hidden';
+        }
+
+
+        function closeMobileMenu() {
+
+            mobileMenu.classList.remove(
+                'open'
+            );
+
+            mobileOverlay.classList.add(
+                'hidden'
+            );
+
+            document.body.style.overflow =
+                '';
+        }
+
+
+        document.getElementById(
+            'mobileMenuButton'
+        ).addEventListener(
+            'click',
+            openMobileMenu
+        );
+
+
+        document.getElementById(
+            'mobileMenuClose'
+        ).addEventListener(
+            'click',
+            closeMobileMenu
+        );
+
+
+        mobileOverlay.addEventListener(
+            'click',
+            closeMobileMenu
+        );
+
+
+        function mobileNavigate(
+            id
+        ) {
+
+            closeMobileMenu();
+
+            scrollToSection(
+                id
+            );
+        }
+
+
+        /*
+         * =====================================================
+         * NAVEGAÇÃO
+         * =====================================================
+         */
+
+        function scrollToSection(
+            id
+        ) {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+            if (!element) {
+                return;
+            }
+
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+
+        /*
+         * =====================================================
+         * SKELETON
+         * =====================================================
+         */
+
+        function renderSkeletons() {
+
+            allProductsElement.innerHTML =
+                Array.from({
+                    length: 10
+                })
+                    .map(
+                        () => `
+                            <div
+                                class="
+                                    bg-white
+                                    border
+                                    border-slate-100
+                                    rounded-3xl
+                                    overflow-hidden
+                                "
+                            >
+                                <div
+                                    class="
+                                        skeleton
+                                        aspect-square
+                                    "
+                                ></div>
+
+                                <div class="p-4">
+
+                                    <div
+                                        class="
+                                            skeleton
+                                            h-3
+                                            rounded
+                                            w-2/3
+                                        "
+                                    ></div>
+
+                                    <div
+                                        class="
+                                            skeleton
+                                            h-4
+                                            rounded
+                                            mt-3
+                                        "
+                                    ></div>
+
+                                    <div
+                                        class="
+                                            skeleton
+                                            h-4
+                                            rounded
+                                            mt-2
+                                            w-4/5
+                                        "
+                                    ></div>
+
+                                    <div
+                                        class="
+                                            skeleton
+                                            h-6
+                                            rounded
+                                            mt-5
+                                            w-1/2
+                                        "
+                                    ></div>
+
+                                    <div
+                                        class="
+                                            skeleton
+                                            h-10
+                                            rounded-xl
+                                            mt-4
+                                        "
+                                    ></div>
+
+                                </div>
+
+                            </div>
+                        `
+                    )
+                    .join('');
+        }
+
+
+        /*
+         * =====================================================
+         * CARREGAMENTO DA API
+         * =====================================================
+         */
+
+        async function loadProducts() {
+
+            renderSkeletons();
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/api/vitrine2/products/published',
+                        {
+                            headers: {
+                                'Accept':
+                                    'application/json'
+                            }
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `HTTP ${response.status}`
+                    );
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !data ||
+                    data.success !== true ||
+                    !Array.isArray(
+                        data.products
+                    )
+                ) {
+
+                    throw new Error(
+                        'Resposta inválida da API.'
+                    );
+                }
+
+
+                catalogProducts =
+                    data.products;
+
+
+                errorStateElement.classList.add(
+                    'hidden'
+                );
+
+
+
+                renderCategories();
+
+                renderPromotions();
+
+                renderFeaturedProducts();
+
+                renderAllProducts();
+
+
+            } catch (error) {
+
+                console.error(
+                    '[VITRINE2] Erro ao carregar produtos:',
+                    error
+                );
+
+
+                catalogProducts =
+                    [];
+
+
+                allProductsElement.innerHTML =
+                    '';
+
+                featuredProductsElement.innerHTML =
+                    '';
+
+                promotionProductsElement.innerHTML =
+                    '';
+
+
+                productCounterElement.textContent =
+                    'Produtos indisponíveis';
+
+
+                errorStateElement.classList.remove(
+                    'hidden'
+                );
+            }
+        }
+
+
+        /*
+         * =====================================================
+         * INICIALIZAÇÃO
+         * =====================================================
+         */
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => {
+                setupWhatsAppGroup();
+                loadProducts();
+            }
+        );
+
+    </script>
+
+</body>
+</html>

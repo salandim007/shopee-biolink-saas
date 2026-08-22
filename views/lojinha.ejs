@@ -211,22 +211,44 @@
                                 </div>
 
                                 <!-- Preços -->
-                                <div class="mt-2.5">
-                                    <% 
-                                        const pOrig = Number(produto.preco_original) || 0;
-                                        const pOferta = Number(produto.preco_oferta) || 0;
-                                    %>
-                                    <% if (pOrig > pOferta && pOferta > 0) { %>
-                                        <span class="text-[10px] text-gray-400 line-through font-medium block">
-                                            R$ <%= pOrig.toFixed(2).replace('.', ',') %>
-                                        </span>
-                                    <% } %>
-                                    <div class="flex items-baseline gap-0.5 text-orange-600 font-extrabold">
-                                        <span class="text-[10px]">R$</span>
-                                        <span class="text-lg leading-none"><%= Math.floor(pOferta) %></span>
-                                        <span class="text-[11px]">,<%= pOferta.toFixed(2).split('.')[1] %></span>
-                                    </div>
-                                </div>
+<div class="mt-2.5">
+    <%
+        const pOrig = Number(produto.preco_original) || 0;
+        const pOferta = Number(produto.preco_oferta) || 0;
+
+        // Usa a faixa real capturada da Shopee.
+        // Mantém preco_oferta como fallback para produtos antigos.
+        const pMin = Number(produto.preco_minimo) || pOferta;
+        const pMax = Number(produto.preco_maximo) || pMin;
+
+        const temFaixa = pMin > 0 && pMax > 0 && Math.abs(pMax - pMin) > 0.001;
+    %>
+
+    <% if (pOrig > pMin && pMin > 0) { %>
+        <span class="text-[10px] text-gray-400 line-through font-medium block">
+            R$ <%= pOrig.toFixed(2).replace('.', ',') %>
+        </span>
+    <% } %>
+
+    <div class="flex items-baseline gap-1 text-orange-600 font-extrabold">
+        <% if (temFaixa) { %>
+
+            <span class="text-lg">
+                R$ <%= pMin.toFixed(2).replace('.', ',') %>
+                -
+                R$ <%= pMax.toFixed(2).replace('.', ',') %>
+            </span>
+
+        <% } else { %>
+
+            <span class="text-[10px]">R$</span>
+            <span class="text-xl">
+                <%= pMin.toFixed(2).replace('.', ',') %>
+            </span>
+
+        <% } %>
+    </div>
+</div>
 
                                 <!-- Botão de Compra Inteligente -->
                                 <a 

@@ -1,0 +1,728 @@
+{
+  "version": 1,
+  "savedAt": "2026-08-22T02:02:10.624Z",
+  "entries": [
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "18599566917",
+        "shopId": "550583053",
+        "title": "Adesivo 3D De Fibra De Carbono Carro Moto Protetora Porta Espelho Anti-Riscos",
+        "description": null,
+        "price": 17.98,
+        "originalPrice": null,
+        "minPrice": 17.98,
+        "maxPrice": 17.98,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/sg-11134201-7rfh7-m319ht5yof212a",
+        "video": null,
+        "shopName": "NEX Insumos e Equipamentos LTDA",
+        "commissionRate": 0.08,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/Adesivo-3D-De-Fibra-De-Carbono-Carro-Moto-Protetora-Porta-Espelho-Anti-Riscos-i.550583053.18599566917",
+        "resolvedUrl": "https://shopee.com.br/Adesivo-3D-De-Fibra-De-Carbono-Carro-Moto-Protetora-Porta-Espelho-Anti-Riscos-i.550583053.18599566917",
+        "affiliateLink": "https://s.shopee.com.br/8V8IWXV22z",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": true,
+        "position": 1
+      },
+      "collections": [
+        "promocoes"
+      ]
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "23594525565",
+        "shopId": "579978597",
+        "title": "Kit 5 Retros Linha RICAMARE Para Bordado - 500m",
+        "description": null,
+        "price": 20.99,
+        "originalPrice": null,
+        "minPrice": 20.99,
+        "maxPrice": 20.99,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-81z1k-mfva97ke80snca",
+        "video": null,
+        "shopName": "Armarinho Campo Grande",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/579978597/23594525565",
+        "resolvedUrl": "https://shopee.com.br/product/579978597/23594525565",
+        "affiliateLink": "https://s.shopee.com.br/3VjeNhPWMM",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 2
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "10239969246",
+        "shopId": "326891807",
+        "title": "Cabana tenda barraca Infantil + Tapete Acolchoado Cinza 135x90x90cm",
+        "description": null,
+        "price": 299.9,
+        "originalPrice": null,
+        "minPrice": 299.9,
+        "maxPrice": 299.9,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-81zuk-mkqu3zj35n9e0d",
+        "video": null,
+        "shopName": "Ateliê Luara",
+        "commissionRate": 0.1,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/326891807/10239969246",
+        "resolvedUrl": "https://shopee.com.br/product/326891807/10239969246",
+        "affiliateLink": "https://s.shopee.com.br/8fRkXCAJtS",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 3
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "14064388819",
+        "shopId": "423978122",
+        "title": "Marmita Térmica 1,5 L Pote Organizador Milão Unitermi",
+        "description": null,
+        "price": 44.12,
+        "originalPrice": null,
+        "minPrice": 44.12,
+        "maxPrice": 44.12,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-820m2-mpw54sb574le02",
+        "video": null,
+        "shopName": "AGRIURBANO",
+        "commissionRate": 0.1,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/423978122/14064388819",
+        "resolvedUrl": "https://shopee.com.br/product/423978122/14064388819",
+        "affiliateLink": "https://s.shopee.com.br/AKZyWG8RYW",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 4
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "23598004054",
+        "shopId": "1325738150",
+        "title": "Ventilador De Coluna/Mesa Com Difusor E Rotação 3 Modos Potente Desmontável - V978",
+        "description": null,
+        "price": 229.99,
+        "originalPrice": null,
+        "minPrice": 229.99,
+        "maxPrice": 229.99,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-7r98o-m2134f0shj2p03",
+        "video": null,
+        "shopName": "Lily Home Store",
+        "commissionRate": 0.11,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1325738150/23598004054",
+        "resolvedUrl": "https://shopee.com.br/product/1325738150/23598004054",
+        "affiliateLink": "https://s.shopee.com.br/6L3pkuRvwr",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 5
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "58254333098",
+        "shopId": "1696255660",
+        "title": "Capinha de celular personalizado Crachá Santos futebol  Para iPhone 13 normal 16 17 12 11 15 13 Pro Max 14 Plus Capa",
+        "description": null,
+        "price": 19.47,
+        "originalPrice": null,
+        "minPrice": 19.47,
+        "maxPrice": 19.47,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/sg-11134201-8262l-mlluqpp4og796a",
+        "video": null,
+        "shopName": "happy capa",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1696255660/58254333098",
+        "resolvedUrl": "https://shopee.com.br/product/1696255660/58254333098",
+        "affiliateLink": "https://s.shopee.com.br/6q06LpUUzZ",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 6
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "20398296044",
+        "shopId": "549528890",
+        "title": "Grafite Pentel Hi-polymer Super 0.5mm Azul E Vermelho",
+        "description": null,
+        "price": 29,
+        "originalPrice": null,
+        "minPrice": 29,
+        "maxPrice": 29,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-81z1k-me30vmr5g2yqd9",
+        "video": null,
+        "shopName": "Mall Online",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/549528890/20398296044",
+        "resolvedUrl": "https://shopee.com.br/product/549528890/20398296044",
+        "affiliateLink": "https://s.shopee.com.br/AKZyWGLZdw",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 7
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "22293117305",
+        "shopId": "470695935",
+        "title": "APOIO PEZINHO TROLINHA DE ALUMINIO PEDALEIRA PARA BICICLETA SUPORTE DE PÉ",
+        "description": null,
+        "price": 15.9,
+        "originalPrice": null,
+        "minPrice": 15.9,
+        "maxPrice": 15.9,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-7r98o-m1q9hiso3o2y6b",
+        "video": null,
+        "shopName": "Utilidades do Dí",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/470695935/22293117305",
+        "resolvedUrl": "https://shopee.com.br/product/470695935/22293117305",
+        "affiliateLink": "https://s.shopee.com.br/gPT0V0m2w",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 8
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "22195943689",
+        "shopId": "1012725449",
+        "title": "Acessórios de mala Rodas Rodas universais pretas Rotação de 360 ​​graus kit2/Kit4",
+        "description": null,
+        "price": 18.99,
+        "originalPrice": null,
+        "minPrice": 18.99,
+        "maxPrice": 18.99,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-7qukw-lhqyxxgerl7hbf",
+        "video": null,
+        "shopName": "backpack studio",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1012725449/22195943689",
+        "resolvedUrl": "https://shopee.com.br/product/1012725449/22195943689",
+        "affiliateLink": "https://s.shopee.com.br/4LIlNErDOW",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 9
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "58257729398",
+        "shopId": "1104525762",
+        "title": "Kit 10 Pincéis de Maquiagem Mini Profissional Multi-funcional Com Bolsa Para Viagem,Rosa/Roxo/Preto",
+        "description": null,
+        "price": 16.99,
+        "originalPrice": null,
+        "minPrice": 16.99,
+        "maxPrice": 16.99,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/sg-11134201-82611-mmb1xzdoxybse3",
+        "video": null,
+        "shopName": "JinJin",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1104525762/58257729398",
+        "resolvedUrl": "https://shopee.com.br/product/1104525762/58257729398",
+        "affiliateLink": "https://s.shopee.com.br/LmcbtAuZ3",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 10
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "58265124286",
+        "shopId": "1753398912",
+        "title": "Blusa Feminina Manga 3/4 Crepe Duna com Modelagem Sofisticada",
+        "description": null,
+        "price": 24.35,
+        "originalPrice": null,
+        "minPrice": 24.35,
+        "maxPrice": 24.35,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-820lt-mr7bj3d4frbae6",
+        "video": null,
+        "shopName": "Confecção Mercedes",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1753398912/58265124286",
+        "resolvedUrl": "https://shopee.com.br/product/1753398912/58265124286",
+        "affiliateLink": "https://s.shopee.com.br/8Kou8akr7J",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 11
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "58208687484",
+        "shopId": "490604318",
+        "title": "Tiaras Kit 12 Unidades Infantil Com Diversos Personagens Mundo Rosa",
+        "description": null,
+        "price": 37.2,
+        "originalPrice": null,
+        "minPrice": 37.2,
+        "maxPrice": 37.2,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-820la-mmxqq13i0ao2e2",
+        "video": null,
+        "shopName": "Bê Presentes",
+        "commissionRate": 0.14,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/490604318/58208687484",
+        "resolvedUrl": "https://shopee.com.br/product/490604318/58208687484",
+        "affiliateLink": "https://s.shopee.com.br/60QzMIy8dX",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 12
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "58113577411",
+        "shopId": "771011426",
+        "title": "Chinelo Infantil Menina Anatômico Macio Antiderrapante Bebê Com Ajuste Em Elastico 17/18 ao 23/24",
+        "description": null,
+        "price": 27.99,
+        "originalPrice": null,
+        "minPrice": 27.99,
+        "maxPrice": 27.99,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/sg-11134201-825aw-mqdvka2l18uk4b",
+        "video": null,
+        "shopName": "EasyShooes",
+        "commissionRate": 0.23,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/771011426/58113577411",
+        "resolvedUrl": "https://shopee.com.br/product/771011426/58113577411",
+        "affiliateLink": "https://s.shopee.com.br/904avoqyoH",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 13
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "23594931015",
+        "shopId": "510736884",
+        "title": "CAMISETA MANGA LONGA MASCULINA PLUZ SIZE BASICA LISA G1-G2-G3 ALGODÃO PREMIUM CASUAL",
+        "description": null,
+        "price": 35.9,
+        "originalPrice": null,
+        "minPrice": 35.9,
+        "maxPrice": 35.9,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-820lx-mn31dc03ifwgec",
+        "video": null,
+        "shopName": "GG's confecções",
+        "commissionRate": 0.08,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/510736884/23594931015",
+        "resolvedUrl": "https://shopee.com.br/product/510736884/23594931015",
+        "affiliateLink": "https://s.shopee.com.br/5VUilO8hh0",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 14
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "22598154293",
+        "shopId": "1288072236",
+        "title": "Difusor Solar Para Carro – Cheirinho Automático Com Rotação Ecológica, Purifica E Deixa O Ar Agradável",
+        "description": null,
+        "price": 31.99,
+        "originalPrice": null,
+        "minPrice": 31.99,
+        "maxPrice": 31.99,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/sg-11134201-821dx-mh6wunk9q42724",
+        "video": null,
+        "shopName": "New waves",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1288072236/22598154293",
+        "resolvedUrl": "https://shopee.com.br/product/1288072236/22598154293",
+        "affiliateLink": "https://s.shopee.com.br/1gI0CLRlVF",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 15
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "20697455669",
+        "shopId": "1096453915",
+        "title": "Massageador Elétrico Alta Frequência Profissional Muscular Massagem",
+        "description": null,
+        "price": 29.99,
+        "originalPrice": null,
+        "minPrice": 29.99,
+        "maxPrice": 29.99,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-820la-mr87pre8tlvr49",
+        "video": null,
+        "shopName": "M G SHOP",
+        "commissionRate": 0.09,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1096453915/20697455669",
+        "resolvedUrl": "https://shopee.com.br/product/1096453915/20697455669",
+        "affiliateLink": "https://s.shopee.com.br/1BLjbQcT45",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 16
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "58213758018",
+        "shopId": "1731690990",
+        "title": "Mochila grande Time Futebol Envio Imediato Unissex",
+        "description": null,
+        "price": 34.95,
+        "originalPrice": null,
+        "minPrice": 34.95,
+        "maxPrice": 34.95,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/sg-11134201-82581-mqbwxgrav6dc16",
+        "video": null,
+        "shopName": "Shopping Urbano",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1731690990/58213758018",
+        "resolvedUrl": "https://shopee.com.br/product/1731690990/58213758018",
+        "affiliateLink": "https://s.shopee.com.br/6q06LqLE5c",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 17
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "58255430563",
+        "shopId": "361929938",
+        "title": "Uma Roupinha Pet Super Confortável – A Partir de R$12,99 🐶💛 Promoção Imperdível!",
+        "description": null,
+        "price": 15.99,
+        "originalPrice": null,
+        "minPrice": 15.99,
+        "maxPrice": 15.99,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-820ln-mp2zfxxpeiv7b2",
+        "video": null,
+        "shopName": "Super Pet",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/361929938/58255430563",
+        "resolvedUrl": "https://shopee.com.br/product/361929938/58255430563",
+        "affiliateLink": "https://s.shopee.com.br/5VUilOUZ4L",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 18
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "22998785704",
+        "shopId": "1595306121",
+        "title": "Tênis Feminino Tipo Meia Slip-on 34 ao 39 – Conforto e Praticidade",
+        "description": null,
+        "price": 29.97,
+        "originalPrice": null,
+        "minPrice": 29.97,
+        "maxPrice": 29.97,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/br-11134207-7r98o-md20nxrz19ttba",
+        "video": null,
+        "shopName": "Sapataria Mineira",
+        "commissionRate": 0.03,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1595306121/22998785704",
+        "resolvedUrl": "https://shopee.com.br/product/1595306121/22998785704",
+        "affiliateLink": "https://s.shopee.com.br/7psdXgQDcg",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 19
+      },
+      "collections": []
+    },
+    {
+      "product": {
+        "source": "shopee_api",
+        "marketplace": "shopee",
+        "itemId": "22694525800",
+        "shopId": "1620515295",
+        "title": "Mochila Bolsa Feminina Alça Lateral Ajustável Antifurto Impermeável",
+        "description": null,
+        "price": 38.99,
+        "originalPrice": null,
+        "minPrice": 38.99,
+        "maxPrice": 38.99,
+        "currency": "BRL",
+        "image": "https://cf.shopee.com.br/file/sg-11134201-824j1-mfpa5utwpki743",
+        "video": null,
+        "shopName": "man.yoo",
+        "commissionRate": 0.07,
+        "category1": null,
+        "category2": null,
+        "category3": null,
+        "originalUrl": "https://shopee.com.br/product/1620515295/22694525800",
+        "resolvedUrl": "https://shopee.com.br/product/1620515295/22694525800",
+        "affiliateLink": "https://s.shopee.com.br/3VjeNikyhh",
+        "available": null,
+        "metadata": {
+          "provider": "Shopee Affiliate Open API",
+          "operation": "productOfferV2"
+        }
+      },
+      "visibility": {
+        "published": true,
+        "featured": false,
+        "position": 20
+      },
+      "collections": []
+    }
+  ]
+}

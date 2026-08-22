@@ -22,6 +22,10 @@ app.use('/api/vitrine2', defaultVitrine2Router);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+app.get('/vitrine2', (req, res) => {
+    res.render('vitrine2');
+});
+
 const dbPath = path.join(__dirname, 'database.sqlite');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) console.error('Erro ao conectar ao SQLite:', err.message);

@@ -1,89 +1,10 @@
-# ==============================
-# Shopee BioLink SaaS
-# ==============================
-
-# Dependências Node.js
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Variáveis de ambiente / segredos
 .env
 .env.*
-!.env.example
-
-# Banco SQLite local
-database.sqlite
-database.sqlite-shm
-database.sqlite-wal
-*.db-shm
-*.db-wal
-
-# Logs
-logs/
-*.log
-
-# Arquivos temporários
-tmp/
-temp/
-*.tmp
-*.temp
-
-# Sistema operacional
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# VS Code
+chrome-shopee-profile-test/
+data/shopee-feed/
+*.zip
 .vscode/
-
-# Cobertura / build
-coverage/
-dist/
-build/
-
-# Puppeteer / Chrome
-.local-chromium/
-.cache/
-
-# Backups locais
-*.bak
-*.backup
-# ==============================
-# Shopee BioLink - arquivos locais
-# ==============================
-
-# Perfil local do Chrome
-chrome-shopee-profile/
-
-# Bancos e backups
-*.sqlite
-*.sqlite-shm
-*.sqlite-wal
-*.backup.sqlite
-
-# Backups de código
-*.backup.js
-*.bak.js
-
-# Saída do servidor
-server_stdout.txt
-server_stderr.txt
-
-# HTML de debug / temporários
-debug_*.html
-tmp_*.html
-
-# Capturas e respostas da Shopee
-shopee_api*.json
-shopee_api*.txt
-body.json
-
-# Scripts temporários de investigação
-temp_*.js
-
-# Arquivos temporários em geral
-tmp_*
-# Quarentena temporária do projeto
 _lixo_temporario/
+chrome-shopee-profile/
+database.sqlite
