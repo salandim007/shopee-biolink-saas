@@ -152,21 +152,82 @@
             }
         }
 
+        
+        
         .category-chip {
-            transition: all .2s ease;
+            transition:
+                transform .14s ease,
+                box-shadow .14s ease,
+                border-color .14s ease,
+                background-color .14s ease;
+
+            -webkit-tap-highlight-color:
+                transparent;
+
+            background: #ffffff;
+            color: #334155;
+            border-color: #e2e8f0;
+
+            box-shadow:
+                0 3px 0 #d1d5db,
+                0 7px 14px rgba(15, 23, 42, .06);
         }
 
         .category-chip:hover {
-            transform: translateY(-1px);
+            background: #ffffff;
+            color: #334155;
+            border-color: #cbd5e1;
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 5px 0 #c7cdd4,
+                0 10px 18px rgba(15, 23, 42, .08);
+        }
+
+        .category-chip:active {
+            background: #ffffff;
+            color: #334155;
+            border-color: #cbd5e1;
+
+            transform:
+                translateY(2px)
+                scale(.975);
+
+            box-shadow:
+                0 1px 0 #c7cdd4,
+                0 4px 8px rgba(15, 23, 42, .06);
+        }
+
+        .category-chip:focus-visible {
+            outline:
+                2px solid rgba(100, 116, 139, .28);
+
+            outline-offset:
+                2px;
         }
 
         .category-chip.active {
-            background: #38bdf8;
-            color: white;
-            border-color: #2563eb;
+            background: #ffffff;
+            color: #334155;
+            border-color: #e2e8f0;
+
+            transform: none;
+
             box-shadow:
-                0 8px 20px rgba(37, 99, 235, .20);
+                0 3px 0 #d1d5db,
+                0 7px 14px rgba(15, 23, 42, .06);
         }
+
+        .category-chip.active span[class*="bg-sky-50"],
+        .category-chip:hover span[class*="bg-sky-50"],
+        .category-chip:active span[class*="bg-sky-50"] {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+
 
         .hero-product-image {
             filter:
@@ -188,6 +249,196 @@
         .mobile-menu.open {
             transform: translateX(0);
         }
+    
+        
+
+    
+        @media (max-width: 520px) {
+            #navigationHub .container-main {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            #navigationHub select {
+                width: 138px;
+                max-width: 138px;
+            }
+
+            #navigationHub button {
+                min-width: 0;
+            }
+
+            #navigationHub button strong {
+                max-width: none;
+                white-space: nowrap;
+                font-size: 13px;
+            }
+
+            #navigationHub #selectedCategoryLabel {
+                max-width: 165px;
+                font-size: 11px;
+            }
+        }
+
+    
+        :root {
+            --sticky-topbar-height: 38px;
+            --sticky-header-height: 72px;
+            --sticky-hub-height: 76px;
+        }
+
+        #stickyMainHeader {
+            box-shadow:
+                0 4px 14px rgba(15, 23, 42, .04);
+        }
+
+        #navigationHub {
+            box-shadow:
+                0 5px 12px rgba(15, 23, 42, .035);
+        }
+
+        @media (max-width: 768px) {
+            #stickyMainHeader {
+                box-shadow:
+                    0 3px 10px rgba(15, 23, 42, .04);
+            }
+        }
+
+    
+        #stickyTopBar {
+            box-shadow: 0 1px 0 rgba(15, 23, 42, .05);
+        }
+
+        #categoryMenuPanel {
+            border-right: 1px solid #e2e8f0;
+        }
+
+        #categorySubmenuPanel {
+            width: 82%;
+            max-width: 300px;
+            left: 0;
+            border-right: 1px solid #e2e8f0;
+            transform: translateX(-100%);
+        }
+        #categorySubmenuPanel.open { transform: translateX(0); }
+        @media (min-width: 641px) {
+            #categorySubmenuPanel {
+                width: 78%; max-width: 320px; left: min(78vw, 320px);
+                transform: translateX(-20px); opacity: 0; pointer-events: none;
+            }
+            #categorySubmenuPanel.open { transform: translateX(0); opacity: 1; pointer-events: auto; }
+        }
+
+        @media (max-width: 520px) {
+            #categoryMenuPanel {
+                width: 82%;
+                max-width: 300px;
+            }
+        }
+
+    
+        #stickyMainHeader {
+            top: var(--sticky-topbar-height);
+        }
+
+        #navigationHub {
+            top:
+                calc(
+                    var(--sticky-topbar-height) +
+                    var(--sticky-header-height)
+                );
+        }
+
+        #ofertas,
+        #destaques,
+        #todos {
+            scroll-margin-top:
+                calc(
+                    var(--sticky-topbar-height) +
+                    var(--sticky-header-height) +
+                    var(--sticky-hub-height) +
+                    18px
+                );
+        }
+
+        #fixedNavigationSpacer {
+            width: 100%;
+            pointer-events: none;
+        }
+
+    
+        @media (max-width: 640px) {
+            #stickyTopBar {
+                font-size: 11px;
+                line-height: 1.15;
+            }
+
+            #stickyTopBar > div {
+                min-height: 0;
+                padding-top: 5px;
+                padding-bottom: 5px;
+            }
+
+            #stickyTopBar .container-main {
+                gap: 6px;
+            }
+        }
+
+    
+        @media (max-width: 640px) {
+            #todos {
+                padding-top: 18px !important;
+            }
+
+            #todos h2 {
+                font-size: 1.75rem;
+                line-height: 1.05;
+            }
+
+            #todos .section-title {
+                margin-bottom: 4px;
+            }
+        }
+
+    
+        @media (max-width: 640px) {
+            .product-card > div:first-child {
+                aspect-ratio: 1 / 0.82;
+            }
+
+            .product-card h3 {
+                font-size: 12px;
+                line-height: 1.25;
+                min-height: 30px;
+            }
+
+            .product-card .mt-3 {
+                margin-top: 8px;
+            }
+
+            .product-card .mt-auto.pt-4 {
+                padding-top: 10px;
+            }
+        }
+
+    
+        @media (min-width: 768px) {
+            #stickyMainHeader .container-main {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 640px) {
+            #stickyMainHeader {
+                min-height: 58px;
+            }
+        }
+
+    
+        #categoryChips button:first-child {
+            margin-bottom: 4px;
+        }
+
     </style>
 </head>
 
@@ -197,7 +448,7 @@
     <!-- TOP BAR                                                -->
     <!-- ====================================================== -->
 
-    <div class="topbar-gradient text-sky-950">
+    <div id="stickyTopBar" class="fixed top-0 left-0 right-0 z-[90] topbar-gradient text-sky-950">
 
         <div
             class="
@@ -251,13 +502,15 @@
     <!-- HEADER                                                 -->
     <!-- ====================================================== -->
 
-    <header
+    <header id="stickyMainHeader"
         class="
             bg-white/95
             backdrop-blur
-            sticky
-            top-0
-            z-40
+            fixed
+            left-0
+            right-0
+            top-[var(--sticky-topbar-height)]
+            z-[85]
             border-b
             border-slate-100
         "
@@ -332,52 +585,7 @@
 
             <!-- SEARCH -->
 
-            <div
-                class="
-                    hidden
-                    md:flex
-                    flex-1
-                    max-w-3xl
-                    mx-auto
-                    relative
-                "
-            >
-
-                <i
-                    class="
-                        fa-solid
-                        fa-magnifying-glass
-                        absolute
-                        left-5
-                        top-1/2
-                        -translate-y-1/2
-                        text-slate-400
-                    "
-                ></i>
-
-                <input
-                    id="desktopSearch"
-                    type="search"
-                    placeholder="Buscar produtos e categorias..."
-                    autocomplete="off"
-                    class="
-                        floating-search
-                        w-full
-                        h-12
-                        rounded-full
-                        border
-                        border-slate-200
-                        bg-slate-50
-                        pl-12
-                        pr-5
-                        outline-none
-                        focus:bg-white
-                        focus:border-sky-300
-                        transition
-                    "
-                >
-
-            </div>
+            
 
 
             <!-- DESKTOP NAV -->
@@ -396,21 +604,21 @@
             >
 
                 <button
-                    onclick="scrollToSection('ofertas')"
+                    onclick="navigateToCatalogSection('ofertas')"
                     class="hover:text-sky-800 transition"
                 >
                     Ofertas
                 </button>
 
                 <button
-                    onclick="scrollToSection('destaques')"
+                    onclick="navigateToCatalogSection('destaques')"
                     class="hover:text-sky-800 transition"
                 >
                     Destaques
                 </button>
 
                 <button
-                    onclick="scrollToSection('todos')"
+                    onclick="navigateToCatalogSection('todos')"
                     class="hover:text-sky-800 transition"
                 >
                     Produtos
@@ -454,40 +662,7 @@
             "
         >
 
-            <div class="relative">
-
-                <i
-                    class="
-                        fa-solid
-                        fa-magnifying-glass
-                        absolute
-                        left-4
-                        top-1/2
-                        -translate-y-1/2
-                        text-slate-400
-                    "
-                ></i>
-
-                <input
-                    id="mobileSearch"
-                    type="search"
-                    placeholder="O que você está procurando?"
-                    autocomplete="off"
-                    class="
-                        w-full
-                        h-11
-                        rounded-full
-                        border
-                        border-slate-200
-                        bg-slate-50
-                        pl-11
-                        pr-4
-                        outline-none
-                        focus:border-sky-300
-                    "
-                >
-
-            </div>
+            
 
         </div>
 
@@ -621,351 +796,401 @@
         <!-- TRUST                                              -->
         <!-- ================================================== -->
 
-        <section class="container-main py-7">
-
-            <div
-                class="
-                    grid
-                    grid-cols-1
-                    sm:grid-cols-3
-                    gap-3
-                "
-            >
-
-                <div
-                    class="
-                        bg-white
-                        border
-                        border-slate-100
-                        rounded-2xl
-                        p-4
-                        flex
-                        items-center
-                        gap-3
-                    "
-                >
-                    <div
-                        class="
-                            w-10
-                            h-10
-                            rounded-xl
-                            bg-sky-50
-                            text-sky-600
-                            flex
-                            items-center
-                            justify-center
-                        "
-                    >
-                        <i class="fa-solid fa-tags"></i>
-                    </div>
-
-                    <div>
-                        <strong class="block text-sm">
-                            Boas ofertas
-                        </strong>
-
-                        <span class="text-xs text-slate-500">
-                            Seleção da vitrine
-                        </span>
-                    </div>
-                </div>
+        
 
 
-                <div
-                    class="
-                        bg-white
-                        border
-                        border-slate-100
-                        rounded-2xl
-                        p-4
-                        flex
-                        items-center
-                        gap-3
-                    "
-                >
-                    <div
-                        class="
-                            w-10
-                            h-10
-                            rounded-xl
-                            bg-sky-50
-                            text-sky-600
-                            flex
-                            items-center
-                            justify-center
-                        "
-                    >
-                        <i class="fa-solid fa-lock"></i>
-                    </div>
-
-                    <div>
-                        <strong class="block text-sm">
-                            Compra segura
-                        </strong>
-
-                        <span class="text-xs text-slate-500">
-                            Finalizada na Shopee
-                        </span>
-                    </div>
-                </div>
-
-
-                <div
-                    class="
-                        bg-white
-                        border
-                        border-slate-100
-                        rounded-2xl
-                        p-4
-                        flex
-                        items-center
-                        gap-3
-                    "
-                >
-                    <div
-                        class="
-                            w-10
-                            h-10
-                            rounded-xl
-                            bg-sky-50
-                            text-sky-600
-                            flex
-                            items-center
-                            justify-center
-                        "
-                    >
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-
-                    <div>
-                        <strong class="block text-sm">
-                            Destaques
-                        </strong>
-
-                        <span class="text-xs text-slate-500">
-                            Produtos selecionados
-                        </span>
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
 
 
         <!-- ================================================== -->
         <!-- CATEGORIES                                         -->
         <!-- ================================================== -->
 
-        <section class="container-main">
+        <section
+            id="navigationHub"
+            class="
+                fixed
+                left-0
+                right-0
+                top-[calc(var(--sticky-topbar-height)+var(--sticky-header-height))]
+                z-[75]
+                bg-slate-50/95
+                backdrop-blur
+                pt-2
+                pb-2
+            "
+        >
+            <div class="container-main">
 
-            <div
-                class="
-                    flex
-                    items-center
-                    justify-between
-                    gap-4
-                    mb-4
-                "
-            >
+                <div
+                    class="
+                        w-full
+                        rounded-[22px]
+                        border
+                        border-slate-200
+                        bg-white
+                        px-2.5
+                        py-2
+                        sm:px-4
+                        flex
+                        items-center
+                        justify-between
+                        gap-3
+                        shadow-sm
+                    "
+                >
 
-                <div>
-
-                    <h2
+                    <button
+                        id="openCategoryMenu"
+                        type="button"
                         class="
-                            text-xl
-                            md:text-2xl
-                            font-extrabold
-                            tracking-tight
+                            min-w-0
+                            flex
+                            items-center
+                            gap-2
+                            text-left
+                            flex-1
+                            rounded-xl
+                            px-2
+                            py-2
+                            transition
+                            hover:bg-slate-50
+                            active:scale-[.985]
+                        "
+                        aria-haspopup="dialog"
+                        aria-controls="categoryMenuOverlay"
+                    >
+                        <span
+                            class="
+                                w-8
+                                h-8
+                                sm:w-9
+                                sm:h-9
+                                rounded-xl
+                                bg-slate-50
+                                border
+                                border-slate-200
+                                text-slate-700
+                                flex
+                                items-center
+                                justify-center
+                                shrink-0
+                            "
+                        >
+                            <i class="fa-solid fa-bars"></i>
+                        </span>
+
+                        <span class="min-w-0">
+                            <strong
+                                class="
+                                    block
+                                    text-sm
+                                    sm:text-[15px]
+                                    font-extrabold
+                                    text-slate-900
+                                "
+                            >
+                                Explore por categoria
+                            </strong>
+
+                            <span
+                                id="selectedCategoryLabel"
+                                class="
+                                    block
+                                    text-xs
+                                    text-slate-500
+                                    mt-0
+                                    truncate
+                                "
+                            >
+                                Todos os produtos
+                            </span>
+                        </span>
+                    </button>
+
+                    <div
+                        class="
+                            relative
+                            shrink-0
+                            flex
+                            items-center
                         "
                     >
-                        Explore por categoria
-                    </h2>
+                        <i
+                            class="
+                                fa-solid
+                                fa-star
+                                absolute
+                                left-3
+                                pointer-events-none
+                                text-slate-500
+                                text-xs
+                                z-10
+                            "
+                        ></i>
 
-                    <p
-                        class="
-                            text-sm
-                            text-slate-500
-                            mt-1
-                        "
-                    >
-                        Encontre o que combina com você
-                    </p>
+                        <select
+                            id="sortProducts"
+                            class="
+                                appearance-none
+                                bg-white
+                                border
+                                border-slate-200
+                                rounded-xl
+                                pl-7
+                                pr-7
+                                py-2
+                                text-[11px]
+                                sm:text-sm
+                                font-bold
+                                text-slate-700
+                                outline-none
+                                cursor-pointer
+                                transition
+                                hover:border-slate-300
+                                focus:border-slate-400
+                            "
+                            aria-label="Ordenar produtos"
+                        >
+                            <option value="position">Recomendados</option>
+                            <option value="price-asc">Menor preço</option>
+                            <option value="price-desc">Maior preço</option>
+                            <option value="name">Nome A-Z</option>
+                        </select>
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-chevron-down
+                                absolute
+                                right-3
+                                pointer-events-none
+                                text-slate-400
+                                text-[10px]
+                            "
+                        ></i>
+                    </div>
 
                 </div>
 
             </div>
+        </section>
+
+        <div
+            id="fixedNavigationSpacer"
+            aria-hidden="true"
+        ></div>
 
 
-            <div
-                id="categoryChips"
+
+
+        <!-- ================================================== -->
+        <!-- CATEGORY DRAWER                                    -->
+        <!-- ================================================== -->
+
+        <div
+            id="categoryMenuOverlay"
+            class="
+                hidden
+                fixed
+                inset-0
+                z-[90]
+                bg-slate-950/45
+                backdrop-blur-[2px]
+            "
+            aria-hidden="true"
+        >
+
+            <aside
+                id="categoryMenuPanel"
                 class="
+                    absolute
+                    top-0
+                    left-0
+                    h-full
+                    w-[78%]
+                    max-w-[320px]
+                    bg-white
+                    shadow-2xl
+                    -translate-x-full
+                    transition-transform
+                    duration-300
+                    ease-out
                     flex
-                    gap-2
-                    overflow-x-auto
-                    hide-scrollbar
-                    pb-3
+                    flex-col
                 "
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="categoryMenuTitle"
             >
 
-                <button
-                    data-category=""
+                <div
                     class="
-                        category-chip
-                        active
-                        whitespace-nowrap
                         px-5
-                        py-2.5
-                        rounded-full
-                        border
-                        border-slate-200
-                        bg-white
-                        text-sm
-                        font-semibold
+                        py-5
+                        border-b
+                        border-slate-100
+                        flex
+                        items-center
+                        justify-between
+                        gap-4
                     "
                 >
-                    Todos
-                </button>
 
-            </div>
+                    <div>
 
-        </section>
+                        <h2
+                            id="categoryMenuTitle"
+                            class="
+                                text-xl
+                                font-extrabold
+                                tracking-tight
+                                text-slate-900
+                            "
+                        >
+                            Categorias
+                        </h2>
+
+                        <p
+                            id="categoryMenuSubtitle"
+                            class="
+                                text-sm
+                                text-slate-500
+                                mt-1
+                            "
+                        >
+                            Toque em uma categoria para explorar
+                        </p>
+
+                    </div>
+
+                    <button
+                        id="closeCategoryMenu"
+                        type="button"
+                        class="
+                            w-10
+                            h-10
+                            rounded-full
+                            bg-slate-100
+                            text-slate-600
+                            flex
+                            items-center
+                            justify-center
+                            transition
+                            hover:bg-slate-200
+                        "
+                        aria-label="Fechar categorias"
+                    >
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="categoryChips"
+                    class="
+                        flex-1
+                        overflow-y-auto
+                        px-4
+                        py-4
+                        space-y-2
+                    "
+                >
+
+                    <button
+                        data-category=""
+                        class="
+                            category-chip
+                            active
+                            w-full
+                            min-h-[54px]
+                            rounded-2xl
+                            border
+                            border-slate-200
+                            bg-white
+                            px-4
+                            py-3
+                            flex
+                            items-center
+                            justify-between
+                            gap-3
+                            text-left
+                            font-bold
+                            text-slate-700
+                        "
+                    >
+                        <span
+                            class="
+                                flex
+                                items-center
+                                gap-3
+                                min-w-0
+                            "
+                        >
+                            <span
+                                class="
+                                    w-9
+                                    h-9
+                                    rounded-xl
+                                    bg-sky-50
+                                    text-sky-600
+                                    flex
+                                    items-center
+                                    justify-center
+                                    shrink-0
+                                "
+                            >
+                                <i class="fa-solid fa-border-all"></i>
+                            </span>
+
+                            <span class="truncate">
+                                Todos os produtos
+                            </span>
+                        </span>
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-chevron-right
+                                text-xs
+                                opacity-50
+                                shrink-0
+                            "
+                        ></i>
+                    </button>
+
+                </div>
+
+            </aside>
+
+            <aside id="categorySubmenuPanel" class="absolute top-0 h-full bg-white shadow-2xl transition-all duration-300 ease-out flex flex-col z-[2]" aria-hidden="true">
+                <div class="px-5 py-5 border-b border-slate-100 flex items-center justify-between gap-4">
+                    <div class="min-w-0">
+                        <h2 id="categorySubmenuTitle" class="text-xl font-extrabold tracking-tight text-slate-900 truncate">Categoria</h2>
+                        <p class="text-sm text-slate-500 mt-1">Escolha uma subcategoria</p>
+                    </div>
+                    <button id="closeCategorySubmenu" type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center transition hover:bg-slate-200 shrink-0" aria-label="Voltar para categorias">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                </div>
+                <div id="subcategoryChips" class="flex-1 overflow-y-auto px-4 py-4 space-y-2"></div>
+            </aside>
+
+        </div>
 
 
         <!-- ================================================== -->
         <!-- PROMOTIONS                                         -->
         <!-- ================================================== -->
 
-        <section
-            id="ofertas"
-            class="hidden container-main py-10"
-        >
-
-            <div
-                class="
-                    flex
-                    items-end
-                    justify-between
-                    gap-4
-                    mb-6
-                "
-            >
-
-                <div>
-
-                    <div class="flex items-center">
-
-                        <h2
-                            class="
-                                section-title
-                                flex
-                                items-center
-                                text-2xl
-                                md:text-3xl
-                                font-extrabold
-                                tracking-tight
-                            "
-                        >
-                            Ofertas e Promoções
-                        </h2>
-
-                    </div>
-
-                    <p
-                        class="
-                            text-sm
-                            md:text-base
-                            text-slate-500
-                            mt-2
-                        "
-                    >
-                        Achadinhos que merecem sua atenção
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="promotionProducts"
-                class="
-                    flex
-                    gap-4
-                    overflow-x-auto
-                    hide-scrollbar
-                    pb-5
-                "
-            ></div>
-
-        </section>
+        
 
 
         <!-- ================================================== -->
         <!-- FEATURED                                           -->
         <!-- ================================================== -->
 
-        <section
-            id="destaques"
-            class="
-                hidden
-                bg-slate-50
-                border-y
-                border-slate-100
-                py-12
-            "
-        >
-
-            <div class="container-main">
-
-                <div class="mb-7">
-
-                    <div class="flex items-center">
-
-                        <h2
-                            class="
-                                section-title
-                                flex
-                                items-center
-                                text-2xl
-                                md:text-3xl
-                                font-extrabold
-                                tracking-tight
-                            "
-                        >
-                            Escolhas da Vitrine
-                        </h2>
-
-                    </div>
-
-                    <p
-                        class="
-                            text-slate-500
-                            mt-2
-                        "
-                    >
-                        Produtos que selecionamos para ficar em destaque
-                    </p>
-
-                </div>
-
-
-                <div
-                    id="featuredProducts"
-                    class="
-                        grid
-                        grid-cols-2
-                        md:grid-cols-3
-                        lg:grid-cols-4
-                        xl:grid-cols-5
-                        gap-3
-                        md:gap-5
-                    "
-                ></div>
-
-            </div>
-
-        </section>
+        
 
 
         <!-- ================================================== -->
@@ -1022,38 +1247,7 @@
                 </div>
 
 
-                <select
-                    id="sortProducts"
-                    class="
-                        bg-white
-                        border
-                        border-slate-200
-                        rounded-xl
-                        px-4
-                        py-3
-                        text-sm
-                        font-medium
-                        outline-none
-                        focus:border-sky-300
-                    "
-                >
-                    <option value="position">
-                        Recomendados
-                    </option>
-
-                    <option value="price-asc">
-                        Menor preço
-                    </option>
-
-                    <option value="price-desc">
-                        Maior preço
-                    </option>
-
-                    <option value="name">
-                        Nome A-Z
-                    </option>
-
-                </select>
+                
 
             </div>
 
@@ -1170,9 +1364,7 @@
                 class="
                     grid
                     grid-cols-2
-                    md:grid-cols-3
                     lg:grid-cols-4
-                    xl:grid-cols-5
                     gap-2.5
                     md:gap-4
                 "
@@ -1570,6 +1762,8 @@
 
         let currentCategory = '';
 
+        let currentSubcategory = '';
+
         let currentSort = 'position';
 
 
@@ -1582,14 +1776,36 @@
         const allProductsElement =
             document.getElementById('allProducts');
 
-        const featuredProductsElement =
-            document.getElementById('featuredProducts');
-
-        const promotionProductsElement =
-            document.getElementById('promotionProducts');
-
         const categoryChipsElement =
             document.getElementById('categoryChips');
+
+        const categoryMenuTitleElement =
+            document.getElementById('categoryMenuTitle');
+
+        const categoryMenuSubtitleElement =
+            document.getElementById('categoryMenuSubtitle');
+
+
+        const openCategoryMenuButton =
+            document.getElementById('openCategoryMenu');
+
+        const closeCategoryMenuButton =
+            document.getElementById('closeCategoryMenu');
+
+        const categoryMenuOverlay =
+            document.getElementById('categoryMenuOverlay');
+
+        const categoryMenuPanel =
+            document.getElementById('categoryMenuPanel');
+
+        const categorySubmenuPanel = document.getElementById('categorySubmenuPanel');
+        const categorySubmenuTitleElement = document.getElementById('categorySubmenuTitle');
+        const subcategoryChipsElement = document.getElementById('subcategoryChips');
+        const closeCategorySubmenuButton = document.getElementById('closeCategorySubmenu');
+
+        const selectedCategoryLabel =
+            document.getElementById('selectedCategoryLabel');
+
 
         const productCounterElement =
             document.getElementById('productCounter');
@@ -1599,15 +1815,65 @@
 
         const errorStateElement =
             document.getElementById('errorState');
-
-        const desktopSearch =
-            document.getElementById('desktopSearch');
-
-        const mobileSearch =
-            document.getElementById('mobileSearch');
-
-        const sortProducts =
+const sortProducts =
             document.getElementById('sortProducts');
+
+
+        const stickyMainHeader =
+            document.getElementById('stickyMainHeader');
+
+        const stickyTopBar =
+            document.getElementById('stickyTopBar');
+
+
+
+        function updateStickyHeaderHeight() {
+
+            const topbarHeight =
+                stickyTopBar
+                    ? stickyTopBar.offsetHeight
+                    : 0;
+
+            const headerHeight =
+                stickyMainHeader
+                    ? stickyMainHeader.offsetHeight
+                    : 0;
+
+            const navigationHub =
+                document.getElementById(
+                    'navigationHub'
+                );
+
+            const hubHeight =
+                navigationHub
+                    ? navigationHub.offsetHeight
+                    : 0;
+
+            document.documentElement.style.setProperty(
+                '--sticky-topbar-height',
+                `${topbarHeight}px`
+            );
+
+            document.documentElement.style.setProperty(
+                '--sticky-header-height',
+                `${headerHeight}px`
+            );
+
+            document.documentElement.style.setProperty(
+                '--sticky-hub-height',
+                `${hubHeight}px`
+            );
+
+            const spacer =
+                document.getElementById(
+                    'fixedNavigationSpacer'
+                );
+
+            if (spacer) {
+                spacer.style.height =
+                    `${topbarHeight + headerHeight + hubHeight}px`;
+            }
+        }
 
 
         /*
@@ -1958,25 +2224,766 @@
          * =====================================================
          */
 
-        function getProductCategories(
+        function inferCategoryFromTitle(
+            title
+        ) {
+
+            const value =
+                normalizeText(
+                    title
+                );
+
+
+            const groups = [
+                {
+                    name: 'Moda',
+                    words: [
+                        'camisa',
+                        'camiseta',
+                        'blusa',
+                        'vestido',
+                        'calca',
+                        'short',
+                        'bermuda',
+                        'cueca',
+                        'calcinha',
+                        'meia',
+                        'roupa',
+                        'tenis',
+                        'sapato',
+                        'sandalia',
+                        'chinelo'
+                    ]
+                },
+                {
+                    name: 'Eletrônicos',
+                    words: [
+                        'fone',
+                        'bluetooth',
+                        'celular',
+                        'smartphone',
+                        'carregador',
+                        'cabo',
+                        'headset',
+                        'smartwatch',
+                        'caixa de som',
+                        'controle',
+                        'led'
+                    ]
+                },
+                {
+                    name: 'Casa e Cozinha',
+                    words: [
+                        'cozinha',
+                        'panela',
+                        'copo',
+                        'garrafa',
+                        'tapete',
+                        'lencol',
+                        'cama',
+                        'toalha',
+                        'organizador',
+                        'decoracao',
+                        'luminaria',
+                        'pote'
+                    ]
+                },
+                {
+                    name: 'Beleza e Cuidados',
+                    words: [
+                        'perfume',
+                        'maquiagem',
+                        'creme',
+                        'shampoo',
+                        'escova',
+                        'secador',
+                        'beleza',
+                        'hidratante'
+                    ]
+                },
+                {
+                    name: 'Acessórios',
+                    words: [
+                        'bolsa',
+                        'mochila',
+                        'relogio',
+                        'oculos',
+                        'carteira',
+                        'colar',
+                        'pulseira'
+                    ]
+                },
+                {
+                    name: 'Ferramentas',
+                    words: [
+                        'ferramenta',
+                        'furadeira',
+                        'parafusadeira',
+                        'chave',
+                        'alicate'
+                    ]
+                },
+                {
+                    name: 'Automotivo',
+                    words: [
+                        'automotivo',
+                        'carro',
+                        'moto',
+                        'veicular'
+                    ]
+                },
+                {
+                    name: 'Infantil',
+                    words: [
+                        'bebe',
+                        'infantil',
+                        'crianca',
+                        'brinquedo'
+                    ]
+                },
+                {
+                    name: 'Pet',
+                    words: [
+                        'pet',
+                        'cachorro',
+                        'gato'
+                    ]
+                },
+                {
+                    name: 'Esporte e Lazer',
+                    words: [
+                        'academia',
+                        'fitness',
+                        'esporte',
+                        'bicicleta',
+                        'camping'
+                    ]
+                }
+            ];
+
+
+            for (const group of groups) {
+
+                if (
+                    group.words.some(
+                        word =>
+                            value.includes(
+                                word
+                            )
+                    )
+                ) {
+                    return group.name;
+                }
+            }
+
+
+            return 'Outros achadinhos';
+        }
+
+
+        function getPrimaryCategory(
             product
         ) {
 
-            return [
+            const candidates = [
                 product.category1,
+                product.metadata?.categoryDisplayName
+            ]
+                .map(
+                    item =>
+                        String(
+                            item || ''
+                        ).trim()
+                )
+                .filter(Boolean);
+
+
+            if (candidates.length) {
+                return candidates[0];
+            }
+
+
+            return inferCategoryFromTitle(
+                product.title || ''
+            );
+        }
+
+
+        function inferSubcategoryFromTitle(
+            product,
+            primaryCategory
+        ) {
+
+            const value =
+                normalizeText(
+                    product.title || ''
+                );
+
+            const primary =
+                normalizeText(
+                    primaryCategory || ''
+                );
+
+
+            const rules = {
+
+                moda: [
+                    ['Calçados', [
+                        'tenis',
+                        'sapato',
+                        'sandalia',
+                        'chinelo',
+                        'sapatilha',
+                        'bota',
+                        'slip on'
+                    ]],
+                    ['Moda Feminina', [
+                        'feminina',
+                        'feminino',
+                        'vestido',
+                        'blusa',
+                        'cropped',
+                        'saia'
+                    ]],
+                    ['Moda Masculina', [
+                        'masculina',
+                        'masculino',
+                        'camiseta',
+                        'camisa',
+                        'cueca',
+                        'bermuda'
+                    ]],
+                    ['Moda Infantil', [
+                        'infantil',
+                        'menina',
+                        'menino',
+                        'crianca'
+                    ]],
+                    ['Acessórios de Moda', [
+                        'bolsa',
+                        'carteira',
+                        'cinto',
+                        'oculos',
+                        'relogio',
+                        'colar',
+                        'pulseira'
+                    ]]
+                ],
+
+                eletronicos: [
+                    ['Áudio', [
+                        'fone',
+                        'headset',
+                        'caixa de som',
+                        'speaker'
+                    ]],
+                    ['Celulares e Acessórios', [
+                        'celular',
+                        'smartphone',
+                        'capa',
+                        'carregador',
+                        'cabo',
+                        'pelicula'
+                    ]],
+                    ['Relógios e Wearables', [
+                        'smartwatch',
+                        'smart watch',
+                        'relogio inteligente'
+                    ]],
+                    ['Informática', [
+                        'mouse',
+                        'teclado',
+                        'notebook',
+                        'usb',
+                        'hub'
+                    ]]
+                ],
+
+                'casa e cozinha': [
+                    ['Cozinha', [
+                        'panela',
+                        'marmita',
+                        'pote',
+                        'copo',
+                        'garrafa',
+                        'cozinha',
+                        'talher'
+                    ]],
+                    ['Organização', [
+                        'organizador',
+                        'caixa organizadora',
+                        'suporte'
+                    ]],
+                    ['Decoração', [
+                        'decoracao',
+                        'luminaria',
+                        'tapete',
+                        'cortina'
+                    ]],
+                    ['Quarto e Cama', [
+                        'cama',
+                        'lencol',
+                        'travesseiro',
+                        'cabana',
+                        'tenda'
+                    ]],
+                    ['Ventilação', [
+                        'ventilador',
+                        'climatizador'
+                    ]]
+                ],
+
+                'beleza e cuidados': [
+                    ['Perfumes', [
+                        'perfume',
+                        'colonia'
+                    ]],
+                    ['Cabelos', [
+                        'shampoo',
+                        'condicionador',
+                        'escova',
+                        'secador',
+                        'cabelo'
+                    ]],
+                    ['Maquiagem', [
+                        'maquiagem',
+                        'batom',
+                        'base',
+                        'rimel'
+                    ]],
+                    ['Cuidados Pessoais', [
+                        'creme',
+                        'hidratante',
+                        'pele'
+                    ]]
+                ],
+
+                acessorios: [
+                    ['Bolsas e Mochilas', [
+                        'bolsa',
+                        'mochila'
+                    ]],
+                    ['Relógios', [
+                        'relogio'
+                    ]],
+                    ['Óculos', [
+                        'oculos'
+                    ]],
+                    ['Bijuterias', [
+                        'colar',
+                        'pulseira',
+                        'brinco'
+                    ]]
+                ],
+
+                infantil: [
+                    ['Roupas Infantis', [
+                        'roupa',
+                        'camiseta',
+                        'vestido',
+                        'conjunto'
+                    ]],
+                    ['Calçados Infantis', [
+                        'tenis',
+                        'sandalia',
+                        'chinelo'
+                    ]],
+                    ['Brinquedos', [
+                        'brinquedo',
+                        'boneca',
+                        'carrinho',
+                        'jogo'
+                    ]],
+                    ['Quarto Infantil', [
+                        'cabana',
+                        'tenda',
+                        'cama',
+                        'tapete'
+                    ]]
+                ],
+
+                automotivo: [
+                    ['Acessórios para Carro', [
+                        'carro',
+                        'automotivo',
+                        'painel',
+                        'volante',
+                        'fibra de carbono'
+                    ]],
+                    ['Acessórios para Moto', [
+                        'moto',
+                        'motocicleta'
+                    ]]
+                ],
+
+                ferramentas: [
+                    ['Ferramentas Elétricas', [
+                        'furadeira',
+                        'parafusadeira'
+                    ]],
+                    ['Ferramentas Manuais', [
+                        'alicate',
+                        'chave',
+                        'martelo'
+                    ]]
+                ],
+
+                pet: [
+                    ['Cães', [
+                        'cachorro',
+                        'cao'
+                    ]],
+                    ['Gatos', [
+                        'gato'
+                    ]],
+                    ['Acessórios Pet', [
+                        'pet',
+                        'coleira',
+                        'comedouro'
+                    ]]
+                ],
+
+                'esporte e lazer': [
+                    ['Fitness', [
+                        'academia',
+                        'fitness',
+                        'halter',
+                        'treino'
+                    ]],
+                    ['Ciclismo', [
+                        'bicicleta',
+                        'bike',
+                        'ciclismo'
+                    ]],
+                    ['Camping e Lazer', [
+                        'camping',
+                        'barraca',
+                        'lazer'
+                    ]]
+                ]
+            };
+
+
+            const categoryRules =
+                rules[primary] || [];
+
+
+            for (
+                const [subcategory, words]
+                of categoryRules
+            ) {
+
+                if (
+                    words.some(
+                        word =>
+                            value.includes(
+                                normalizeText(
+                                    word
+                                )
+                            )
+                    )
+                ) {
+                    return subcategory;
+                }
+            }
+
+
+            return 'Outros';
+        }
+
+
+        function getProductSubcategory(
+            product,
+            primaryCategory
+        ) {
+
+            const candidates = [
+                product.metadata?.subcategoryDisplayName,
                 product.category2,
                 product.category3
             ]
-                .filter(Boolean)
                 .map(
                     item =>
-                        String(item).trim()
+                        String(
+                            item || ''
+                        ).trim()
                 )
-                .filter(Boolean);
+                .filter(Boolean)
+                .filter(
+                    item =>
+                        normalizeText(item) !==
+                        normalizeText(
+                            primaryCategory
+                        )
+                );
+
+
+            if (candidates.length) {
+                return candidates[0];
+            }
+
+
+            return inferSubcategoryFromTitle(
+                product,
+                primaryCategory
+            );
+        }
+
+
+        function openCategoryMenu() {
+
+            renderCategories();
+            closeCategorySubmenu();
+
+            categoryMenuOverlay.classList.remove(
+                'hidden'
+            );
+
+            categoryMenuOverlay.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+
+            document.body.style.overflow =
+                'hidden';
+
+            requestAnimationFrame(
+                () => {
+                    categoryMenuPanel.classList.remove(
+                        '-translate-x-full'
+                    );
+                }
+            );
+        }
+
+
+        function closeCategoryMenu() {
+
+            closeCategorySubmenu();
+
+            categoryMenuPanel.classList.add(
+                '-translate-x-full'
+            );
+
+            document.body.style.overflow =
+                '';
+
+            window.setTimeout(
+                () => {
+                    categoryMenuOverlay.classList.add(
+                        'hidden'
+                    );
+
+                    categoryMenuOverlay.setAttribute(
+                        'aria-hidden',
+                        'true'
+                    );
+                },
+                300
+            );
+        }
+
+
+        function updateSelectedCategoryLabel() {
+
+            if (
+                currentCategory &&
+                currentSubcategory
+            ) {
+                selectedCategoryLabel.textContent =
+                    `${currentCategory} › ${currentSubcategory}`;
+
+                return;
+            }
+
+
+            if (currentCategory) {
+                selectedCategoryLabel.textContent =
+                    `Categoria: ${currentCategory}`;
+
+                return;
+            }
+
+
+            selectedCategoryLabel.textContent =
+                'Todos os produtos';
+        }
+
+
+        function scrollToProductsAfterFilter() {
+
+            window.setTimeout(
+                () => {
+
+                    const section =
+                        document.getElementById(
+                            'todos'
+                        );
+
+                    if (!section) {
+                        return;
+                    }
+
+                    const top =
+                        section.getBoundingClientRect().top +
+                        window.scrollY -
+                        getFixedNavigationHeight() -
+                        8;
+
+                    window.scrollTo({
+                        top: Math.max(0, top),
+                        behavior: 'smooth'
+                    });
+                },
+                320
+            );
+        }
+
+
+        function applyCategoryFilter(
+            category,
+            subcategory = ''
+        ) {
+
+            currentCategory =
+                category || '';
+
+            currentSubcategory =
+                subcategory || '';
+
+            currentSearch = '';
+
+            updateSelectedCategoryLabel();
+            renderAllProducts();
+            closeCategoryMenu();
+            scrollToProductsAfterFilter();
+        }
+
+
+        function createCategoryMenuButton(
+            label,
+            options = {}
+        ) {
+
+            const button =
+                document.createElement(
+                    'button'
+                );
+
+            button.type =
+                'button';
+
+            button.className =
+                `
+                    category-chip
+                    w-full
+                    min-h-[52px]
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    bg-white
+                    px-3
+                    py-2.5
+                    flex
+                    items-center
+                    justify-between
+                    gap-3
+                    text-left
+                    font-bold
+                    text-slate-700
+                `;
+
+            const icon =
+                options.icon ||
+                'fa-tag';
+
+            button.innerHTML =
+                `
+                    <span
+                        class="
+                            flex
+                            items-center
+                            gap-3
+                            min-w-0
+                        "
+                    >
+                        <span
+                            class="
+                                w-9
+                                h-9
+                                rounded-xl
+                                bg-slate-50
+                                text-slate-600
+                                flex
+                                items-center
+                                justify-center
+                                shrink-0
+                            "
+                        >
+                            <i class="fa-solid ${icon}"></i>
+                        </span>
+
+                        <span class="truncate">
+                            ${escapeHtml(label)}
+                        </span>
+                    </span>
+
+                    ${
+                        options.noArrow
+                            ? ''
+                            : `
+                                <i
+                                    class="
+                                        fa-solid
+                                        fa-chevron-right
+                                        text-xs
+                                        opacity-50
+                                        shrink-0
+                                    "
+                                ></i>
+                            `
+                    }
+                `;
+
+            return button;
         }
 
 
         function renderCategories() {
+
+            categoryMenuTitleElement.textContent =
+                'Categorias';
+
+            categoryMenuSubtitleElement.textContent =
+                'Toque em uma categoria para explorar';
+
+            categoryChipsElement.innerHTML =
+                '';
+
+
+            const allButton =
+                createCategoryMenuButton(
+                    'Todos os produtos',
+                    {
+                        icon:
+                            'fa-border-all'
+                    }
+                );
+
+            allButton.addEventListener(
+                'click',
+                () => {
+                    applyCategoryFilter(
+                        '',
+                        ''
+                    );
+                }
+            );
+
+            categoryChipsElement.appendChild(
+                allButton
+            );
+
 
             const categories =
                 new Set();
@@ -1985,114 +2992,197 @@
             catalogProducts.forEach(
                 entry => {
 
-                    getProductCategories(
-                        entry.product || {}
-                    ).forEach(
-                        category =>
-                            categories.add(
-                                category
-                            )
-                    );
+                    const category =
+                        getPrimaryCategory(
+                            entry.product || {}
+                        );
+
+                    if (category) {
+                        categories.add(
+                            category
+                        );
+                    }
                 }
             );
+
+
+            const categoryPriority = [
+                'Moda',
+                'Eletrônicos',
+                'Casa e Cozinha',
+                'Beleza e Cuidados',
+                'Acessórios',
+                'Infantil',
+                'Esporte e Lazer',
+                'Automotivo',
+                'Ferramentas',
+                'Pet',
+                'Outros achadinhos'
+            ];
+
+
+            const priorityIndex =
+                value => {
+
+                    const normalized =
+                        normalizeText(
+                            value
+                        );
+
+                    const index =
+                        categoryPriority
+                            .findIndex(
+                                item =>
+                                    normalizeText(
+                                        item
+                                    ) ===
+                                    normalized
+                            );
+
+                    return index === -1
+                        ? 999
+                        : index;
+                };
 
 
             const sorted =
                 [...categories]
                     .sort(
-                        (a, b) =>
-                            a.localeCompare(
+                        (a, b) => {
+
+                            const priorityDifference =
+                                priorityIndex(a) -
+                                priorityIndex(b);
+
+                            if (
+                                priorityDifference !== 0
+                            ) {
+                                return priorityDifference;
+                            }
+
+                            return a.localeCompare(
                                 b,
                                 'pt-BR'
-                            )
+                            );
+                        }
                     );
-
-
-            categoryChipsElement
-                .querySelectorAll(
-                    '[data-generated="true"]'
-                )
-                .forEach(
-                    element =>
-                        element.remove()
-                );
 
 
             sorted.forEach(
                 category => {
 
                     const button =
-                        document.createElement(
-                            'button'
+                        createCategoryMenuButton(
+                            category
                         );
 
-                    button.dataset.category =
-                        category;
-
-                    button.dataset.generated =
-                        'true';
-
-                    button.className =
-                        `
-                            category-chip
-                            whitespace-nowrap
-                            px-5
-                            py-2.5
-                            rounded-full
-                            border
-                            border-slate-200
-                            bg-white
-                            text-sm
-                            font-semibold
-                            text-slate-600
-                        `;
-
-                    button.textContent =
-                        category;
+                    button.addEventListener(
+                        'click',
+                        () => {
+                            renderSubcategories(
+                                category
+                            );
+                        }
+                    );
 
                     categoryChipsElement.appendChild(
                         button
                     );
                 }
             );
-
-
-            categoryChipsElement
-                .querySelectorAll(
-                    '[data-category]'
-                )
-                .forEach(
-                    button => {
-
-                        button.addEventListener(
-                            'click',
-                            () => {
-
-                                currentCategory =
-                                    button.dataset.category ||
-                                    '';
-
-                                categoryChipsElement
-                                    .querySelectorAll(
-                                        '[data-category]'
-                                    )
-                                    .forEach(
-                                        item =>
-                                            item.classList.remove(
-                                                'active'
-                                            )
-                                    );
-
-                                button.classList.add(
-                                    'active'
-                                );
-
-                                renderAllProducts();
-                            }
-                        );
-                    }
-                );
         }
+
+
+        function closeCategorySubmenu() {
+            categorySubmenuPanel.classList.remove('open');
+            categorySubmenuPanel.setAttribute('aria-hidden', 'true');
+        }
+
+        function openCategorySubmenu() {
+            categorySubmenuPanel.setAttribute('aria-hidden', 'false');
+            requestAnimationFrame(() => categorySubmenuPanel.classList.add('open'));
+        }
+
+        function renderSubcategories(category) {
+            categorySubmenuTitleElement.textContent = category;
+            subcategoryChipsElement.innerHTML = '';
+
+            const backButton = createCategoryMenuButton('Voltar para categorias', { icon: 'fa-arrow-left', noArrow: true });
+            backButton.addEventListener('click', closeCategorySubmenu);
+            subcategoryChipsElement.appendChild(backButton);
+
+            const allInCategoryButton = createCategoryMenuButton(`Ver todos em ${category}`, { icon: 'fa-border-all' });
+            allInCategoryButton.addEventListener('click', () => applyCategoryFilter(category, ''));
+            subcategoryChipsElement.appendChild(allInCategoryButton);
+
+            const subcategories = new Set();
+            catalogProducts.forEach(entry => {
+                const product = entry.product || {};
+                const primary = getPrimaryCategory(product);
+                if (normalizeText(primary) !== normalizeText(category)) return;
+                const subcategory = getProductSubcategory(product, primary);
+                if (subcategory) subcategories.add(subcategory);
+            });
+
+            [...subcategories]
+                .sort((a, b) => {
+                    if (a === 'Outros') return 1;
+                    if (b === 'Outros') return -1;
+                    return a.localeCompare(b, 'pt-BR');
+                })
+                .forEach(subcategory => {
+                    const button = createCategoryMenuButton(subcategory, { icon: 'fa-tag', noArrow: true });
+                    button.addEventListener('click', () => applyCategoryFilter(category, subcategory));
+                    subcategoryChipsElement.appendChild(button);
+                });
+
+            openCategorySubmenu();
+        }
+
+
+        openCategoryMenuButton.addEventListener(
+            'click',
+            openCategoryMenu
+        );
+
+
+        closeCategorySubmenuButton.addEventListener('click', closeCategorySubmenu);
+
+
+        closeCategoryMenuButton.addEventListener(
+            'click',
+            closeCategoryMenu
+        );
+
+
+        categoryMenuOverlay.addEventListener(
+            'click',
+            event => {
+
+                if (
+                    event.target ===
+                    categoryMenuOverlay
+                ) {
+                    closeCategoryMenu();
+                }
+            }
+        );
+
+
+        document.addEventListener(
+            'keydown',
+            event => {
+
+                if (
+                    event.key === 'Escape' &&
+                    !categoryMenuOverlay.classList.contains(
+                        'hidden'
+                    )
+                ) {
+                    closeCategoryMenu();
+                }
+            }
+        );
 
 
         /*
@@ -2107,40 +3197,6 @@
                 [...catalogProducts];
 
 
-            if (currentSearch) {
-
-                const search =
-                    normalizeText(
-                        currentSearch
-                    );
-
-                items =
-                    items.filter(
-                        entry => {
-
-                            const product =
-                                entry.product || {};
-
-                            const searchable =
-                                normalizeText(
-                                    [
-                                        product.title,
-                                        product.category1,
-                                        product.category2,
-                                        product.category3
-                                    ]
-                                        .filter(Boolean)
-                                        .join(' ')
-                                );
-
-                            return searchable.includes(
-                                search
-                            );
-                        }
-                    );
-            }
-
-
             if (currentCategory) {
 
                 const category =
@@ -2152,16 +3208,44 @@
                     items.filter(
                         entry => {
 
-                            const categories =
-                                getProductCategories(
-                                    entry.product || {}
-                                )
-                                    .map(
-                                        normalizeText
-                                    );
+                            const product =
+                                entry.product || {};
 
-                            return categories.includes(
+                            const productCategory =
+                                normalizeText(
+                                    getPrimaryCategory(
+                                        product
+                                    )
+                                );
+
+                            if (
+                                productCategory !==
                                 category
+                            ) {
+                                return false;
+                            }
+
+
+                            if (!currentSubcategory) {
+                                return true;
+                            }
+
+
+                            const productSubcategory =
+                                normalizeText(
+                                    getProductSubcategory(
+                                        product,
+                                        getPrimaryCategory(
+                                            product
+                                        )
+                                    )
+                                );
+
+                            return (
+                                productSubcategory ===
+                                normalizeText(
+                                    currentSubcategory
+                                )
                             );
                         }
                     );
@@ -2299,145 +3383,11 @@
          * =====================================================
          */
 
-        function renderFeaturedProducts() {
-
-            const featured =
-                catalogProducts.filter(
-                    entry =>
-                        entry.visibility?.featured
-                );
-
-
-            const products =
-                featured.length
-                    ? featured
-                    : catalogProducts.slice(
-                        0,
-                        5
-                    );
-
-
-            featuredProductsElement.innerHTML =
-                products
-                    .slice(0, 10)
-                    .map(
-                        entry =>
-                            createProductCard(
-                                entry
-                            )
-                    )
-                    .join('');
-        }
-
-
         /*
          * =====================================================
          * PROMOÇÕES
          * =====================================================
          */
-
-        function renderPromotions() {
-
-            let promotions =
-                catalogProducts.filter(
-                    entry =>
-                        Array.isArray(
-                            entry.collections
-                        ) &&
-                        entry.collections.some(
-                            collection =>
-                                normalizeText(
-                                    collection
-                                ) ===
-                                'promocoes'
-                        )
-                );
-
-
-            if (
-                promotions.length === 0
-            ) {
-
-                promotions =
-                    catalogProducts.filter(
-                        entry =>
-                            getDiscountPercent(
-                                entry.product || {}
-                            )
-                    );
-            }
-
-
-            if (
-                promotions.length === 0
-            ) {
-
-                promotions =
-                    catalogProducts.slice(
-                        0,
-                        8
-                    );
-            }
-
-
-            promotionProductsElement.innerHTML =
-                promotions
-                    .map(
-                        entry =>
-                            createProductCard(
-                                entry,
-                                true
-                            )
-                    )
-                    .join('');
-        }
-
-
-        /*
-         * =====================================================
-         * BUSCA
-         * =====================================================
-         */
-
-        function updateSearch(
-            value
-        ) {
-
-            currentSearch =
-                String(value || '')
-                    .trim();
-
-            desktopSearch.value =
-                currentSearch;
-
-            mobileSearch.value =
-                currentSearch;
-
-            renderAllProducts();
-        }
-
-
-        desktopSearch.addEventListener(
-            'input',
-            event => {
-
-                updateSearch(
-                    event.target.value
-                );
-            }
-        );
-
-
-        mobileSearch.addEventListener(
-            'input',
-            event => {
-
-                updateSearch(
-                    event.target.value
-                );
-            }
-        );
-
 
         /*
          * =====================================================
@@ -2526,13 +3476,23 @@
         );
 
 
+        function navigateToCatalogSection(
+            id
+        ) {
+
+            scrollToSection(
+                id
+            );
+        }
+
+
         function mobileNavigate(
             id
         ) {
 
             closeMobileMenu();
 
-            scrollToSection(
+            navigateToCatalogSection(
                 id
             );
         }
@@ -2543,6 +3503,28 @@
          * NAVEGAÇÃO
          * =====================================================
          */
+
+        function getFixedNavigationHeight() {
+
+            const topbarHeight =
+                stickyTopBar?.offsetHeight || 0;
+
+            const headerHeight =
+                stickyMainHeader?.offsetHeight || 0;
+
+            const hubHeight =
+                document.getElementById(
+                    'navigationHub'
+                )?.offsetHeight || 0;
+
+            return (
+                topbarHeight +
+                headerHeight +
+                hubHeight +
+                18
+            );
+        }
+
 
         function scrollToSection(
             id
@@ -2557,9 +3539,14 @@
                 return;
             }
 
-            element.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+            const top =
+                element.getBoundingClientRect().top +
+                window.scrollY -
+                getFixedNavigationHeight();
+
+            window.scrollTo({
+                top: Math.max(0, top),
+                behavior: 'smooth'
             });
         }
 
@@ -2713,13 +3700,15 @@
 
 
 
-                renderCategories();
+                updateStickyHeaderHeight();
 
-                renderPromotions();
+        window.addEventListener(
+            'resize',
+            updateStickyHeaderHeight
+        );
 
-                renderFeaturedProducts();
-
-                renderAllProducts();
+        renderCategories();
+renderAllProducts();
 
 
             } catch (error) {
