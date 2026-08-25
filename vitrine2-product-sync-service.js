@@ -19,7 +19,7 @@ const {
  * - localizar o produto atual no catálogo;
  * - consultar os dados atuais na Shopee;
  * - preservar configurações internas da Vitrine;
- * - montar a versão atualizada do produto;
+ * - atualizar preço, comissão, links e categorias;
  * - permitir prévia sem salvar;
  * - salvar somente quando solicitado.
  *
@@ -43,7 +43,9 @@ function preserveCatalogOptions(entry) {
             null,
 
         collections:
-            Array.isArray(entry.collections)
+            Array.isArray(
+                entry.collections
+            )
                 ? [...entry.collections]
                 : []
     };
@@ -57,6 +59,21 @@ function mergeShopeeSnapshot(
     const current =
         currentProduct || {};
 
+    const currentMetadata =
+        current.metadata &&
+        typeof current.metadata ===
+            'object'
+            ? current.metadata
+            : {};
+
+    const categoryMetadata =
+        snapshot.categoryMetadata &&
+        typeof snapshot.categoryMetadata ===
+            'object'
+            ? snapshot.categoryMetadata
+            : {};
+
+
     return {
         ...current,
 
@@ -66,6 +83,10 @@ function mergeShopeeSnapshot(
         itemId:
             snapshot.itemId ||
             current.itemId,
+
+        shopId:
+            snapshot.shopId ??
+            current.shopId,
 
         title:
             snapshot.title ??
@@ -103,13 +124,86 @@ function mergeShopeeSnapshot(
             snapshot.commissionRate ??
             current.commissionRate,
 
+
+        // ====================================================
+        // CATEGORIAS
+        // ====================================================
+
+        category1:
+            snapshot.category1 ??
+            current.category1 ??
+            null,
+
+        category2:
+            snapshot.category2 ??
+            current.category2 ??
+            null,
+
+        category3:
+            snapshot.category3 ??
+            current.category3 ??
+            null,
+
+
+        // ====================================================
+        // METADATA
+        // ====================================================
+
         metadata: {
-            ...(
-                current.metadata &&
-                typeof current.metadata === 'object'
-                    ? current.metadata
-                    : {}
-            ),
+            ...currentMetadata,
+
+            productLink:
+                snapshot.productLink ??
+                currentMetadata.productLink ??
+                null,
+
+            productCatIds:
+                Array.isArray(
+                    categoryMetadata.productCatIds
+                )
+                    ? categoryMetadata.productCatIds
+                    : (
+                        Array.isArray(
+                            currentMetadata.productCatIds
+                        )
+                            ? currentMetadata.productCatIds
+                            : []
+                    ),
+
+            categoryId1:
+                categoryMetadata.categoryId1 ??
+                currentMetadata.categoryId1 ??
+                null,
+
+            categoryId2:
+                categoryMetadata.categoryId2 ??
+                currentMetadata.categoryId2 ??
+                null,
+
+            categoryId3:
+                categoryMetadata.categoryId3 ??
+                currentMetadata.categoryId3 ??
+                null,
+
+            sourceCategory1:
+                categoryMetadata.sourceCategory1 ??
+                currentMetadata.sourceCategory1 ??
+                null,
+
+            sourceCategory2:
+                categoryMetadata.sourceCategory2 ??
+                currentMetadata.sourceCategory2 ??
+                null,
+
+            sourceCategory3:
+                categoryMetadata.sourceCategory3 ??
+                currentMetadata.sourceCategory3 ??
+                null,
+
+            categorySourceFile:
+                categoryMetadata.sourceFile ??
+                currentMetadata.categorySourceFile ??
+                null,
 
             lastSyncedAt:
                 snapshot.syncedAt,
@@ -163,10 +257,14 @@ async function prepareProductSync(
     return {
         catalogStore,
         catalog,
+
         currentEntry:
             entry,
+
         snapshot,
+
         catalogOptions,
+
         updatedProduct
     };
 }
@@ -197,6 +295,21 @@ async function previewProductSync(
                     .product?.price ??
                 null,
 
+            category1:
+                prepared.currentEntry
+                    .product?.category1 ??
+                null,
+
+            category2:
+                prepared.currentEntry
+                    .product?.category2 ??
+                null,
+
+            category3:
+                prepared.currentEntry
+                    .product?.category3 ??
+                null,
+
             affiliateLink:
                 prepared.currentEntry
                     .product?.affiliateLink ??
@@ -212,6 +325,21 @@ async function previewProductSync(
             price:
                 prepared.updatedProduct
                     .price ??
+                null,
+
+            category1:
+                prepared.updatedProduct
+                    .category1 ??
+                null,
+
+            category2:
+                prepared.updatedProduct
+                    .category2 ??
+                null,
+
+            category3:
+                prepared.updatedProduct
+                    .category3 ??
                 null,
 
             affiliateLink:
@@ -278,11 +406,11 @@ async function syncProduct(
  *
  * Prévia segura:
  *
- * node vitrine2-product-sync-service.js 18599566917
+ * node vitrine2-product-sync-service.js 43173265179
  *
  * Sincronização real:
  *
- * node vitrine2-product-sync-service.js 18599566917 --save
+ * node vitrine2-product-sync-service.js 43173265179 --save
  * ============================================================
  */
 
@@ -300,43 +428,58 @@ async function main() {
         console.log(
             'Uso:'
         );
+
         console.log(
             'node vitrine2-product-sync-service.js ITEM_ID'
         );
+
         console.log('');
         console.log(
             'Para salvar:'
         );
+
         console.log(
             'node vitrine2-product-sync-service.js ITEM_ID --save'
         );
+
         console.log('');
+
         process.exitCode = 1;
+
         return;
     }
 
+
     console.log('');
+
     console.log(
         '========================================'
     );
+
     console.log(
         'VITRINE 2 - PRODUCT SYNC SERVICE'
     );
+
     console.log(
         '========================================'
     );
+
     console.log('');
+
 
     if (!shouldSave) {
         console.log(
             'MODO: PRÉVIA - NENHUM DADO SERÁ SALVO'
         );
+
         console.log('');
+
 
         const preview =
             await previewProductSync(
                 itemId
             );
+
 
         console.log(
             JSON.stringify(
@@ -346,39 +489,62 @@ async function main() {
             )
         );
 
+
         console.log('');
+
         console.log(
             'Prévia concluída.'
         );
+
         console.log(
             'Nenhum dado do catálogo foi alterado.'
         );
+
         console.log('');
 
         return;
     }
 
+
     console.log(
         'MODO: SINCRONIZAÇÃO REAL'
     );
+
     console.log('');
+
 
     const entry =
         await syncProduct(
             itemId
         );
 
+
     console.log(
         JSON.stringify(
             {
                 itemId:
-                    entry.product?.itemId,
+                    entry.product
+                        ?.itemId,
 
                 title:
-                    entry.product?.title,
+                    entry.product
+                        ?.title,
 
                 price:
-                    entry.product?.price,
+                    entry.product
+                        ?.price,
+
+                category1:
+                    entry.product
+                        ?.category1,
+
+                category2:
+                    entry.product
+                        ?.category2,
+
+                category3:
+                    entry.product
+                        ?.category3,
 
                 affiliateLink:
                     entry.product
@@ -400,29 +566,39 @@ async function main() {
         )
     );
 
+
     console.log('');
+
     console.log(
         'Produto sincronizado e catálogo salvo.'
     );
+
     console.log('');
 }
 
 
-if (require.main === module) {
-    main().catch(
-        error => {
-            console.error('');
-            console.error(
-                '[VITRINE2 SYNC SERVICE] ERRO:'
-            );
-            console.error(
-                error.message
-            );
-            console.error('');
+if (
+    require.main ===
+    module
+) {
+    main()
+        .catch(
+            error => {
+                console.error('');
 
-            process.exitCode = 1;
-        }
-    );
+                console.error(
+                    '[VITRINE2 SYNC SERVICE] ERRO:'
+                );
+
+                console.error(
+                    error.message
+                );
+
+                console.error('');
+
+                process.exitCode = 1;
+            }
+        );
 }
 
 
