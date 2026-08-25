@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Admin Vitrine 2
+    </title>
+
+    <script
+        src="https://cdn.tailwindcss.com"
+    ></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+    <main class="min-h-screen">
+
+        <header
+            class="
+                bg-white
+                border-b
+                border-slate-200
+                sticky
+                top-0
+                z-20
+            "
+        >
+            <div
+                class="
+                    max-w-7xl
+                    mx-auto
+                    px-4
+                    sm:px-6
+                    py-4
+                    flex
+                    flex-col
+                    sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                    gap-4
+                "
+            >
+
+                <div>
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-3
+                        "
+                    >
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-2xl
+                                bg-sky-100
+                                text-sky-700
+                                flex
+                                items-center
+                                justify-center
+                            "
+                        >
+                            <i
+                                class="fa-solid fa-store"
+                            ></i>
+                        </div>
+
+                        <div>
+                            <h1
+                                class="
+                                    text-xl
+                                    sm:text-2xl
+                                    font-extrabold
+                                "
+                            >
+                                Admin Vitrine 2
+                            </h1>
+
+                            <p
+                                class="
+                                    text-sm
+                                    text-slate-500
+                                "
+                            >
+                                Controle rápido do catálogo publicado.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="
+                        flex
+                        items-center
+                        gap-2
+                    "
+                >
+                    <a
+                        href="/vitrine2"
+                        target="_blank"
+                        rel="noopener"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            gap-2
+                            px-4
+                            py-2.5
+                            rounded-xl
+                            bg-slate-100
+                            hover:bg-slate-200
+                            font-bold
+                            text-sm
+                            transition
+                        "
+                    >
+                        <i
+                            class="fa-solid fa-arrow-up-right-from-square"
+                        ></i>
+                        Abrir Vitrine
+                    </a>
+
+                    <button
+                        id="reloadButton"
+                        type="button"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            gap-2
+                            px-4
+                            py-2.5
+                            rounded-xl
+                            bg-sky-600
+                            hover:bg-sky-700
+                            text-white
+                            font-bold
+                            text-sm
+                            transition
+                        "
+                    >
+                        <i
+                            class="fa-solid fa-rotate"
+                        ></i>
+                        Atualizar
+                    </button>
+                </div>
+
+            </div>
+        </header>
+
+
+        <section
+            class="
+                max-w-7xl
+                mx-auto
+                px-4
+                sm:px-6
+                py-6
+            "
+        >
+
+            <!-- RESUMO -->
+
+            <div
+                class="
+                    grid
+                    grid-cols-2
+                    lg:grid-cols-4
+                    gap-3
+                    mb-6
+                "
+            >
+                <div
+                    class="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-slate-400
+                            font-bold
+                        "
+                    >
+                        Total
+                    </div>
+
+                    <div
+                        id="totalCount"
+                        class="
+                            mt-1
+                            text-2xl
+                            font-extrabold
+                        "
+                    >
+                        —
+                    </div>
+                </div>
+
+                <div
+                    class="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-slate-400
+                            font-bold
+                        "
+                    >
+                        Publicados
+                    </div>
+
+                    <div
+                        id="publishedCount"
+                        class="
+                            mt-1
+                            text-2xl
+                            font-extrabold
+                            text-emerald-600
+                        "
+                    >
+                        —
+                    </div>
+                </div>
+
+                <div
+                    class="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-slate-400
+                            font-bold
+                        "
+                    >
+                        Ocultos
+                    </div>
+
+                    <div
+                        id="hiddenCount"
+                        class="
+                            mt-1
+                            text-2xl
+                            font-extrabold
+                            text-slate-600
+                        "
+                    >
+                        —
+                    </div>
+                </div>
+
+                <div
+                    class="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-slate-400
+                            font-bold
+                        "
+                    >
+                        Último Sync
+                    </div>
+
+                    <div
+                        id="lastSyncSummary"
+                        class="
+                            mt-1
+                            text-sm
+                            font-bold
+                            text-slate-700
+                        "
+                    >
+                        —
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- FILTROS -->
+
+            <div
+                class="
+                    bg-white
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    p-4
+                    mb-6
+                "
+            >
+                <div
+                    class="
+                        grid
+                        grid-cols-1
+                        md:grid-cols-2
+                        xl:grid-cols-4
+                        gap-3
+                    "
+                >
+                    <input
+                        id="searchInput"
+                        type="search"
+                        placeholder="Buscar produto..."
+                        class="
+                            rounded-xl
+                            border
+                            border-slate-200
+                            px-4
+                            py-3
+                            text-sm
+                            outline-none
+                            focus:border-sky-400
+                        "
+                    >
+
+                    <select
+                        id="categoryFilter"
+                        class="
+                            rounded-xl
+                            border
+                            border-slate-200
+                            px-4
+                            py-3
+                            text-sm
+                            outline-none
+                            bg-white
+                        "
+                    >
+                        <option value="all">
+                            Todas as categorias
+                        </option>
+                    </select>
+
+                    <select
+                        id="commissionFilter"
+                        class="
+                            rounded-xl
+                            border
+                            border-slate-200
+                            px-4
+                            py-3
+                            text-sm
+                            outline-none
+                            bg-white
+                        "
+                    >
+                        <option value="0">
+                            Todas as comissões
+                        </option>
+
+                        <option value="0.03">
+                            Comissão 3% ou mais
+                        </option>
+
+                        <option value="0.05">
+                            Comissão 5% ou mais
+                        </option>
+
+                        <option value="0.08">
+                            Comissão 8% ou mais
+                        </option>
+
+                        <option value="0.10">
+                            Comissão 10% ou mais
+                        </option>
+
+                        <option value="0.15">
+                            Comissão 15% ou mais
+                        </option>
+                    </select>
+
+                    <select
+                        id="statusFilter"
+                        class="
+                            rounded-xl
+                            border
+                            border-slate-200
+                            px-4
+                            py-3
+                            text-sm
+                            outline-none
+                            bg-white
+                        "
+                    >
+                        <option value="all">
+                            Todos os status
+                        </option>
+
+                        <option value="published">
+                            Publicados
+                        </option>
+
+                        <option value="hidden">
+                            Ocultos
+                        </option>
+                    </select>
+                </div>
+
+                <div
+                    class="
+                        mt-3
+                        flex
+                        flex-col
+                        sm:flex-row
+                        sm:items-center
+                        sm:justify-between
+                        gap-2
+                        text-xs
+                        text-slate-500
+                    "
+                >
+                    <div id="filteredCounter">
+                        —
+                    </div>
+
+                    <button
+                        id="clearFiltersButton"
+                        type="button"
+                        class="
+                            self-start
+                            sm:self-auto
+                            font-bold
+                            text-sky-700
+                            hover:text-sky-800
+                        "
+                    >
+                        Limpar filtros
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- ESTADO -->
+
+            <div
+                id="messageBox"
+                class="
+                    hidden
+                    rounded-2xl
+                    border
+                    px-4
+                    py-3
+                    mb-5
+                    text-sm
+                    font-semibold
+                "
+            ></div>
+
+
+            <!-- CARREGANDO -->
+
+            <div
+                id="loadingState"
+                class="
+                    bg-white
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    p-10
+                    text-center
+                    text-slate-500
+                "
+            >
+                <i
+                    class="
+                        fa-solid
+                        fa-spinner
+                        fa-spin
+                        text-2xl
+                        text-sky-600
+                    "
+                ></i>
+
+                <p class="mt-3">
+                    Carregando catálogo...
+                </p>
+            </div>
+
+
+            <!-- TABELA DESKTOP -->
+
+            <div
+                id="desktopTableWrapper"
+                class="
+                    hidden
+                    lg:block
+                    bg-white
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    overflow-hidden
+                "
+            >
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead
+                            class="
+                                bg-slate-50
+                                border-b
+                                border-slate-200
+                            "
+                        >
+                            <tr
+                                class="
+                                    text-left
+                                    text-xs
+                                    uppercase
+                                    tracking-wide
+                                    text-slate-500
+                                "
+                            >
+                                <th class="px-4 py-3">
+                                    Produto
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Preço
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Comissão
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Status
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Posição
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Publicação
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Ações
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody
+                            id="desktopProducts"
+                            class="
+                                divide-y
+                                divide-slate-100
+                            "
+                        ></tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- CARDS MOBILE -->
+
+            <div
+                id="mobileProducts"
+                class="
+                    lg:hidden
+                    space-y-3
+                "
+            ></div>
+
+
+            <!-- VAZIO -->
+
+            <div
+                id="emptyState"
+                class="
+                    hidden
+                    bg-white
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    p-10
+                    text-center
+                "
+            >
+                <i
+                    class="
+                        fa-solid
+                        fa-box-open
+                        text-3xl
+                        text-slate-300
+                    "
+                ></i>
+
+                <p
+                    class="
+                        mt-3
+                        font-bold
+                    "
+                >
+                    Nenhum produto encontrado.
+                </p>
+            </div>
+
+        </section>
+    </main>
+
+
+    <script>
+        let catalogEntries = [];
+
+
+        function escapeHtml(
+            value
+        ) {
+            return String(
+                value ?? ''
+            )
+                .replace(
+                    /&/g,
+                    '&amp;'
+                )
+                .replace(
+                    /</g,
+                    '&lt;'
+                )
+                .replace(
+                    />/g,
+                    '&gt;'
+                )
+                .replace(
+                    /"/g,
+                    '&quot;'
+                )
+                .replace(
+                    /'/g,
+                    '&#039;'
+                );
+        }
+
+
+        function formatPrice(
+            value
+        ) {
+            const number =
+                Number(value);
+
+            if (
+                !Number.isFinite(
+                    number
+                )
+            ) {
+                return '—';
+            }
+
+            return new Intl.NumberFormat(
+                'pt-BR',
+                {
+                    style:
+                        'currency',
+
+                    currency:
+                        'BRL'
+                }
+            ).format(
+                number
+            );
+        }
+
+
+        function formatCommission(
+            value
+        ) {
+            const number =
+                Number(value);
+
+            if (
+                !Number.isFinite(
+                    number
+                )
+            ) {
+                return '—';
+            }
+
+            return `${(
+                number *
+                100
+            ).toFixed(1).replace(
+                '.0',
+                ''
+            )}%`;
+        }
+
+
+        function normalizeText(
+            value
+        ) {
+            return String(
+                value || ''
+            )
+                .normalize(
+                    'NFD'
+                )
+                .replace(
+                    /[\u0300-\u036f]/g,
+                    ''
+                )
+                .toLowerCase()
+                .trim();
+        }
+
+
+        function inferCategoryFromTitle(
+            title
+        ) {
+            const value =
+                normalizeText(
+                    title
+                );
+
+            const groups = [
+                {
+                    name: 'Moda',
+                    words: [
+                        'camisa',
+                        'camiseta',
+                        'blusa',
+                        'vestido',
+                        'calca',
+                        'short',
+                        'bermuda',
+                        'cueca',
+                        'calcinha',
+                        'meia',
+                        'roupa',
+                        'tenis',
+                        'sapato',
+                        'sandalia',
+                        'chinelo'
+                    ]
+                },
+                {
+                    name: 'Eletrônicos',
+                    words: [
+                        'fone',
+                        'bluetooth',
+                        'celular',
+                        'smartphone',
+                        'carregador',
+                        'cabo',
+                        'headset',
+                        'smartwatch',
+                        'caixa de som',
+                        'controle',
+                        'led'
+                    ]
+                },
+                {
+                    name: 'Casa e Cozinha',
+                    words: [
+                        'cozinha',
+                        'panela',
+                        'copo',
+                        'garrafa',
+                        'tapete',
+                        'lencol',
+                        'cama',
+                        'toalha',
+                        'organizador',
+                        'decoracao',
+                        'luminaria',
+                        'pote'
+                    ]
+                },
+                {
+                    name: 'Beleza e Cuidados',
+                    words: [
+                        'perfume',
+                        'maquiagem',
+                        'creme',
+                        'shampoo',
+                        'escova',
+                        'secador',
+                        'beleza',
+                        'hidratante'
+                    ]
+                },
+                {
+                    name: 'Acessórios',
+                    words: [
+                        'bolsa',
+                        'mochila',
+                        'relogio',
+                        'oculos',
+                        'carteira',
+                        'colar',
+                        'pulseira'
+                    ]
+                },
+                {
+                    name: 'Ferramentas',
+                    words: [
+                        'ferramenta',
+                        'furadeira',
+                        'parafusadeira',
+                        'chave',
+                        'alicate'
+                    ]
+                },
+                {
+                    name: 'Automotivo',
+                    words: [
+                        'automotivo',
+                        'carro',
+                        'moto',
+                        'veicular'
+                    ]
+                },
+                {
+                    name: 'Infantil',
+                    words: [
+                        'bebe',
+                        'infantil',
+                        'crianca',
+                        'brinquedo'
+                    ]
+                },
+                {
+                    name: 'Pet',
+                    words: [
+                        'pet',
+                        'cachorro',
+                        'gato'
+                    ]
+                },
+                {
+                    name: 'Esporte e Lazer',
+                    words: [
+                        'academia',
+                        'fitness',
+                        'esporte',
+                        'bicicleta',
+                        'camping'
+                    ]
+                }
+            ];
+
+            for (
+                const group
+                of groups
+            ) {
+                if (
+                    group.words.some(
+                        word =>
+                            value.includes(
+                                word
+                            )
+                    )
+                ) {
+                    return group.name;
+                }
+            }
+
+            return 'Outros achadinhos';
+        }
+
+
+        function getPrimaryCategory(
+            product
+        ) {
+            const candidates = [
+                product?.category1,
+                product?.metadata
+                    ?.categoryDisplayName,
+                product?.category2,
+                product?.metadata
+                    ?.subcategoryDisplayName,
+                product?.category3
+            ]
+                .map(
+                    item =>
+                        String(
+                            item || ''
+                        ).trim()
+                )
+                .filter(
+                    Boolean
+                );
+
+            if (
+                candidates.length
+            ) {
+                return candidates[0];
+            }
+
+            return inferCategoryFromTitle(
+                product?.title ||
+                ''
+            );
+        }
+
+
+        function getProductCategories(
+            product
+        ) {
+            const categories = [
+                product?.category1,
+                product?.metadata
+                    ?.categoryDisplayName,
+                product?.category2,
+                product?.metadata
+                    ?.subcategoryDisplayName,
+                product?.category3
+            ]
+                .map(
+                    item =>
+                        String(
+                            item || ''
+                        ).trim()
+                )
+                .filter(
+                    Boolean
+                );
+
+            if (
+                categories.length
+            ) {
+                return categories;
+            }
+
+            return [
+                inferCategoryFromTitle(
+                    product?.title ||
+                    ''
+                )
+            ];
+        }
+
+
+        function populateCategoryFilter() {
+            const select =
+                document.getElementById(
+                    'categoryFilter'
+                );
+
+            const currentValue =
+                select.value;
+
+            const categories =
+                [
+                    ...new Set(
+                        catalogEntries
+                            .map(
+                                entry =>
+                                    getPrimaryCategory(
+                                        getProduct(
+                                            entry
+                                        )
+                                    )
+                            )
+                            .filter(
+                                Boolean
+                            )
+                    )
+                ]
+                    .sort(
+                        (a, b) =>
+                            a.localeCompare(
+                                b,
+                                'pt-BR'
+                            )
+                    );
+
+            select.innerHTML =
+                `
+                    <option value="all">
+                        Todas as categorias
+                    </option>
+                ` +
+                categories
+                    .map(
+                        category =>
+                            `
+                                <option
+                                    value="${escapeHtml(category)}"
+                                >
+                                    ${escapeHtml(category)}
+                                </option>
+                            `
+                    )
+                    .join('');
+
+            if (
+                categories.includes(
+                    currentValue
+                )
+            ) {
+                select.value =
+                    currentValue;
+            }
+        }
+
+
+        function formatDate(
+            value
+        ) {
+            if (!value) {
+                return 'Nunca';
+            }
+
+            const date =
+                new Date(
+                    value
+                );
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+                return '—';
+            }
+
+            return new Intl.DateTimeFormat(
+                'pt-BR',
+                {
+                    dateStyle:
+                        'short',
+
+                    timeStyle:
+                        'short'
+                }
+            ).format(
+                date
+            );
+        }
+
+
+        function getProduct(
+            entry
+        ) {
+            return (
+                entry?.product ||
+                {}
+            );
+        }
+
+
+        function getSyncDate(
+            entry
+        ) {
+            return (
+                getProduct(
+                    entry
+                )
+                    ?.metadata
+                    ?.lastSyncedAt ||
+                null
+            );
+        }
+
+
+        function isPublished(
+            entry
+        ) {
+            return Boolean(
+                entry
+                    ?.visibility
+                    ?.published
+            );
+        }
+
+
+        function showMessage(
+            text,
+            type = 'success'
+        ) {
+            const box =
+                document.getElementById(
+                    'messageBox'
+                );
+
+            box.textContent =
+                text;
+
+            box.className =
+                [
+                    'rounded-2xl',
+                    'border',
+                    'px-4',
+                    'py-3',
+                    'mb-5',
+                    'text-sm',
+                    'font-semibold',
+                    type ===
+                    'success'
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                        : 'bg-red-50 border-red-200 text-red-700'
+                ].join(' ');
+
+            window.setTimeout(
+                () => {
+                    box.classList.add(
+                        'hidden'
+                    );
+                },
+                3500
+            );
+        }
+
+
+        function updateSummary() {
+            const total =
+                catalogEntries.length;
+
+            const published =
+                catalogEntries.filter(
+                    isPublished
+                ).length;
+
+            const hidden =
+                total -
+                published;
+
+            const syncDates =
+                catalogEntries
+                    .map(
+                        getSyncDate
+                    )
+                    .filter(
+                        Boolean
+                    )
+                    .map(
+                        value =>
+                            new Date(
+                                value
+                            )
+                    )
+                    .filter(
+                        date =>
+                            !Number.isNaN(
+                                date.getTime()
+                            )
+                    )
+                    .sort(
+                        (a, b) =>
+                            b -
+                            a
+                    );
+
+            document
+                .getElementById(
+                    'totalCount'
+                )
+                .textContent =
+                    total;
+
+            document
+                .getElementById(
+                    'publishedCount'
+                )
+                .textContent =
+                    published;
+
+            document
+                .getElementById(
+                    'hiddenCount'
+                )
+                .textContent =
+                    hidden;
+
+            document
+                .getElementById(
+                    'lastSyncSummary'
+                )
+                .textContent =
+                    syncDates.length
+                        ? formatDate(
+                            syncDates[0]
+                        )
+                        : 'Nunca';
+        }
+
+
+        function getFilteredEntries() {
+            const search =
+                document
+                    .getElementById(
+                        'searchInput'
+                    )
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+            const status =
+                document
+                    .getElementById(
+                        'statusFilter'
+                    )
+                    .value;
+
+            const selectedCategory =
+                document
+                    .getElementById(
+                        'categoryFilter'
+                    )
+                    .value;
+
+            const minimumCommission =
+                Number(
+                    document
+                        .getElementById(
+                            'commissionFilter'
+                        )
+                        .value ||
+                    0
+                );
+
+            return catalogEntries.filter(
+                entry => {
+                    const product =
+                        getProduct(
+                            entry
+                        );
+
+                    const primaryCategory =
+                        getPrimaryCategory(
+                            product
+                        );
+
+                    const matchesSearch =
+                        !search ||
+                        String(
+                            product.title ||
+                            ''
+                        )
+                            .toLowerCase()
+                            .includes(
+                                search
+                            ) ||
+                        String(
+                            product.itemId ||
+                            ''
+                        )
+                            .includes(
+                                search
+                            );
+
+                    const published =
+                        isPublished(
+                            entry
+                        );
+
+                    const matchesStatus =
+                        status ===
+                        'all' ||
+                        (
+                            status ===
+                            'published' &&
+                            published
+                        ) ||
+                        (
+                            status ===
+                            'hidden' &&
+                            !published
+                        );
+
+                    const matchesCategory =
+                        selectedCategory ===
+                        'all' ||
+                        normalizeText(
+                            primaryCategory
+                        ) ===
+                        normalizeText(
+                            selectedCategory
+                        );
+
+                    const commission =
+                        Number(
+                            product.commissionRate
+                        );
+
+                    const matchesCommission =
+                        minimumCommission <=
+                        0 ||
+                        (
+                            Number.isFinite(
+                                commission
+                            ) &&
+                            commission >=
+                            minimumCommission
+                        );
+
+                    return (
+                        matchesSearch &&
+                        matchesStatus &&
+                        matchesCategory &&
+                        matchesCommission
+                    );
+                }
+            );
+        }
+
+
+        function createStatusBadge(
+            entry
+        ) {
+            if (
+                isPublished(
+                    entry
+                )
+            ) {
+                return `
+                    <span
+                        class="
+                            inline-flex
+                            items-center
+                            gap-1.5
+                            rounded-full
+                            bg-emerald-50
+                            text-emerald-700
+                            px-2.5
+                            py-1
+                            text-xs
+                            font-bold
+                        "
+                    >
+                        <span
+                            class="
+                                w-1.5
+                                h-1.5
+                                rounded-full
+                                bg-emerald-500
+                            "
+                        ></span>
+                        Publicado
+                    </span>
+                `;
+            }
+
+            return `
+                <span
+                    class="
+                        inline-flex
+                        items-center
+                        gap-1.5
+                        rounded-full
+                        bg-slate-100
+                        text-slate-600
+                        px-2.5
+                        py-1
+                        text-xs
+                        font-bold
+                    "
+                >
+                    <span
+                        class="
+                            w-1.5
+                            h-1.5
+                            rounded-full
+                            bg-slate-400
+                        "
+                    ></span>
+                    Oculto
+                </span>
+            `;
+        }
+
+
+        function createDesktopRow(
+            entry
+        ) {
+            const product =
+                getProduct(
+                    entry
+                );
+
+            const marketplace =
+                product.marketplace ||
+                'shopee';
+
+            const itemId =
+                product.itemId ||
+                '';
+
+            const position =
+                entry
+                    ?.visibility
+                    ?.position ??
+                '';
+
+            return `
+                <tr class="align-middle">
+                    <td class="px-4 py-4">
+                        <div
+                            class="
+                                flex
+                                items-center
+                                gap-3
+                                min-w-[320px]
+                            "
+                        >
+                            <img
+                                src="${escapeHtml(product.image)}"
+                                alt=""
+                                class="
+                                    w-14
+                                    h-14
+                                    rounded-xl
+                                    object-cover
+                                    bg-slate-100
+                                    shrink-0
+                                "
+                            >
+
+                            <div>
+                                <div
+                                    class="
+                                        font-bold
+                                        text-sm
+                                        line-clamp-2
+                                    "
+                                >
+                                    ${escapeHtml(product.title)}
+                                </div>
+
+                                <div
+                                    class="
+                                        mt-1
+                                        text-xs
+                                        text-slate-400
+                                    "
+                                >
+                                    ID ${escapeHtml(itemId)}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td
+                        class="
+                            px-4
+                            py-4
+                            font-bold
+                            whitespace-nowrap
+                        "
+                    >
+                        ${formatPrice(product.price)}
+                    </td>
+
+                    <td
+                        class="
+                            px-4
+                            py-4
+                            font-extrabold
+                            text-sky-700
+                            whitespace-nowrap
+                        "
+                    >
+                        ${formatCommission(product.commissionRate)}
+                    </td>
+
+                    <td class="px-4 py-4">
+                        ${createStatusBadge(entry)}
+                    </td>
+
+                    <td class="px-4 py-4">
+                        <input
+                            type="number"
+                            min="1"
+                            value="${escapeHtml(position)}"
+                            data-position-marketplace="${escapeHtml(marketplace)}"
+                            data-position-item-id="${escapeHtml(itemId)}"
+                            class="
+                                w-20
+                                rounded-lg
+                                border
+                                border-slate-200
+                                px-2
+                                py-2
+                                text-sm
+                            "
+                        >
+                    </td>
+
+                    <td class="px-4 py-4">
+                        <select
+                            aria-label="Ação de publicação"
+                            onchange="handlePublicationAction(
+                                this,
+                                '${escapeHtml(marketplace)}',
+                                '${escapeHtml(itemId)}'
+                            )"
+                            class="
+                                rounded-xl
+                                border
+                                border-slate-200
+                                bg-white
+                                px-3
+                                py-2
+                                text-xs
+                                font-bold
+                                outline-none
+                                ${
+                                    isPublished(entry)
+                                        ? 'text-emerald-700'
+                                        : 'text-slate-600'
+                                }
+                            "
+                        >
+                            <option value="">
+                                ${
+                                    isPublished(entry)
+                                        ? 'Publicado'
+                                        : 'Oculto'
+                                }
+                            </option>
+
+                            ${
+                                isPublished(entry)
+                                    ? `
+                                        <option value="hide">
+                                            Ocultar
+                                        </option>
+                                    `
+                                    : `
+                                        <option value="publish">
+                                            Publicar
+                                        </option>
+                                    `
+                            }
+
+                            <option value="delete">
+                                Excluir
+                            </option>
+                        </select>
+                    </td>
+
+                    <td class="px-4 py-4">
+                        <button
+                            type="button"
+                            onclick="savePosition(
+                                '${escapeHtml(marketplace)}',
+                                '${escapeHtml(itemId)}'
+                            )"
+                            class="
+                                rounded-lg
+                                bg-sky-50
+                                text-sky-700
+                                hover:bg-sky-100
+                                px-3
+                                py-2
+                                text-xs
+                                font-bold
+                            "
+                        >
+                            Salvar posição
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+
+        function createMobileCard(
+            entry
+        ) {
+            const product =
+                getProduct(
+                    entry
+                );
+
+            const marketplace =
+                product.marketplace ||
+                'shopee';
+
+            const itemId =
+                product.itemId ||
+                '';
+
+            const position =
+                entry
+                    ?.visibility
+                    ?.position ??
+                '';
+
+            return `
+                <article
+                    class="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            flex
+                            gap-3
+                        "
+                    >
+                        <img
+                            src="${escapeHtml(product.image)}"
+                            alt=""
+                            class="
+                                w-20
+                                h-20
+                                rounded-xl
+                                object-cover
+                                bg-slate-100
+                                shrink-0
+                            "
+                        >
+
+                        <div class="min-w-0">
+                            <h2
+                                class="
+                                    font-bold
+                                    text-sm
+                                    line-clamp-2
+                                "
+                            >
+                                ${escapeHtml(product.title)}
+                            </h2>
+
+                            <div
+                                class="
+                                    mt-1
+                                    font-extrabold
+                                "
+                            >
+                                ${formatPrice(product.price)}
+                            </div>
+
+                            <div
+                                class="
+                                    mt-1
+                                    text-xs
+                                    font-bold
+                                    text-sky-700
+                                "
+                            >
+                                Comissão:
+                                ${formatCommission(product.commissionRate)}
+                            </div>
+
+                            <div class="mt-2">
+                                ${createStatusBadge(entry)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="
+                            grid
+                            grid-cols-2
+                            gap-3
+                            mt-4
+                        "
+                    >
+                        <div>
+                            <label
+                                class="
+                                    text-xs
+                                    font-bold
+                                    text-slate-500
+                                "
+                            >
+                                Posição
+                            </label>
+
+                            <input
+                                type="number"
+                                min="1"
+                                value="${escapeHtml(position)}"
+                                data-position-marketplace="${escapeHtml(marketplace)}"
+                                data-position-item-id="${escapeHtml(itemId)}"
+                                class="
+                                    mt-1
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    border-slate-200
+                                    px-3
+                                    py-2
+                                    text-sm
+                                "
+                            >
+                        </div>
+
+                        <div>
+                            <div
+                                class="
+                                    text-xs
+                                    font-bold
+                                    text-slate-500
+                                "
+                            >
+                                Publicação
+                            </div>
+
+                            <select
+                                aria-label="Ação de publicação"
+                                onchange="handlePublicationAction(
+                                    this,
+                                    '${escapeHtml(marketplace)}',
+                                    '${escapeHtml(itemId)}'
+                                )"
+                                class="
+                                    mt-1
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    border-slate-200
+                                    bg-white
+                                    px-3
+                                    py-2
+                                    text-xs
+                                    font-bold
+                                    ${
+                                        isPublished(entry)
+                                            ? 'text-emerald-700'
+                                            : 'text-slate-600'
+                                    }
+                                "
+                            >
+                                <option value="">
+                                    ${
+                                        isPublished(entry)
+                                            ? 'Publicado'
+                                            : 'Oculto'
+                                    }
+                                </option>
+
+                                ${
+                                    isPublished(entry)
+                                        ? `
+                                            <option value="hide">
+                                                Ocultar
+                                            </option>
+                                        `
+                                        : `
+                                            <option value="publish">
+                                                Publicar
+                                            </option>
+                                        `
+                                }
+
+                                <option value="delete">
+                                    Excluir
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button
+                            type="button"
+                            onclick="savePosition(
+                                '${escapeHtml(marketplace)}',
+                                '${escapeHtml(itemId)}'
+                            )"
+                            class="
+                                w-full
+                                rounded-xl
+                                bg-sky-50
+                                text-sky-700
+                                px-3
+                                py-2.5
+                                text-xs
+                                font-bold
+                            "
+                        >
+                            Salvar posição
+                        </button>
+                    </div>
+                </article>
+            `;
+        }
+
+
+        function renderProducts() {
+            const entries =
+                getFilteredEntries();
+
+            document
+                .getElementById(
+                    'filteredCounter'
+                )
+                .textContent =
+                    `${entries.length} de ${catalogEntries.length} produtos exibidos`;
+
+            const loading =
+                document.getElementById(
+                    'loadingState'
+                );
+
+            const desktop =
+                document.getElementById(
+                    'desktopTableWrapper'
+                );
+
+            const desktopBody =
+                document.getElementById(
+                    'desktopProducts'
+                );
+
+            const mobile =
+                document.getElementById(
+                    'mobileProducts'
+                );
+
+            const empty =
+                document.getElementById(
+                    'emptyState'
+                );
+
+            loading.classList.add(
+                'hidden'
+            );
+
+            if (
+                entries.length === 0
+            ) {
+                desktop.classList.add(
+                    'hidden'
+                );
+
+                mobile.classList.add(
+                    'hidden'
+                );
+
+                empty.classList.remove(
+                    'hidden'
+                );
+
+                return;
+            }
+
+            empty.classList.add(
+                'hidden'
+            );
+
+            desktop.classList.remove(
+                'hidden'
+            );
+
+            mobile.classList.remove(
+                'hidden'
+            );
+
+            desktopBody.innerHTML =
+                entries
+                    .map(
+                        createDesktopRow
+                    )
+                    .join('');
+
+            mobile.innerHTML =
+                entries
+                    .map(
+                        createMobileCard
+                    )
+                    .join('');
+        }
+
+
+        async function loadProducts() {
+            const loading =
+                document.getElementById(
+                    'loadingState'
+                );
+
+            loading.classList.remove(
+                'hidden'
+            );
+
+            try {
+                const response =
+                    await fetch(
+                        '/api/vitrine2/products'
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        'Falha ao carregar produtos.'
+                    );
+                }
+
+                catalogEntries =
+                    Array.isArray(
+                        data.products
+                    )
+                        ? data.products
+                        : [];
+
+                updateSummary();
+                populateCategoryFilter();
+                renderProducts();
+            } catch (error) {
+                loading.classList.add(
+                    'hidden'
+                );
+
+                showMessage(
+                    error.message,
+                    'error'
+                );
+            }
+        }
+
+
+        async function togglePublished(
+            marketplace,
+            itemId,
+            published
+        ) {
+            try {
+                const response =
+                    await fetch(
+                        `/api/vitrine2/products/${encodeURIComponent(marketplace)}/${encodeURIComponent(itemId)}/published`,
+                        {
+                            method:
+                                'PATCH',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    published
+                                })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        'Não foi possível alterar publicação.'
+                    );
+                }
+
+                showMessage(
+                    published
+                        ? 'Produto publicado.'
+                        : 'Produto ocultado.'
+                );
+
+                await loadProducts();
+            } catch (error) {
+                showMessage(
+                    error.message,
+                    'error'
+                );
+            }
+        }
+
+
+        async function deleteProduct(
+            marketplace,
+            itemId
+        ) {
+            const confirmed =
+                window.confirm(
+                    'Excluir este produto do catálogo? Esta ação remove o produto da Vitrine 2.'
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                const response =
+                    await fetch(
+                        `/api/vitrine2/products/${encodeURIComponent(marketplace)}/${encodeURIComponent(itemId)}`,
+                        {
+                            method:
+                                'DELETE'
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        'Não foi possível excluir o produto.'
+                    );
+                }
+
+                showMessage(
+                    'Produto excluído do catálogo.'
+                );
+
+                await loadProducts();
+            } catch (error) {
+                showMessage(
+                    error.message,
+                    'error'
+                );
+            }
+        }
+
+
+        async function handlePublicationAction(
+            select,
+            marketplace,
+            itemId
+        ) {
+            const action =
+                select.value;
+
+            if (!action) {
+                return;
+            }
+
+            select.disabled =
+                true;
+
+            try {
+                if (
+                    action ===
+                    'publish'
+                ) {
+                    await togglePublished(
+                        marketplace,
+                        itemId,
+                        true
+                    );
+
+                    return;
+                }
+
+                if (
+                    action ===
+                    'hide'
+                ) {
+                    await togglePublished(
+                        marketplace,
+                        itemId,
+                        false
+                    );
+
+                    return;
+                }
+
+                if (
+                    action ===
+                    'delete'
+                ) {
+                    await deleteProduct(
+                        marketplace,
+                        itemId
+                    );
+                }
+            } finally {
+                select.disabled =
+                    false;
+
+                select.value =
+                    '';
+            }
+        }
+
+
+        async function syncProducts() {
+            const button =
+                document.getElementById(
+                    'reloadButton'
+                );
+
+            const originalHtml =
+                button.innerHTML;
+
+            button.disabled =
+                true;
+
+            button.innerHTML =
+                `
+                    <i class="fa-solid fa-rotate fa-spin"></i>
+                    Sincronizando...
+                `;
+
+            try {
+                const response =
+                    await fetch(
+                        '/api/vitrine2/sync',
+                        {
+                            method:
+                                'POST'
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        'Não foi possível sincronizar a Vitrine 2.'
+                    );
+                }
+
+                showMessage(
+                    'Sincronização concluída.'
+                );
+
+                await loadProducts();
+            } catch (error) {
+                showMessage(
+                    error.message,
+                    'error'
+                );
+            } finally {
+                button.disabled =
+                    false;
+
+                button.innerHTML =
+                    originalHtml;
+            }
+        }
+
+
+        async function savePosition(
+            marketplace,
+            itemId
+        ) {
+            const inputs =
+                document.querySelectorAll(
+                    '[data-position-item-id]'
+                );
+
+            const input =
+                Array.from(
+                    inputs
+                ).find(
+                    element =>
+                        element.dataset
+                            .positionItemId ===
+                        String(itemId) &&
+                        element.dataset
+                            .positionMarketplace ===
+                        String(marketplace)
+                );
+
+            if (!input) {
+                showMessage(
+                    'Campo de posição não encontrado.',
+                    'error'
+                );
+                return;
+            }
+
+            const raw =
+                input.value.trim();
+
+            const position =
+                raw === ''
+                    ? null
+                    : Number(raw);
+
+            if (
+                position !== null &&
+                (
+                    !Number.isInteger(
+                        position
+                    ) ||
+                    position < 1
+                )
+            ) {
+                showMessage(
+                    'A posição deve ser um número inteiro maior que zero.',
+                    'error'
+                );
+                return;
+            }
+
+            try {
+                const response =
+                    await fetch(
+                        `/api/vitrine2/products/${encodeURIComponent(marketplace)}/${encodeURIComponent(itemId)}/position`,
+                        {
+                            method:
+                                'PATCH',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    position
+                                })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        'Não foi possível alterar posição.'
+                    );
+                }
+
+                showMessage(
+                    'Posição atualizada.'
+                );
+
+                await loadProducts();
+            } catch (error) {
+                showMessage(
+                    error.message,
+                    'error'
+                );
+            }
+        }
+
+
+        document
+            .getElementById(
+                'reloadButton'
+            )
+            .addEventListener(
+                'click',
+                syncProducts
+            );
+
+
+        document
+            .getElementById(
+                'searchInput'
+            )
+            .addEventListener(
+                'input',
+                renderProducts
+            );
+
+
+        document
+            .getElementById(
+                'statusFilter'
+            )
+            .addEventListener(
+                'change',
+                renderProducts
+            );
+
+
+        document
+            .getElementById(
+                'categoryFilter'
+            )
+            .addEventListener(
+                'change',
+                renderProducts
+            );
+
+
+        document
+            .getElementById(
+                'commissionFilter'
+            )
+            .addEventListener(
+                'change',
+                renderProducts
+            );
+
+
+        document
+            .getElementById(
+                'clearFiltersButton'
+            )
+            .addEventListener(
+                'click',
+                () => {
+                    document
+                        .getElementById(
+                            'searchInput'
+                        )
+                        .value =
+                            '';
+
+                    document
+                        .getElementById(
+                            'categoryFilter'
+                        )
+                        .value =
+                            'all';
+
+                    document
+                        .getElementById(
+                            'commissionFilter'
+                        )
+                        .value =
+                            '0';
+
+                    document
+                        .getElementById(
+                            'statusFilter'
+                        )
+                        .value =
+                            'all';
+
+                    renderProducts();
+                }
+            );
+
+
+        loadProducts();
+    </script>
+
+</body>
+</html>

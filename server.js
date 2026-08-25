@@ -7,7 +7,13 @@ const http = require('http');
 const puppeteer = require('puppeteer-core');
 const { URL } = require('url');
 
-const { defaultVitrine2Router } = require('./vitrine2-routes');
+const {
+    defaultVitrine2SyncRouter
+} = require('./vitrine2-sync-routes');
+
+const {
+    defaultVitrine2Router
+} = require('./vitrine2-routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,12 +24,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/vitrine2', defaultVitrine2Router);
+app.use('/api/vitrine2', defaultVitrine2SyncRouter);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.get('/vitrine2', (req, res) => {
     res.render('vitrine2');
+});
+
+app.get('/admin/vitrine2', (req, res) => {
+    res.render('admin-vitrine2');
 });
 
 const dbPath = path.join(__dirname, 'database.sqlite');
