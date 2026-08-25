@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "savedAt": "2026-08-25T01:13:42.108Z",
+  "savedAt": "2026-08-25T01:32:11.442Z",
   "entries": [
     {
       "product": {
@@ -29,7 +29,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:36.285Z",
+          "lastSyncedAt": "2026-08-25T01:32:05.569Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -69,7 +69,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:36.909Z",
+          "lastSyncedAt": "2026-08-25T01:32:06.171Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -107,7 +107,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:37.201Z",
+          "lastSyncedAt": "2026-08-25T01:32:06.454Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -145,7 +145,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:37.510Z",
+          "lastSyncedAt": "2026-08-25T01:32:06.735Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -183,7 +183,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:37.820Z",
+          "lastSyncedAt": "2026-08-25T01:32:07.013Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -221,7 +221,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:38.096Z",
+          "lastSyncedAt": "2026-08-25T01:32:07.286Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -259,7 +259,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:38.402Z",
+          "lastSyncedAt": "2026-08-25T01:32:07.555Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -297,7 +297,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:38.696Z",
+          "lastSyncedAt": "2026-08-25T01:32:07.865Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -335,7 +335,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:38.947Z",
+          "lastSyncedAt": "2026-08-25T01:32:08.324Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -373,7 +373,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:39.217Z",
+          "lastSyncedAt": "2026-08-25T01:32:08.619Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -411,7 +411,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:39.470Z",
+          "lastSyncedAt": "2026-08-25T01:32:08.932Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -449,7 +449,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:39.750Z",
+          "lastSyncedAt": "2026-08-25T01:32:09.205Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -487,7 +487,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:40.027Z",
+          "lastSyncedAt": "2026-08-25T01:32:09.455Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -525,7 +525,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:40.300Z",
+          "lastSyncedAt": "2026-08-25T01:32:09.831Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -563,7 +563,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:40.568Z",
+          "lastSyncedAt": "2026-08-25T01:32:10.086Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -601,7 +601,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:40.832Z",
+          "lastSyncedAt": "2026-08-25T01:32:10.347Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -639,7 +639,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:41.256Z",
+          "lastSyncedAt": "2026-08-25T01:32:10.605Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -677,7 +677,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:41.505Z",
+          "lastSyncedAt": "2026-08-25T01:32:10.862Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -715,7 +715,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:41.814Z",
+          "lastSyncedAt": "2026-08-25T01:32:11.178Z",
           "syncSource": "shopee_affiliate_api"
         }
       },
@@ -753,7 +753,7 @@
         "metadata": {
           "provider": "Shopee Affiliate Open API",
           "operation": "productOfferV2",
-          "lastSyncedAt": "2026-08-25T01:13:42.107Z",
+          "lastSyncedAt": "2026-08-25T01:32:11.441Z",
           "syncSource": "shopee_affiliate_api"
         }
       },

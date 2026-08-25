@@ -8,6 +8,10 @@ const {
     syncProduct
 } = require('./vitrine2-product-sync-service');
 
+const {
+    createErrorDecision
+} = require('./vitrine2-product-availability');
+
 
 /*
  * ============================================================
@@ -19,6 +23,9 @@ const {
  * - listar produtos publicados da Vitrine 2;
  * - sincronizar um produto por vez;
  * - continuar mesmo quando um item falhar;
+ * - ocultar produto somente quando a Shopee confirmar
+ *   que ele não foi encontrado;
+ * - NÃO ocultar por falhas temporárias de API/rede/credencial;
  * - mostrar resultado individual;
  * - mostrar resumo final.
  *
@@ -65,6 +72,7 @@ async function syncPublishedProducts(
     const summary = {
         total,
         success: 0,
+        unavailable: 0,
         failed: 0,
         results: []
     };
@@ -134,6 +142,7 @@ async function syncPublishedProducts(
                 itemId: null,
                 title,
                 success: false,
+                unavailable: false,
                 error: errorMessage
             });
 
@@ -179,6 +188,7 @@ async function syncPublishedProducts(
                     String(itemId),
                 title,
                 success: true,
+                unavailable: false,
                 price:
                     updatedPrice,
                 lastSyncedAt
@@ -188,11 +198,90 @@ async function syncPublishedProducts(
                 error?.message ||
                 String(error);
 
+            const availability =
+                createErrorDecision(
+                    error
+                );
+
+            if (
+                availability.shouldUnpublish
+            ) {
+                try {
+                    service.setPublished(
+                        'shopee',
+                        itemId,
+                        false
+                    );
+
+                    console.log(
+                        `INDISPONÍVEL - itemId ${itemId}`
+                    );
+                    console.log(
+                        'Produto removido automaticamente da Vitrine.'
+                    );
+                    console.log(
+                        availability.reason
+                    );
+
+                    summary.unavailable += 1;
+
+                    summary.results.push({
+                        itemId:
+                            String(itemId),
+                        title,
+                        success: false,
+                        unavailable: true,
+                        unpublished: true,
+                        availabilityStatus:
+                            availability.status,
+                        error:
+                            errorMessage
+                    });
+
+                    console.log('');
+                    continue;
+                } catch (
+                    unpublishError
+                ) {
+                    const unpublishMessage =
+                        unpublishError?.message ||
+                        String(
+                            unpublishError
+                        );
+
+                    console.log(
+                        `ERRO ao ocultar itemId ${itemId}`
+                    );
+                    console.log(
+                        unpublishMessage
+                    );
+
+                    summary.failed += 1;
+
+                    summary.results.push({
+                        itemId:
+                            String(itemId),
+                        title,
+                        success: false,
+                        unavailable: true,
+                        unpublished: false,
+                        error:
+                            unpublishMessage
+                    });
+
+                    console.log('');
+                    continue;
+                }
+            }
+
             console.log(
-                `ERRO - itemId ${itemId}`
+                `ERRO TEMPORÁRIO - itemId ${itemId}`
             );
             console.log(
                 errorMessage
+            );
+            console.log(
+                'Produto mantido publicado.'
             );
 
             summary.failed += 1;
@@ -202,6 +291,10 @@ async function syncPublishedProducts(
                     String(itemId),
                 title,
                 success: false,
+                unavailable: false,
+                unpublished: false,
+                availabilityStatus:
+                    availability.status,
                 error:
                     errorMessage
             });
@@ -226,7 +319,10 @@ async function syncPublishedProducts(
         `Sucesso: ${summary.success}`
     );
     console.log(
-        `Falhas: ${summary.failed}`
+        `Indisponíveis ocultados: ${summary.unavailable}`
+    );
+    console.log(
+        `Falhas temporárias: ${summary.failed}`
     );
     console.log('');
 
