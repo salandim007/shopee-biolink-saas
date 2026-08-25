@@ -21,6 +21,7 @@ if (!SECRET) {
     );
 }
 
+
 function createSignature(
     appId,
     timestamp,
@@ -35,6 +36,7 @@ function createSignature(
         )
         .digest('hex');
 }
+
 
 function getArg(name) {
     const args =
@@ -53,11 +55,13 @@ function getArg(name) {
     return args[index + 1];
 }
 
+
 function hasArg(name) {
     return process.argv
         .slice(2)
         .includes(name);
 }
+
 
 function getPositiveIntegerArg(
     name,
@@ -88,6 +92,7 @@ function getPositiveIntegerArg(
     return parsed;
 }
 
+
 function buildQuery() {
     const itemId =
         getArg('--item');
@@ -97,6 +102,9 @@ function buildQuery() {
 
     const schema =
         hasArg('--schema');
+
+    const productFields =
+        hasArg('--product-fields');
 
     const page =
         getPositiveIntegerArg(
@@ -110,20 +118,81 @@ function buildQuery() {
             10
         );
 
+
+    /*
+     * ============================================================
+     * INTROSPECÇÃO DOS CAMPOS DE ProductOfferV2
+     * ============================================================
+     */
+    if (productFields) {
+        return `
+            query {
+                __type(name: "ProductOfferV2") {
+                    name
+                    fields {
+                        name
+                        type {
+                            kind
+                            name
+                            ofType {
+                                kind
+                                name
+                                ofType {
+                                    kind
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        `;
+    }
+
+
+    /*
+     * ============================================================
+     * INTROSPECÇÃO DO SCHEMA
+     * ============================================================
+     */
     if (schema) {
         return `
             query {
                 __type(name: "Query") {
                     fields {
                         name
-                        args {
+
+                        type {
+                            kind
                             name
-                            type {
+
+                            ofType {
                                 kind
                                 name
+
                                 ofType {
                                     kind
                                     name
+
+                                    ofType {
+                                        kind
+                                        name
+                                    }
+                                }
+                            }
+                        }
+
+                        args {
+                            name
+
+                            type {
+                                kind
+                                name
+
+                                ofType {
+                                    kind
+                                    name
+
                                     ofType {
                                         kind
                                         name
@@ -137,6 +206,12 @@ function buildQuery() {
         `;
     }
 
+
+    /*
+     * ============================================================
+     * CONSULTA POR ITEM ID
+     * ============================================================
+     */
     if (itemId) {
         if (!/^\d+$/.test(itemId)) {
             throw new Error(
@@ -155,11 +230,23 @@ function buildQuery() {
                         itemId
                         productName
                         offerLink
+                        productLink
                         price
+                        priceMin
+                        priceMax
+                        priceDiscountRate
                         commissionRate
+                        commission
+                        sellerCommissionRate
+                        shopeeCommissionRate
+                        sales
+                        ratingStar
                         imageUrl
                         shopName
+                        shopId
+                        productCatIds
                     }
+
                     pageInfo {
                         scrollId
                         hasNextPage
@@ -169,6 +256,12 @@ function buildQuery() {
         `;
     }
 
+
+    /*
+     * ============================================================
+     * CONSULTA POR PALAVRA-CHAVE
+     * ============================================================
+     */
     if (keyword) {
         const safeKeyword =
             keyword
@@ -186,11 +279,23 @@ function buildQuery() {
                         itemId
                         productName
                         offerLink
+                        productLink
                         price
+                        priceMin
+                        priceMax
+                        priceDiscountRate
                         commissionRate
+                        commission
+                        sellerCommissionRate
+                        shopeeCommissionRate
+                        sales
+                        ratingStar
                         imageUrl
                         shopName
+                        shopId
+                        productCatIds
                     }
+
                     pageInfo {
                         scrollId
                         hasNextPage
@@ -200,10 +305,12 @@ function buildQuery() {
         `;
     }
 
+
     throw new Error(
-        'Informe --item, --keyword ou --schema.'
+        'Informe --item, --keyword, --schema ou --product-fields.'
     );
 }
+
 
 async function callShopeeApi(query) {
     const bodyObject = {
@@ -230,6 +337,7 @@ async function callShopeeApi(query) {
         `SHA256 Credential=${APP_ID}, ` +
         `Timestamp=${timestamp}, ` +
         `Signature=${signature}`;
+
 
     console.log(
         '========================================'
@@ -261,6 +369,7 @@ async function callShopeeApi(query) {
         'Enviando requisição GraphQL...'
     );
 
+
     const response =
         await fetch(
             ENDPOINT,
@@ -279,11 +388,13 @@ async function callShopeeApi(query) {
             }
         );
 
+
     console.log('');
 
     console.log(
         `HTTP STATUS: ${response.status}`
     );
+
 
     const text =
         await response.text();
@@ -305,6 +416,7 @@ async function callShopeeApi(query) {
         return null;
     }
 
+
     console.log('');
 
     console.log(
@@ -319,6 +431,12 @@ async function callShopeeApi(query) {
         }
     );
 
+
+    /*
+     * ============================================================
+     * ERROS GRAPHQL
+     * ============================================================
+     */
     if (data.errors) {
         console.log('');
 
@@ -346,6 +464,12 @@ async function callShopeeApi(query) {
         return data;
     }
 
+
+    /*
+     * ============================================================
+     * RESULTADO PRODUCT OFFER V2
+     * ============================================================
+     */
     if (
         data.data?.productOfferV2
     ) {
@@ -378,6 +502,7 @@ async function callShopeeApi(query) {
             `Scroll ID: ${result.pageInfo.scrollId}`
         );
 
+
         if (
             result.nodes.length > 0
         ) {
@@ -386,6 +511,7 @@ async function callShopeeApi(query) {
             console.log(
                 'PRODUTOS:'
             );
+
 
             for (
                 const product
@@ -402,6 +528,10 @@ async function callShopeeApi(query) {
                 );
 
                 console.log(
+                    `Shop ID: ${product.shopId}`
+                );
+
+                console.log(
                     `Nome: ${product.productName}`
                 );
 
@@ -410,7 +540,39 @@ async function callShopeeApi(query) {
                 );
 
                 console.log(
+                    `Preço mínimo: R$ ${product.priceMin}`
+                );
+
+                console.log(
+                    `Preço máximo: R$ ${product.priceMax}`
+                );
+
+                console.log(
+                    `Desconto: ${product.priceDiscountRate}%`
+                );
+
+                console.log(
                     `Comissão: ${product.commissionRate}`
+                );
+
+                console.log(
+                    `Comissão estimada: ${product.commission}`
+                );
+
+                console.log(
+                    `Comissão vendedor: ${product.sellerCommissionRate}`
+                );
+
+                console.log(
+                    `Comissão Shopee: ${product.shopeeCommissionRate}`
+                );
+
+                console.log(
+                    `Vendas: ${product.sales}`
+                );
+
+                console.log(
+                    `Avaliação: ${product.ratingStar}`
                 );
 
                 console.log(
@@ -418,7 +580,21 @@ async function callShopeeApi(query) {
                 );
 
                 console.log(
+                    `Categorias IDs: ${
+                        Array.isArray(
+                            product.productCatIds
+                        )
+                            ? product.productCatIds.join(' > ')
+                            : ''
+                    }`
+                );
+
+                console.log(
                     `Imagem: ${product.imageUrl}`
+                );
+
+                console.log(
+                    `Link produto: ${product.productLink}`
                 );
 
                 console.log(
@@ -428,11 +604,21 @@ async function callShopeeApi(query) {
         }
     }
 
+
+    /*
+     * ============================================================
+     * RESULTADO DA INTROSPECÇÃO
+     * ============================================================
+     */
     if (
         data.data?.__type
     ) {
+        const typeInfo =
+            data.data.__type;
+
         const fields =
-            data.data.__type.fields || [];
+            typeInfo.fields || [];
+
 
         console.log('');
 
@@ -441,12 +627,13 @@ async function callShopeeApi(query) {
         );
 
         console.log(
-            'OPERAÇÕES DO SCHEMA'
+            `TIPO GRAPHQL: ${typeInfo.name || '(sem nome)'}`
         );
 
         console.log(
             '========================================'
         );
+
 
         for (
             const field
@@ -455,23 +642,46 @@ async function callShopeeApi(query) {
             console.log('');
 
             console.log(
-                `OPERAÇÃO: ${field.name}`
+                `CAMPO: ${field.name}`
             );
+
+
+            const returnType =
+                field.type?.name ||
+                field.type?.ofType?.name ||
+                field.type?.ofType?.ofType?.name ||
+                field.type?.ofType?.ofType?.ofType?.name ||
+                '(não identificado)';
+
+
+            console.log(
+                `RETORNO: ${returnType}`
+            );
+
 
             for (
                 const arg
-                of field.args
+                of field.args || []
             ) {
+                const argType =
+                    arg.type?.name ||
+                    arg.type?.ofType?.name ||
+                    arg.type?.ofType?.ofType?.name ||
+                    arg.type?.kind ||
+                    '(não identificado)';
+
+
                 console.log(
-                    `- ${arg.name}: ` +
-                    `${arg.type.name || arg.type.kind}`
+                    `- ${arg.name}: ${argType}`
                 );
             }
         }
     }
 
+
     return data;
 }
+
 
 async function main() {
     const query =
@@ -481,6 +691,7 @@ async function main() {
         query
     );
 }
+
 
 main().catch(error => {
     console.error('');
