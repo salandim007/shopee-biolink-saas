@@ -1580,3 +1580,251 @@ Informar:
 
 Não reinvestigar arquitetura já registrada neste documento.
 
+---
+
+
+
+\## Atualização — Categorias Shopee e Tradução Automática
+
+
+
+Data: 25/08/2026
+
+
+
+\### Situação concluída
+
+
+
+A integração de categorias da Shopee foi implementada e validada.
+
+
+
+Fluxo atual:
+
+
+
+Shopee Affiliate Open API
+
+→ `productCatIds`
+
+→ Data Feed CSV da Shopee
+
+→ resolução dos IDs para nomes oficiais
+
+→ `category-registry.json`
+
+→ tradução pt-BR
+
+→ produto normalizado com `category1`, `category2` e `category3`
+
+
+
+\### Arquivos principais
+
+
+
+\- `category-id-resolver.js`
+
+\- `shopee-product-url.js`
+
+\- `data/category-registry.json`
+
+\- `data/category-translations-pending.json`
+
+\- `data/category-translations-complete.json`
+
+\- `export-pending-category-translations.js`
+
+\- `import-category-translations.js`
+
+
+
+\### Category ID Resolver
+
+
+
+O arquivo `category-id-resolver.js` passou a:
+
+
+
+\- receber `productCatIds` vindos da Affiliate Open API;
+
+\- construir um índice em memória a partir do Data Feed;
+
+\- relacionar:
+
+&#x20; - `global\_catid1` → `global\_category1`;
+
+&#x20; - `global\_catid2` → `global\_category2`;
+
+&#x20; - `global\_catid3` → `global\_category3`;
+
+\- carregar o CSV apenas uma vez por processo Node;
+
+\- reutilizar o índice em memória nas próximas resoluções;
+
+\- consultar o `category-registry.json`;
+
+\- registrar novas categorias automaticamente como `pending` quando necessário;
+
+\- preservar o nome oficial da Shopee como fallback para evitar quebra da importação.
+
+
+
+\### Estrutura real de categorias encontrada no Data Feed
+
+
+
+Total atual:
+
+
+
+\- Categorias principais: 29
+
+\- Subcategorias: 249
+
+\- Categorias nível 3: 1.016
+
+\- Total geral: 1.294
+
+
+
+\### Traduções
+
+
+
+Antes da nova etapa existiam:
+
+
+
+\- Categorias principais pendentes: 0
+
+\- Subcategorias pendentes: 199
+
+\- Nível 3 pendentes: 1.016
+
+\- Total pendente: 1.215
+
+
+
+Foi criado:
+
+
+
+`export-pending-category-translations.js`
+
+
+
+Esse script exportou as 1.215 pendências para:
+
+
+
+`data/category-translations-pending.json`
+
+
+
+As 1.215 traduções foram preenchidas em pt-BR e salvas em:
+
+
+
+`data/category-translations-complete.json`
+
+
+
+Depois foi criado:
+
+
+
+`import-category-translations.js`
+
+
+
+Resultado da importação:
+
+
+
+\- Total recebido: 1.215
+
+\- Atualizados: 1.215
+
+\- Não encontrados: 0
+
+\- Inválidos: 0
+
+
+
+Resultado final do Registry:
+
+
+
+\- Categorias pendentes: 0
+
+\- Subcategorias pendentes: 0
+
+\- Nível 3 pendentes: 0
+
+\- Total pendente: 0
+
+
+
+\### Teste real validado
+
+
+
+Produto:
+
+
+
+`Pano Bate Mão em Formato de Pirulito com Alça e Alta Absorção`
+
+
+
+IDs Shopee:
+
+
+
+\- categoryId1: `100636`
+
+\- categoryId2: `100716`
+
+\- categoryId3: `101209`
+
+
+
+Nomes oficiais Shopee:
+
+
+
+\- `Home \& Living`
+
+\- `Home Care Supplies`
+
+\- `Cleaning Cloths`
+
+
+
+Resultado final pt-BR:
+
+
+
+\- `Casa e Decoração`
+
+\- `Produtos para Cuidados com a Casa`
+
+\- `Panos de Limpeza`
+
+
+
+O produto normalizado retornou corretamente:
+
+
+
+```text
+
+category1: 'Casa e Decoração'
+
+category2: 'Produtos para Cuidados com a Casa'
+
+category3: 'Panos de Limpeza'
+
