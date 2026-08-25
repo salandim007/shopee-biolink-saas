@@ -20,6 +20,7 @@ const {
  * - expor uma rota HTTP para sincronização manual;
  * - reaproveitar o sincronizador em lote já validado;
  * - devolver um resumo JSON para o Admin;
+ * - não informar sucesso completo quando houver falhas temporárias.
  *
  * Este arquivo NÃO altera a vitrine2.ejs.
  * ============================================================
@@ -48,7 +49,38 @@ function createVitrine2SyncRouter() {
                 const summary =
                     await syncPublishedProducts();
 
-                res.json({
+                const temporaryFailures =
+                    Number(
+                        summary?.failed ||
+                        0
+                    );
+
+                /*
+                 * A sincronização pode terminar tecnicamente
+                 * sem lançar exceção, mas ainda possuir
+                 * produtos com falhas temporárias.
+                 *
+                 * Nesse caso NÃO devemos informar ao Admin
+                 * que tudo foi concluído com sucesso.
+                 */
+                if (
+                    temporaryFailures >
+                    0
+                ) {
+                    return res.json({
+                        success:
+                            false,
+
+                        error:
+                            temporaryFailures === 1
+                                ? 'Sincronização concluída com 1 falha temporária. Verifique o resumo e tente atualizar novamente.'
+                                : `Sincronização concluída com ${temporaryFailures} falhas temporárias. Verifique o resumo e tente atualizar novamente.`,
+
+                        summary
+                    });
+                }
+
+                return res.json({
                     success:
                         true,
 
@@ -63,7 +95,7 @@ function createVitrine2SyncRouter() {
                     error
                 );
 
-                res
+                return res
                     .status(500)
                     .json({
                         success:
