@@ -59,6 +59,35 @@ function hasArg(name) {
         .includes(name);
 }
 
+function getPositiveIntegerArg(
+    name,
+    fallback
+) {
+    const value =
+        getArg(name);
+
+    if (value === null) {
+        return fallback;
+    }
+
+    if (!/^\d+$/.test(value)) {
+        throw new Error(
+            `${name} deve ser um número inteiro positivo.`
+        );
+    }
+
+    const parsed =
+        Number(value);
+
+    if (parsed < 1) {
+        throw new Error(
+            `${name} deve ser maior ou igual a 1.`
+        );
+    }
+
+    return parsed;
+}
+
 function buildQuery() {
     const itemId =
         getArg('--item');
@@ -68,6 +97,18 @@ function buildQuery() {
 
     const schema =
         hasArg('--schema');
+
+    const page =
+        getPositiveIntegerArg(
+            '--page',
+            1
+        );
+
+    const limit =
+        getPositiveIntegerArg(
+            '--limit',
+            10
+        );
 
     if (schema) {
         return `
@@ -107,8 +148,8 @@ function buildQuery() {
             query {
                 productOfferV2(
                     itemId: ${itemId}
-                    page: 1
-                    limit: 10
+                    page: ${page}
+                    limit: ${limit}
                 ) {
                     nodes {
                         itemId
@@ -138,8 +179,8 @@ function buildQuery() {
             query {
                 productOfferV2(
                     keyword: "${safeKeyword}"
-                    page: 1
-                    limit: 10
+                    page: ${page}
+                    limit: ${limit}
                 ) {
                     nodes {
                         itemId

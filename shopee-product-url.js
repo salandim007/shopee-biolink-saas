@@ -104,11 +104,22 @@ function extractShopeeIds(url) {
         normalizeUrl(url);
 
     const patterns = [
-        /-i\.(\d+)\.(\d+)/i,
-        /\/product\/(\d+)\/(\d+)/i,
-        /shop_id=(\d+).*item_id=(\d+)/i,
-        /item_id=(\d+).*shop_id=(\d+)/i
-    ];
+    /-i\.(\d+)\.(\d+)/i,
+    /\/product\/(\d+)\/(\d+)/i,
+    /shop_id=(\d+).*item_id=(\d+)/i,
+    /item_id=(\d+).*shop_id=(\d+)/i,
+
+    /*
+     * Novo formato usado pela Shopee em links
+     * resolvidos de afiliado:
+     *
+     * /nome-ou-slug/shopId/itemId
+     *
+     * Exemplo:
+     * /opaanlp/1340075916/43173265179
+     */
+    /\/[^/?#]+\/(\d+)\/(\d+)(?:[/?#]|$)/i
+];
 
     for (
         let index = 0;
