@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "savedAt": "2026-08-22T02:02:10.624Z",
+  "savedAt": "2026-08-25T01:13:42.108Z",
   "entries": [
     {
       "product": {
@@ -24,11 +24,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/Adesivo-3D-De-Fibra-De-Carbono-Carro-Moto-Protetora-Porta-Espelho-Anti-Riscos-i.550583053.18599566917",
         "resolvedUrl": "https://shopee.com.br/Adesivo-3D-De-Fibra-De-Carbono-Carro-Moto-Protetora-Porta-Espelho-Anti-Riscos-i.550583053.18599566917",
-        "affiliateLink": "https://s.shopee.com.br/8V8IWXV22z",
+        "affiliateLink": "https://s.shopee.com.br/9V0wERmfxv",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:36.285Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -62,11 +64,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/579978597/23594525565",
         "resolvedUrl": "https://shopee.com.br/product/579978597/23594525565",
-        "affiliateLink": "https://s.shopee.com.br/3VjeNhPWMM",
+        "affiliateLink": "https://s.shopee.com.br/AUtTRUjN3S",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:36.909Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -98,11 +102,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/326891807/10239969246",
         "resolvedUrl": "https://shopee.com.br/product/326891807/10239969246",
-        "affiliateLink": "https://s.shopee.com.br/8fRkXCAJtS",
+        "affiliateLink": "https://s.shopee.com.br/8fRpG7qcpF",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:37.201Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -134,11 +140,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/423978122/14064388819",
         "resolvedUrl": "https://shopee.com.br/product/423978122/14064388819",
-        "affiliateLink": "https://s.shopee.com.br/AKZyWG8RYW",
+        "affiliateLink": "https://s.shopee.com.br/7Ad1TMw3p8",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:37.510Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -170,11 +178,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1325738150/23598004054",
         "resolvedUrl": "https://shopee.com.br/product/1325738150/23598004054",
-        "affiliateLink": "https://s.shopee.com.br/6L3pkuRvwr",
+        "affiliateLink": "https://s.shopee.com.br/6L3uTq3uL9",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:37.820Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -206,11 +216,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1696255660/58254333098",
         "resolvedUrl": "https://shopee.com.br/product/1696255660/58254333098",
-        "affiliateLink": "https://s.shopee.com.br/6q06LpUUzZ",
+        "affiliateLink": "https://s.shopee.com.br/2VrBunIV82",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:38.096Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -242,11 +254,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/549528890/20398296044",
         "resolvedUrl": "https://shopee.com.br/product/549528890/20398296044",
-        "affiliateLink": "https://s.shopee.com.br/AKZyWGLZdw",
+        "affiliateLink": "https://s.shopee.com.br/7VFrrz3rkm",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:38.402Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -278,11 +292,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/470695935/22293117305",
         "resolvedUrl": "https://shopee.com.br/product/470695935/22293117305",
-        "affiliateLink": "https://s.shopee.com.br/gPT0V0m2w",
+        "affiliateLink": "https://s.shopee.com.br/8KoyrW0YYY",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:38.696Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -314,11 +330,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1012725449/22195943689",
         "resolvedUrl": "https://shopee.com.br/product/1012725449/22195943689",
-        "affiliateLink": "https://s.shopee.com.br/4LIlNErDOW",
+        "affiliateLink": "https://s.shopee.com.br/8KoyrW0Q2A",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:38.947Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -336,25 +354,27 @@
         "shopId": "1104525762",
         "title": "Kit 10 Pincéis de Maquiagem Mini Profissional Multi-funcional Com Bolsa Para Viagem,Rosa/Roxo/Preto",
         "description": null,
-        "price": 16.99,
+        "price": 15.99,
         "originalPrice": null,
-        "minPrice": 16.99,
-        "maxPrice": 16.99,
+        "minPrice": 15.99,
+        "maxPrice": 15.99,
         "currency": "BRL",
         "image": "https://cf.shopee.com.br/file/sg-11134201-82611-mmb1xzdoxybse3",
         "video": null,
-        "shopName": "JinJin",
+        "shopName": "JinJin ",
         "commissionRate": 0.03,
         "category1": null,
         "category2": null,
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1104525762/58257729398",
         "resolvedUrl": "https://shopee.com.br/product/1104525762/58257729398",
-        "affiliateLink": "https://s.shopee.com.br/LmcbtAuZ3",
+        "affiliateLink": "https://s.shopee.com.br/70JbH4A6I3",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:39.217Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -386,11 +406,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1753398912/58265124286",
         "resolvedUrl": "https://shopee.com.br/product/1753398912/58265124286",
-        "affiliateLink": "https://s.shopee.com.br/8Kou8akr7J",
+        "affiliateLink": "https://s.shopee.com.br/8KoyrW55ru",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:39.470Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -422,11 +444,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/490604318/58208687484",
         "resolvedUrl": "https://shopee.com.br/product/490604318/58208687484",
-        "affiliateLink": "https://s.shopee.com.br/60QzMIy8dX",
+        "affiliateLink": "https://s.shopee.com.br/1qbV7ZTq3n",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:39.750Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -458,11 +482,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/771011426/58113577411",
         "resolvedUrl": "https://shopee.com.br/product/771011426/58113577411",
-        "affiliateLink": "https://s.shopee.com.br/904avoqyoH",
+        "affiliateLink": "https://s.shopee.com.br/2VrBunVYwN",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:40.027Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -494,11 +520,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/510736884/23594931015",
         "resolvedUrl": "https://shopee.com.br/product/510736884/23594931015",
-        "affiliateLink": "https://s.shopee.com.br/5VUilO8hh0",
+        "affiliateLink": "https://s.shopee.com.br/1gI4vGYb6s",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:40.300Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -530,11 +558,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1288072236/22598154293",
         "resolvedUrl": "https://shopee.com.br/product/1288072236/22598154293",
-        "affiliateLink": "https://s.shopee.com.br/1gI0CLRlVF",
+        "affiliateLink": "https://s.shopee.com.br/4fvgUmNS5R",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:40.568Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -566,11 +596,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1096453915/20697455669",
         "resolvedUrl": "https://shopee.com.br/product/1096453915/20697455669",
-        "affiliateLink": "https://s.shopee.com.br/1BLjbQcT45",
+        "affiliateLink": "https://s.shopee.com.br/3qMZVFV1Xj",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:40.832Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -602,11 +634,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1731690990/58213758018",
         "resolvedUrl": "https://shopee.com.br/product/1731690990/58213758018",
-        "affiliateLink": "https://s.shopee.com.br/6q06LqLE5c",
+        "affiliateLink": "https://s.shopee.com.br/5foDgcNloW",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:41.256Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -624,14 +658,14 @@
         "shopId": "361929938",
         "title": "Uma Roupinha Pet Super Confortável – A Partir de R$12,99 🐶💛 Promoção Imperdível!",
         "description": null,
-        "price": 15.99,
+        "price": 12.63,
         "originalPrice": null,
-        "minPrice": 15.99,
-        "maxPrice": 15.99,
+        "minPrice": 12.63,
+        "maxPrice": 12.63,
         "currency": "BRL",
         "image": "https://cf.shopee.com.br/file/br-11134207-820ln-mp2zfxxpeiv7b2",
         "video": null,
-        "shopName": "Super Pet",
+        "shopName": "Super Pet ",
         "commissionRate": 0.03,
         "category1": null,
         "category2": null,
@@ -642,7 +676,9 @@
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:41.505Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -658,12 +694,12 @@
         "marketplace": "shopee",
         "itemId": "22998785704",
         "shopId": "1595306121",
-        "title": "Tênis Feminino Tipo Meia Slip-on 34 ao 39 – Conforto e Praticidade",
+        "title": "Tênis Feminino Tipo Meia Slip-on 34 ao 39 – Conforto e Praticidade\n\n",
         "description": null,
-        "price": 29.97,
+        "price": 27.49,
         "originalPrice": null,
-        "minPrice": 29.97,
-        "maxPrice": 29.97,
+        "minPrice": 27.49,
+        "maxPrice": 27.49,
         "currency": "BRL",
         "image": "https://cf.shopee.com.br/file/br-11134207-7r98o-md20nxrz19ttba",
         "video": null,
@@ -674,11 +710,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1595306121/22998785704",
         "resolvedUrl": "https://shopee.com.br/product/1595306121/22998785704",
-        "affiliateLink": "https://s.shopee.com.br/7psdXgQDcg",
+        "affiliateLink": "https://s.shopee.com.br/4AzPtrY9eH",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:41.814Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
@@ -710,11 +748,13 @@
         "category3": null,
         "originalUrl": "https://shopee.com.br/product/1620515295/22694525800",
         "resolvedUrl": "https://shopee.com.br/product/1620515295/22694525800",
-        "affiliateLink": "https://s.shopee.com.br/3VjeNikyhh",
+        "affiliateLink": "https://s.shopee.com.br/5LBNI0TZlU",
         "available": null,
         "metadata": {
           "provider": "Shopee Affiliate Open API",
-          "operation": "productOfferV2"
+          "operation": "productOfferV2",
+          "lastSyncedAt": "2026-08-25T01:13:42.107Z",
+          "syncSource": "shopee_affiliate_api"
         }
       },
       "visibility": {
