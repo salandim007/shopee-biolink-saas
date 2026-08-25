@@ -1,8 +1,15 @@
+'use strict';
+
 const crypto = require('crypto');
 
 const {
     createCatalogProduct
 } = require('./product-normalizer');
+
+const {
+    resolveCategoryIds
+} = require('./category-id-resolver');
+
 
 const SHOPEE_API_ENDPOINT =
     'https://open-api.affiliate.shopee.com.br/graphql';
@@ -104,22 +111,22 @@ function extractShopeeIds(url) {
         normalizeUrl(url);
 
     const patterns = [
-    /-i\.(\d+)\.(\d+)/i,
-    /\/product\/(\d+)\/(\d+)/i,
-    /shop_id=(\d+).*item_id=(\d+)/i,
-    /item_id=(\d+).*shop_id=(\d+)/i,
+        /-i\.(\d+)\.(\d+)/i,
+        /\/product\/(\d+)\/(\d+)/i,
+        /shop_id=(\d+).*item_id=(\d+)/i,
+        /item_id=(\d+).*shop_id=(\d+)/i,
 
-    /*
-     * Novo formato usado pela Shopee em links
-     * resolvidos de afiliado:
-     *
-     * /nome-ou-slug/shopId/itemId
-     *
-     * Exemplo:
-     * /opaanlp/1340075916/43173265179
-     */
-    /\/[^/?#]+\/(\d+)\/(\d+)(?:[/?#]|$)/i
-];
+        /*
+         * Novo formato usado pela Shopee em links
+         * resolvidos de afiliado:
+         *
+         * /nome-ou-slug/shopId/itemId
+         *
+         * Exemplo:
+         * /opaanlp/1340075916/43173265179
+         */
+        /\/[^/?#]+\/(\d+)\/(\d+)(?:[/?#]|$)/i
+    ];
 
     for (
         let index = 0;
@@ -200,6 +207,7 @@ async function resolveShopeeUrl(url) {
             {
                 method: 'GET',
                 redirect: 'follow',
+
                 headers: {
                     'User-Agent':
                         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
@@ -240,13 +248,19 @@ async function fetchProductOfferByItemId(
             ) {
                 nodes {
                     itemId
+                    shopId
                     productName
                     price
+                    priceMin
+                    priceMax
                     commissionRate
                     imageUrl
                     offerLink
+                    productLink
                     shopName
+                    productCatIds
                 }
+
                 pageInfo {
                     scrollId
                     hasNextPage
@@ -260,7 +274,9 @@ async function fetchProductOfferByItemId(
     };
 
     const payload =
-        JSON.stringify(body);
+        JSON.stringify(
+            body
+        );
 
     const {
         authorization
@@ -357,7 +373,8 @@ async function fetchProductOfferByItemId(
             products[0],
 
         pageInfo:
-            offer.pageInfo || null
+            offer.pageInfo ||
+            null
     };
 }
 
@@ -371,13 +388,17 @@ function normalizeApiProduct({
     originalUrl,
     resolvedUrl,
     shopId,
-    itemId
+    itemId,
+    categories
 }) {
     if (!apiProduct) {
         throw new Error(
             'Produto da API não informado para normalização.'
         );
     }
+
+    const resolvedCategories =
+        categories || {};
 
     return createCatalogProduct({
         source:
@@ -391,6 +412,7 @@ function normalizeApiProduct({
             itemId,
 
         shopId:
+            apiProduct.shopId ||
             shopId,
 
         title:
@@ -406,9 +428,11 @@ function normalizeApiProduct({
             null,
 
         minPrice:
+            apiProduct.priceMin ||
             apiProduct.price,
 
         maxPrice:
+            apiProduct.priceMax ||
             apiProduct.price,
 
         currency:
@@ -427,12 +451,15 @@ function normalizeApiProduct({
             apiProduct.commissionRate,
 
         category1:
+            resolvedCategories.category1 ||
             null,
 
         category2:
+            resolvedCategories.category2 ||
             null,
 
         category3:
+            resolvedCategories.category3 ||
             null,
 
         originalUrl:
@@ -452,7 +479,46 @@ function normalizeApiProduct({
                 'Shopee Affiliate Open API',
 
             operation:
-                'productOfferV2'
+                'productOfferV2',
+
+            productLink:
+                apiProduct.productLink ||
+                null,
+
+            productCatIds:
+                Array.isArray(
+                    apiProduct.productCatIds
+                )
+                    ? apiProduct.productCatIds
+                    : [],
+
+            categoryId1:
+                resolvedCategories.categoryId1 ||
+                null,
+
+            categoryId2:
+                resolvedCategories.categoryId2 ||
+                null,
+
+            categoryId3:
+                resolvedCategories.categoryId3 ||
+                null,
+
+            sourceCategory1:
+                resolvedCategories.sourceCategory1 ||
+                null,
+
+            sourceCategory2:
+                resolvedCategories.sourceCategory2 ||
+                null,
+
+            sourceCategory3:
+                resolvedCategories.sourceCategory3 ||
+                null,
+
+            categorySourceFile:
+                resolvedCategories.sourceFile ||
+                null
         }
     });
 }
@@ -460,7 +526,7 @@ function normalizeApiProduct({
 
 // ============================================================
 // FLUXO COMPLETO
-// URL -> IDs -> API -> CATÁLOGO NORMALIZADO
+// URL -> IDs -> API -> CATEGORIA -> CATÁLOGO NORMALIZADO
 // ============================================================
 
 async function getShopeeProductFromUrl(
@@ -498,6 +564,7 @@ async function getShopeeProductFromUrl(
     }
 
     console.log('');
+
     console.log(
         '========================================'
     );
@@ -544,6 +611,66 @@ async function getShopeeProductFromUrl(
             ids.itemId
         );
 
+    const productCatIds =
+        Array.isArray(
+            result.product
+                ?.productCatIds
+        )
+            ? result.product
+                .productCatIds
+            : [];
+
+    console.log('');
+
+    console.log(
+        `CATEGORIA IDS: ${
+            productCatIds.length > 0
+                ? productCatIds.join(' > ')
+                : 'não informadas'
+        }`
+    );
+
+    let categories = {
+        category1: null,
+        category2: null,
+        category3: null,
+
+        sourceCategory1: null,
+        sourceCategory2: null,
+        sourceCategory3: null,
+
+        categoryId1: null,
+        categoryId2: null,
+        categoryId3: null,
+
+        sourceFile: null
+    };
+
+    if (
+        productCatIds.length > 0
+    ) {
+        console.log(
+            'Resolvendo categorias pelo Data Feed...'
+        );
+
+        categories =
+            await resolveCategoryIds(
+                productCatIds
+            );
+
+        console.log(
+            `CATEGORIA 1: ${categories.category1 || 'não identificada'}`
+        );
+
+        console.log(
+            `CATEGORIA 2: ${categories.category2 || 'não identificada'}`
+        );
+
+        console.log(
+            `CATEGORIA 3: ${categories.category3 || 'não identificada'}`
+        );
+    }
+
     const normalized =
         normalizeApiProduct({
             apiProduct:
@@ -557,7 +684,9 @@ async function getShopeeProductFromUrl(
                 ids.shopId,
 
             itemId:
-                ids.itemId
+                ids.itemId,
+
+            categories
         });
 
     return {
@@ -583,7 +712,10 @@ async function main() {
 
     if (!inputUrl) {
         console.log('');
-        console.log('Uso:');
+
+        console.log(
+            'Uso:'
+        );
 
         console.log(
             'node shopee-product-url.js "URL_DO_PRODUTO_SHOPEE"'
@@ -592,6 +724,7 @@ async function main() {
         console.log('');
 
         process.exitCode = 1;
+
         return;
     }
 
@@ -602,6 +735,7 @@ async function main() {
             );
 
         console.log('');
+
         console.log(
             '========================================'
         );
@@ -623,6 +757,7 @@ async function main() {
         );
 
         console.log('');
+
         console.log(
             'PAGE INFO:'
         );
@@ -636,6 +771,7 @@ async function main() {
         );
 
         console.log('');
+
         console.log(
             '========================================'
         );
@@ -649,6 +785,7 @@ async function main() {
         );
     } catch (error) {
         console.error('');
+
         console.error(
             '========================================'
         );
