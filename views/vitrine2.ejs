@@ -3833,6 +3833,56 @@ renderAllProducts();
                     return;
                 }
 
+                /*
+                 * Fecha o pop-up antes de sair da Vitrine.
+                 * O link já está salvo em targetUrl, então
+                 * podemos limpar pendingShopeeUrl com segurança.
+                 */
+                closeShopeeConfirm();
+
+                const isMobileDevice =
+                    /Android|iPhone|iPad|iPod/i.test(
+                        navigator.userAgent
+                    );
+
+                if (isMobileDevice) {
+                    /*
+                     * No celular, mantemos a navegação normal.
+                     * Assim, o Android/iOS pode encaminhar o
+                     * link oficial da Shopee para o aplicativo
+                     * quando ele estiver instalado e associado.
+                     */
+                    window.location.href =
+                        targetUrl;
+
+                    return;
+                }
+
+                /*
+                 * No desktop, abrimos a oferta em uma nova aba.
+                 *
+                 * Não usamos "noopener" no terceiro argumento do
+                 * window.open porque alguns navegadores retornam
+                 * null mesmo quando a nova aba foi aberta. Isso
+                 * fazia o fallback navegar também a aba da Vitrine.
+                 */
+                const newWindow =
+                    window.open(
+                        targetUrl,
+                        '_blank'
+                    );
+
+                if (newWindow) {
+                    newWindow.opener =
+                        null;
+
+                    return;
+                }
+
+                /*
+                 * Fallback apenas quando a nova aba realmente
+                 * for bloqueada pelo navegador.
+                 */
                 window.location.href =
                     targetUrl;
             }
