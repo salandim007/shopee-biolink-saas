@@ -1828,3 +1828,135 @@ category2: 'Produtos para Cuidados com a Casa'
 
 category3: 'Panos de Limpeza'
 
+---
+
+## Atualização 25/08/2026 — Sync comercial e Admin Vitrine 2
+
+### Sincronização dos 50 produtos
+
+Foi concluída a sincronização completa dos 50 produtos publicados na Vitrine 2.
+
+Resultado:
+
+- Total: 50
+- Sucesso: 50
+- Indisponíveis ocultados: 0
+- Falhas temporárias: 0
+
+As categorias permaneceram corretas após a sincronização.
+
+Estado das categorias:
+
+- 50 produtos com `category1`
+- 50 produtos com `category2`
+- 45 produtos com `category3`
+- 5 produtos sem `category3` porque a própria Shopee retorna `categoryId3 = 0`
+
+Não deve ser inventada uma categoria de nível 3 para esses produtos.
+
+Commit da integração de categorias no sync:
+
+`4d7e2ba — Sync Shopee categories into Vitrine 2 catalog`
+
+
+### Novos dados comerciais da Shopee
+
+O `productOfferV2` foi expandido para trazer também:
+
+- `priceDiscountRate`
+- `commission`
+- `sellerCommissionRate`
+- `shopeeCommissionRate`
+- `sales`
+- `ratingStar`
+
+Exemplo validado:
+
+Item ID:
+
+`22193593141`
+
+Produto:
+
+`Marmita infantil ZooKids com formato e estampa de animais fofos travas e talheres`
+
+Dados retornados:
+
+- Preço: R$ 23,90
+- Comissão total: 0.83 = 83%
+- Comissão estimada: R$ 19,837
+- Comissão vendedor: 0.80
+- Comissão Shopee: 0.03
+- Vendas: 30
+- Avaliação: 4.9
+- Desconto: 4%
+
+A comissão de 83% foi confirmada como valor real retornado pela API para esse produto.
+
+Os novos dados passaram a ser gravados pelo Product Sync no catálogo.
+
+
+### Arquivos alterados
+
+- `shopee-product-url.js`
+- `vitrine2-product-sync.js`
+- `vitrine2-product-sync-service.js`
+- `views/admin-vitrine2.ejs`
+
+
+### Admin Vitrine 2
+
+O Admin foi atualizado para exibir os seguintes dados por produto:
+
+- Preço
+- Comissão percentual
+- Comissão estimada em reais
+- Vendas
+- Avaliação
+- Status
+- Posição
+- Publicação
+- Ações
+
+Exemplo visual:
+
+`Comissão 83% | Estimada R$ 19,84 | Vendas 30 | Avaliação 4,9 ★`
+
+O nome do produto no Admin agora é clicável.
+
+Ao clicar no nome:
+
+- abre a página oficial do produto na Shopee;
+- abre em nova aba;
+- permite conferir rapidamente o preço e o produto diretamente na Shopee.
+
+Foi realizado ajuste fino no layout do Admin:
+
+- nome do produto permanece em negrito;
+- valores deixaram de usar negrito;
+- colunas ficaram mais compactas;
+- coluna `Ações` voltou a ficar totalmente visível;
+- botão de posição aparece como `Salvar`;
+- layout final aprovado visualmente.
+
+
+### Estado atual validado
+
+- Vitrine 2 pública permanece sem alteração visual.
+- Admin Vitrine 2 funcionando.
+- Categorias em português funcionando.
+- Filtro de categorias funcionando.
+- Sync via Admin funcionando.
+- 50 produtos sincronizados.
+- Dados comerciais sincronizados.
+- Link direto para Shopee funcionando.
+
+
+### Último commit estável
+
+`e512a05 — Add commercial metrics to Vitrine 2 admin`
+
+Push realizado com sucesso para `origin/main`.
+
+---
+
