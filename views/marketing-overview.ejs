@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Visão Geral — Central de Marketing</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-extrabold">
+                        Central de Marketing
+                    </h1>
+
+                    <p class="text-sm text-slate-500">
+                        Seleção estratégica dos produtos antes das campanhas.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <a
+                    href="/admin/vitrine2"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm font-bold transition"
+                >
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Catálogo
+                </a>
+
+                <a
+                    href="/vitrine2"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold transition"
+                >
+                    <i class="fa-solid fa-store"></i>
+                    Abrir Vitrine
+                </a>
+            </div>
+        </div>
+
+
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 pb-4">
+            <div class="flex gap-2 overflow-x-auto pb-1">
+                <a href="/admin/vitrine2/marketing/overview" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-sky-600 text-white">
+                    <i class="fa-solid fa-chart-line"></i> Visão Geral
+                </a>
+                <a href="/admin/vitrine2/marketing/instagram" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-brands fa-instagram"></i> Instagram
+                </a>
+                <a href="/admin/vitrine2/marketing/facebook" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-brands fa-facebook"></i> Facebook
+                </a>
+                <a href="/admin/vitrine2/marketing/tiktok" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-brands fa-tiktok"></i> TikTok
+                </a>
+                <a href="/admin/vitrine2/marketing/kwai" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-solid fa-video"></i> Kwai
+                </a>
+                <a href="/admin/vitrine2/marketing/outros" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-solid fa-share-nodes"></i> Outros canais
+                </a>
+            </div>
+        </nav>
+
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-6">
+            <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                <div class="text-xs uppercase tracking-wide text-slate-400 font-bold">
+                    Comissão
+                </div>
+                <div class="mt-1 text-sm text-slate-600">
+                    Priorize boa remuneração por venda.
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                <div class="text-xs uppercase tracking-wide text-slate-400 font-bold">
+                    Estimada
+                </div>
+                <div class="mt-1 text-sm text-slate-600">
+                    Compare o valor real estimado em reais.
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                <div class="text-xs uppercase tracking-wide text-slate-400 font-bold">
+                    Vendas
+                </div>
+                <div class="mt-1 text-sm text-slate-600">
+                    Observe a tração comercial do produto.
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                <div class="text-xs uppercase tracking-wide text-slate-400 font-bold">
+                    Avaliação
+                </div>
+                <div class="mt-1 text-sm text-slate-600">
+                    Use a reputação como proteção da curadoria.
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div>
+                    <h2 class="font-extrabold">
+                        Produtos disponíveis para Marketing
+                    </h2>
+                    <p class="text-sm text-slate-500">
+                        Mesmos produtos publicados no catálogo, vistos pelos quatro indicadores principais.
+                    </p>
+                </div>
+
+                <select
+                    id="overviewSort"
+                    class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm"
+                >
+                    <option value="commissionRate">Maior comissão</option>
+                    <option value="commission">Maior estimada</option>
+                    <option value="sales">Mais vendidos</option>
+                    <option value="ratingStar">Melhor avaliação</option>
+                </select>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                        <tr>
+                            <th class="px-4 py-3">Produto</th>
+                            <th class="px-4 py-3">Comissão</th>
+                            <th class="px-4 py-3">Estimada</th>
+                            <th class="px-4 py-3">Vendas</th>
+                            <th class="px-4 py-3">Avaliação</th>
+                            <th class="px-4 py-3">Canais</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="overviewProducts" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="6" class="px-4 py-10 text-center text-slate-500">
+                                Carregando produtos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatPrice(value) {
+            const number = Number(value);
+
+            if (!Number.isFinite(number)) {
+                return '—';
+            }
+
+            return new Intl.NumberFormat(
+                'pt-BR',
+                {
+                    style: 'currency',
+                    currency: 'BRL'
+                }
+            ).format(number);
+        }
+
+        function formatCommission(value) {
+            const number = Number(value);
+
+            if (!Number.isFinite(number)) {
+                return '—';
+            }
+
+            return `${(number * 100).toFixed(1).replace('.0', '')}%`;
+        }
+
+        function formatSales(value) {
+            const number = Number(value);
+
+            if (!Number.isFinite(number)) {
+                return '—';
+            }
+
+            return new Intl.NumberFormat('pt-BR').format(number);
+        }
+
+        function formatRating(value) {
+            const number = Number(value);
+
+            if (!Number.isFinite(number)) {
+                return '—';
+            }
+
+            return `${number.toFixed(1).replace('.', ',')} ★`;
+        }
+
+        function productLink(product) {
+            return product?.metadata?.productLink || product?.affiliateLink || '#';
+        }
+
+        async function fetchCatalogProducts() {
+            const response =
+                await fetch(
+                    '/api/vitrine2/products'
+                );
+
+            const data =
+                await response.json();
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+                throw new Error(
+                    data.error ||
+                    'Falha ao carregar produtos.'
+                );
+            }
+
+            return (
+                Array.isArray(data.products)
+                    ? data.products
+                    : []
+            )
+                .filter(
+                    entry =>
+                        entry?.visibility?.published
+                )
+                .map(
+                    entry => ({
+                        entry,
+                        product:
+                            entry.product || {}
+                    })
+                );
+        }
+
+
+        let overviewItems = [];
+
+        function renderOverview() {
+            const sortKey =
+                document
+                    .getElementById(
+                        'overviewSort'
+                    )
+                    .value;
+
+            const items =
+                [...overviewItems]
+                    .sort(
+                        (a, b) =>
+                            (
+                                Number(b.product?.[sortKey]) || 0
+                            ) -
+                            (
+                                Number(a.product?.[sortKey]) || 0
+                            )
+                    );
+
+            const body =
+                document.getElementById(
+                    'overviewProducts'
+                );
+
+            body.innerHTML =
+                items
+                    .map(
+                        ({ product }) => `
+                            <tr>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-3 min-w-[320px]">
+                                        <img
+                                            src="${escapeHtml(product.image)}"
+                                            alt=""
+                                            class="w-14 h-14 rounded-xl object-cover bg-slate-100"
+                                        >
+
+                                        <div>
+                                            <a
+                                                href="${escapeHtml(productLink(product))}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="font-bold text-sm hover:text-sky-700 hover:underline"
+                                            >
+                                                ${escapeHtml(product.title)}
+                                            </a>
+
+                                            <div class="mt-1 text-xs text-slate-400">
+                                                ID ${escapeHtml(product.itemId)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-4 py-4 text-sky-700 whitespace-nowrap">
+                                    ${formatCommission(product.commissionRate)}
+                                </td>
+
+                                <td class="px-4 py-4 text-emerald-700 whitespace-nowrap">
+                                    ${formatPrice(product.commission)}
+                                </td>
+
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    ${formatSales(product.sales)}
+                                </td>
+
+                                <td class="px-4 py-4 text-amber-600 whitespace-nowrap">
+                                    ${formatRating(product.ratingStar)}
+                                </td>
+
+                                <td class="px-4 py-4">
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <span class="rounded-full bg-pink-50 text-pink-700 px-2 py-1 text-xs font-bold">Instagram</span>
+                                        <span class="rounded-full bg-blue-50 text-blue-700 px-2 py-1 text-xs font-bold">Facebook</span>
+                                        <span class="rounded-full bg-slate-100 text-slate-700 px-2 py-1 text-xs font-bold">TikTok</span>
+                                        <span class="rounded-full bg-orange-50 text-orange-700 px-2 py-1 text-xs font-bold">Kwai</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        `
+                    )
+                    .join('');
+        }
+
+
+        async function loadOverview() {
+            try {
+                overviewItems =
+                    await fetchCatalogProducts();
+
+                renderOverview();
+            } catch (error) {
+                document
+                    .getElementById(
+                        'overviewProducts'
+                    )
+                    .innerHTML =
+                        `
+                            <tr>
+                                <td colspan="6" class="px-4 py-10 text-center text-red-600">
+                                    ${escapeHtml(error.message)}
+                                </td>
+                            </tr>
+                        `;
+            }
+        }
+
+
+        document
+            .getElementById(
+                'overviewSort'
+            )
+            .addEventListener(
+                'change',
+                renderOverview
+            );
+
+
+        loadOverview();
+
+    </script>
+</body>
+</html>

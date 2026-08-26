@@ -15,6 +15,9 @@ const {
     defaultVitrine2Router
 } = require('./vitrine2-routes');
 
+const marketingRoutes =
+    require('./marketing-routes');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const CHROME_EXECUTABLE_PATH = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
@@ -25,6 +28,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/vitrine2', defaultVitrine2Router);
 app.use('/api/vitrine2', defaultVitrine2SyncRouter);
+
+app.use(
+    '/admin/vitrine2/marketing',
+    marketingRoutes
+);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

@@ -19,6 +19,47 @@
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     >
+
+    <style>
+        :root {
+            --admin-header-height: 0px;
+        }
+
+        #desktopTableWrapper,
+        #desktopTableWrapper > div {
+            overflow: visible;
+        }
+
+        #desktopTableHead th {
+            position: sticky;
+            top: var(--admin-header-height);
+            z-index: 15;
+            background: rgb(248 250 252);
+            box-shadow: 0 1px 0 rgb(226 232 240);
+        }
+
+        .sort-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: color 150ms ease;
+        }
+
+        .sort-button:hover,
+        .sort-button.active {
+            color: rgb(2 132 199);
+        }
+
+        .sort-indicator {
+            min-width: 0.8rem;
+            text-align: center;
+            font-size: 0.7rem;
+            line-height: 1;
+        }
+    </style>
 </head>
 
 <body class="bg-slate-50 text-slate-900">
@@ -26,6 +67,7 @@
     <main class="min-h-screen">
 
         <header
+            id="adminHeader"
             class="
                 bg-white
                 border-b
@@ -106,6 +148,28 @@
                         gap-2
                     "
                 >
+                    <a
+                        href="/admin/vitrine2/marketing/overview"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            gap-2
+                            px-4
+                            py-2.5
+                            rounded-xl
+                            bg-sky-50
+                            hover:bg-sky-100
+                            text-sky-700
+                            font-bold
+                            text-sm
+                            transition
+                        "
+                    >
+                        <i class="fa-solid fa-bullhorn"></i>
+                        Central de Marketing
+                    </a>
+
                     <a
                         href="/vitrine2"
                         target="_blank"
@@ -531,12 +595,12 @@
                     rounded-2xl
                     border
                     border-slate-200
-                    overflow-hidden
                 "
             >
-                <div class="overflow-x-auto">
+                <div>
                     <table class="w-full">
                         <thead
+                            id="desktopTableHead"
                             class="
                                 bg-slate-50
                                 border-b
@@ -553,35 +617,99 @@
                                 "
                             >
                                 <th class="px-3 py-3">
-                                    Produto
+                                    <button
+                                        type="button"
+                                        class="sort-button"
+                                        data-sort-button="title"
+                                        onclick="setSort('title')"
+                                    >
+                                        Produto
+                                        <span class="sort-indicator" data-sort-indicator="title">↕</span>
+                                    </button>
                                 </th>
 
                                 <th class="px-3 py-3">
-                                    Preço
+                                    <button
+                                        type="button"
+                                        class="sort-button"
+                                        data-sort-button="price"
+                                        onclick="setSort('price')"
+                                    >
+                                        Preço
+                                        <span class="sort-indicator" data-sort-indicator="price">↕</span>
+                                    </button>
                                 </th>
 
                                 <th class="px-3 py-3">
-                                    Comissão
+                                    <button
+                                        type="button"
+                                        class="sort-button"
+                                        data-sort-button="commissionRate"
+                                        onclick="setSort('commissionRate')"
+                                    >
+                                        Comissão
+                                        <span class="sort-indicator" data-sort-indicator="commissionRate">↕</span>
+                                    </button>
                                 </th>
 
                                 <th class="px-3 py-3">
-                                    Estimada
+                                    <button
+                                        type="button"
+                                        class="sort-button"
+                                        data-sort-button="commission"
+                                        onclick="setSort('commission')"
+                                    >
+                                        Estimada
+                                        <span class="sort-indicator" data-sort-indicator="commission">↕</span>
+                                    </button>
                                 </th>
 
                                 <th class="px-3 py-3">
-                                    Vendas
+                                    <button
+                                        type="button"
+                                        class="sort-button"
+                                        data-sort-button="sales"
+                                        onclick="setSort('sales')"
+                                    >
+                                        Vendas
+                                        <span class="sort-indicator" data-sort-indicator="sales">↕</span>
+                                    </button>
                                 </th>
 
                                 <th class="px-3 py-3">
-                                    Avaliação
+                                    <button
+                                        type="button"
+                                        class="sort-button"
+                                        data-sort-button="ratingStar"
+                                        onclick="setSort('ratingStar')"
+                                    >
+                                        Avaliação
+                                        <span class="sort-indicator" data-sort-indicator="ratingStar">↕</span>
+                                    </button>
                                 </th>
 
                                 <th class="px-3 py-3">
-                                    Status
+                                    <button
+                                        type="button"
+                                        class="sort-button"
+                                        data-sort-button="status"
+                                        onclick="setSort('status')"
+                                    >
+                                        Status
+                                        <span class="sort-indicator" data-sort-indicator="status">↕</span>
+                                    </button>
                                 </th>
 
                                 <th class="px-3 py-3">
-                                    Posição
+                                    <button
+                                        type="button"
+                                        class="sort-button"
+                                        data-sort-button="position"
+                                        onclick="setSort('position')"
+                                    >
+                                        Posição
+                                        <span class="sort-indicator" data-sort-indicator="position">↕</span>
+                                    </button>
                                 </th>
 
                                 <th class="px-3 py-3">
@@ -656,6 +784,11 @@
 
     <script>
         let catalogEntries = [];
+
+        let sortState = {
+            key: null,
+            direction: null
+        };
 
 
         function escapeHtml(
@@ -777,6 +910,211 @@
             }
 
             return `${number.toFixed(1).replace('.', ',')} ★`;
+        }
+
+
+        function updateStickyTableOffset() {
+            const header =
+                document.getElementById(
+                    'adminHeader'
+                );
+
+            if (!header) {
+                return;
+            }
+
+            document.documentElement.style.setProperty(
+                '--admin-header-height',
+                `${header.offsetHeight}px`
+            );
+        }
+
+
+        function getSortValue(
+            entry,
+            key
+        ) {
+            const product =
+                getProduct(
+                    entry
+                );
+
+            if (key === 'title') {
+                return normalizeText(
+                    product.title
+                );
+            }
+
+            if (key === 'status') {
+                return isPublished(
+                    entry
+                )
+                    ? 1
+                    : 0;
+            }
+
+            if (key === 'position') {
+                const position =
+                    Number(
+                        entry?.visibility?.position
+                    );
+
+                return Number.isFinite(position)
+                    ? position
+                    : null;
+            }
+
+            const value =
+                Number(
+                    product?.[key]
+                );
+
+            return Number.isFinite(value)
+                ? value
+                : null;
+        }
+
+
+        function sortEntries(
+            entries
+        ) {
+            if (
+                !sortState.key ||
+                !sortState.direction
+            ) {
+                return [...entries];
+            }
+
+            const direction =
+                sortState.direction === 'asc'
+                    ? 1
+                    : -1;
+
+            return [...entries].sort(
+                (entryA, entryB) => {
+                    const valueA =
+                        getSortValue(
+                            entryA,
+                            sortState.key
+                        );
+
+                    const valueB =
+                        getSortValue(
+                            entryB,
+                            sortState.key
+                        );
+
+                    if (valueA === null && valueB === null) {
+                        return 0;
+                    }
+
+                    if (valueA === null) {
+                        return 1;
+                    }
+
+                    if (valueB === null) {
+                        return -1;
+                    }
+
+                    if (
+                        typeof valueA === 'string' ||
+                        typeof valueB === 'string'
+                    ) {
+                        return String(valueA)
+                            .localeCompare(
+                                String(valueB),
+                                'pt-BR'
+                            ) * direction;
+                    }
+
+                    if (valueA === valueB) {
+                        return 0;
+                    }
+
+                    return (
+                        valueA < valueB
+                            ? -1
+                            : 1
+                    ) * direction;
+                }
+            );
+        }
+
+
+        function updateSortIndicators() {
+            document
+                .querySelectorAll(
+                    '[data-sort-button]'
+                )
+                .forEach(
+                    button => {
+                        const key =
+                            button.dataset.sortButton;
+
+                        const indicator =
+                            button.querySelector(
+                                '[data-sort-indicator]'
+                            );
+
+                        const active =
+                            sortState.key === key &&
+                            Boolean(sortState.direction);
+
+                        button.classList.toggle(
+                            'active',
+                            active
+                        );
+
+                        if (!indicator) {
+                            return;
+                        }
+
+                        if (!active) {
+                            indicator.textContent = '↕';
+                            return;
+                        }
+
+                        indicator.textContent =
+                            sortState.direction === 'asc'
+                                ? '↑'
+                                : '↓';
+                    }
+                );
+        }
+
+
+        function setSort(
+            key
+        ) {
+            const isText =
+                key === 'title';
+
+            const firstDirection =
+                isText
+                    ? 'asc'
+                    : 'desc';
+
+            const secondDirection =
+                isText
+                    ? 'desc'
+                    : 'asc';
+
+            if (
+                sortState.key !== key ||
+                sortState.direction === null
+            ) {
+                sortState.key = key;
+                sortState.direction = firstDirection;
+            } else if (
+                sortState.direction === firstDirection
+            ) {
+                sortState.direction = secondDirection;
+            } else {
+                sortState.key = null;
+                sortState.direction = null;
+            }
+
+            renderProducts();
         }
 
 
@@ -1304,8 +1642,9 @@
                     0
                 );
 
-            return catalogEntries.filter(
-                entry => {
+            const filteredEntries =
+                catalogEntries.filter(
+                    entry => {
                     const product =
                         getProduct(
                             entry
@@ -1386,6 +1725,10 @@
                         matchesCommission
                     );
                 }
+            );
+
+            return sortEntries(
+                filteredEntries
             );
         }
 
@@ -2068,6 +2411,9 @@
                         createMobileCard
                     )
                     .join('');
+
+            updateSortIndicators();
+            updateStickyTableOffset();
         }
 
 
@@ -2540,6 +2886,18 @@
             );
 
 
+        window.addEventListener(
+            'resize',
+            updateStickyTableOffset
+        );
+
+        window.addEventListener(
+            'load',
+            updateStickyTableOffset
+        );
+
+        updateStickyTableOffset();
+        updateSortIndicators();
         loadProducts();
     </script>
 
