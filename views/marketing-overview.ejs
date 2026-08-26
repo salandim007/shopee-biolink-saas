@@ -2,173 +2,605 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Visão Geral — Central de Marketing</title>
+    <title>
+        Visão Geral — Central de Marketing
+    </title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+        src="https://cdn.tailwindcss.com"
+    ></script>
 
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     >
+
+    <style>
+        :root {
+            --admin-header-height: 0px;
+        }
+
+        #marketingTableWrapper,
+        #marketingTableWrapper > div {
+            overflow: visible;
+        }
+
+        #marketingTableHead th {
+            position: sticky;
+            top: var(--admin-header-height);
+            z-index: 15;
+            background: rgb(248 250 252);
+            box-shadow: 0 1px 0 rgb(226 232 240);
+        }
+    </style>
 </head>
 
 <body class="bg-slate-50 text-slate-900">
 
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <main class="min-h-screen">
 
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center">
-                    <i class="fa-solid fa-bullhorn"></i>
-                </div>
+        <header
+            id="adminHeader"
+            class="
+                bg-white
+                border-b
+                border-slate-200
+                sticky
+                top-0
+                z-20
+            "
+        >
+            <div
+                class="
+                    max-w-7xl
+                    mx-auto
+                    px-4
+                    sm:px-6
+                    py-4
+                    flex
+                    flex-col
+                    sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                    gap-4
+                "
+            >
 
                 <div>
-                    <h1 class="text-xl sm:text-2xl font-extrabold">
-                        Central de Marketing
-                    </h1>
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-3
+                        "
+                    >
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-2xl
+                                bg-sky-100
+                                text-sky-700
+                                flex
+                                items-center
+                                justify-center
+                            "
+                        >
+                            <i class="fa-solid fa-bullhorn"></i>
+                        </div>
 
-                    <p class="text-sm text-slate-500">
-                        Seleção estratégica dos produtos antes das campanhas.
-                    </p>
+                        <div>
+                            <h1
+                                class="
+                                    text-xl
+                                    sm:text-2xl
+                                    font-extrabold
+                                "
+                            >
+                                Central de Marketing
+                            </h1>
+
+                            <p
+                                class="
+                                    text-sm
+                                    text-slate-500
+                                "
+                            >
+                                Seleção estratégica dos produtos antes das campanhas.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="flex items-center gap-2">
-                <a
-                    href="/admin/vitrine2"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm font-bold transition"
+                <div
+                    class="
+                        flex
+                        items-center
+                        gap-2
+                    "
                 >
-                    <i class="fa-solid fa-arrow-left"></i>
-                    Catálogo
-                </a>
+                    <a
+                        href="/admin/vitrine2"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            gap-2
+                            px-4
+                            py-2.5
+                            rounded-xl
+                            bg-sky-50
+                            hover:bg-sky-100
+                            text-sky-700
+                            font-bold
+                            text-sm
+                            transition
+                        "
+                    >
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Catálogo
+                    </a>
 
-                <a
-                    href="/vitrine2"
-                    target="_blank"
-                    rel="noopener"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold transition"
+                    <a
+                        href="/vitrine2"
+                        target="_blank"
+                        rel="noopener"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            gap-2
+                            px-4
+                            py-2.5
+                            rounded-xl
+                            bg-slate-100
+                            hover:bg-slate-200
+                            font-bold
+                            text-sm
+                            transition
+                        "
+                    >
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        Abrir Vitrine
+                    </a>
+                </div>
+
+            </div>
+
+            <nav
+                class="
+                    max-w-7xl
+                    mx-auto
+                    px-4
+                    sm:px-6
+                    pb-4
+                "
+            >
+                <div class="flex gap-2 overflow-x-auto pb-1">
+
+                    <a
+                        href="/admin/vitrine2/marketing/overview"
+                        class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            px-4
+                            py-2.5
+                            text-sm
+                            font-bold
+                            transition
+                            bg-sky-600
+                            text-white
+                        "
+                    >
+                        <i class="fa-solid fa-chart-line"></i>
+                        Visão Geral
+                    </a>
+
+                    <a
+                        href="/admin/vitrine2/marketing/instagram"
+                        class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            px-4
+                            py-2.5
+                            text-sm
+                            font-bold
+                            transition
+                            bg-white
+                            text-slate-600
+                            hover:bg-slate-100
+                            border
+                            border-slate-200
+                        "
+                    >
+                        <i class="fa-brands fa-instagram"></i>
+                        Instagram
+                    </a>
+
+                    <a
+                        href="/admin/vitrine2/marketing/facebook"
+                        class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            px-4
+                            py-2.5
+                            text-sm
+                            font-bold
+                            transition
+                            bg-white
+                            text-slate-600
+                            hover:bg-slate-100
+                            border
+                            border-slate-200
+                        "
+                    >
+                        <i class="fa-brands fa-facebook"></i>
+                        Facebook
+                    </a>
+
+                    <a
+                        href="/admin/vitrine2/marketing/tiktok"
+                        class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            px-4
+                            py-2.5
+                            text-sm
+                            font-bold
+                            transition
+                            bg-white
+                            text-slate-600
+                            hover:bg-slate-100
+                            border
+                            border-slate-200
+                        "
+                    >
+                        <i class="fa-brands fa-tiktok"></i>
+                        TikTok
+                    </a>
+
+                    <a
+                        href="/admin/vitrine2/marketing/kwai"
+                        class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            px-4
+                            py-2.5
+                            text-sm
+                            font-bold
+                            transition
+                            bg-white
+                            text-slate-600
+                            hover:bg-slate-100
+                            border
+                            border-slate-200
+                        "
+                    >
+                        <i class="fa-solid fa-video"></i>
+                        Kwai
+                    </a>
+
+                    <a
+                        href="/admin/vitrine2/marketing/outros"
+                        class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            px-4
+                            py-2.5
+                            text-sm
+                            font-bold
+                            transition
+                            bg-white
+                            text-slate-600
+                            hover:bg-slate-100
+                            border
+                            border-slate-200
+                        "
+                    >
+                        <i class="fa-solid fa-share-nodes"></i>
+                        Outros canais
+                    </a>
+
+                </div>
+            </nav>
+
+        </header>
+
+
+        <section
+            class="
+                max-w-7xl
+                mx-auto
+                px-4
+                sm:px-6
+                py-6
+            "
+        >
+
+            <div
+                class="
+                    grid
+                    grid-cols-2
+                    lg:grid-cols-4
+                    gap-3
+                    mb-6
+                "
+            >
+
+                <div
+                    class="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        p-4
+                    "
                 >
-                    <i class="fa-solid fa-store"></i>
-                    Abrir Vitrine
-                </a>
+                    <div
+                        class="
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-slate-400
+                            font-bold
+                        "
+                    >
+                        Comissão
+                    </div>
+
+                    <div class="mt-1 text-sm text-slate-600">
+                        Peso de 30% na oportunidade.
+                    </div>
+                </div>
+
+                <div
+                    class="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-slate-400
+                            font-bold
+                        "
+                    >
+                        Estimada
+                    </div>
+
+                    <div class="mt-1 text-sm text-slate-600">
+                        Peso de 30% na oportunidade.
+                    </div>
+                </div>
+
+                <div
+                    class="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-slate-400
+                            font-bold
+                        "
+                    >
+                        Vendas
+                    </div>
+
+                    <div class="mt-1 text-sm text-slate-600">
+                        Peso de 25% na oportunidade.
+                    </div>
+                </div>
+
+                <div
+                    class="
+                        bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        p-4
+                    "
+                >
+                    <div
+                        class="
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-slate-400
+                            font-bold
+                        "
+                    >
+                        Avaliação
+                    </div>
+
+                    <div class="mt-1 text-sm text-slate-600">
+                        Peso de 15% na oportunidade.
+                    </div>
+                </div>
+
             </div>
-        </div>
 
 
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 pb-4">
-            <div class="flex gap-2 overflow-x-auto pb-1">
-                <a href="/admin/vitrine2/marketing/overview" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-sky-600 text-white">
-                    <i class="fa-solid fa-chart-line"></i> Visão Geral
-                </a>
-                <a href="/admin/vitrine2/marketing/instagram" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
-                    <i class="fa-brands fa-instagram"></i> Instagram
-                </a>
-                <a href="/admin/vitrine2/marketing/facebook" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
-                    <i class="fa-brands fa-facebook"></i> Facebook
-                </a>
-                <a href="/admin/vitrine2/marketing/tiktok" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
-                    <i class="fa-brands fa-tiktok"></i> TikTok
-                </a>
-                <a href="/admin/vitrine2/marketing/kwai" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
-                    <i class="fa-solid fa-video"></i> Kwai
-                </a>
-                <a href="/admin/vitrine2/marketing/outros" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
-                    <i class="fa-solid fa-share-nodes"></i> Outros canais
-                </a>
-            </div>
-        </nav>
+            <div
+                id="marketingTableWrapper"
+                class="
+                    bg-white
+                    rounded-2xl
+                    border
+                    border-slate-200
+                "
+            >
 
-    </header>
+                <div
+                    class="
+                        p-4
+                        border-b
+                        border-slate-200
+                        flex
+                        flex-col
+                        md:flex-row
+                        md:items-center
+                        md:justify-between
+                        gap-3
+                    "
+                >
+                    <div>
+                        <h2 class="font-extrabold">
+                            Produtos disponíveis para Marketing
+                        </h2>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+                        <p class="text-sm text-slate-500">
+                            Ranking automático dos produtos publicados com base em comissão, estimada, vendas e avaliação.
+                        </p>
+                    </div>
 
-        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-6">
-            <div class="bg-white border border-slate-200 rounded-2xl p-4">
-                <div class="text-xs uppercase tracking-wide text-slate-400 font-bold">
-                    Comissão
+                    <select
+                        id="overviewSort"
+                        class="
+                            rounded-xl
+                            border
+                            border-slate-200
+                            bg-white
+                            px-4
+                            py-2.5
+                            text-sm
+                        "
+                    >
+                        <option value="opportunityScore">
+                            Melhor oportunidade
+                        </option>
+
+                        <option value="commissionRate">
+                            Maior comissão
+                        </option>
+
+                        <option value="commission">
+                            Maior estimada
+                        </option>
+
+                        <option value="sales">
+                            Mais vendidos
+                        </option>
+
+                        <option value="ratingStar">
+                            Melhor avaliação
+                        </option>
+                    </select>
                 </div>
-                <div class="mt-1 text-sm text-slate-600">
-                    Priorize boa remuneração por venda.
-                </div>
-            </div>
 
-            <div class="bg-white border border-slate-200 rounded-2xl p-4">
-                <div class="text-xs uppercase tracking-wide text-slate-400 font-bold">
-                    Estimada
-                </div>
-                <div class="mt-1 text-sm text-slate-600">
-                    Compare o valor real estimado em reais.
-                </div>
-            </div>
 
-            <div class="bg-white border border-slate-200 rounded-2xl p-4">
-                <div class="text-xs uppercase tracking-wide text-slate-400 font-bold">
-                    Vendas
-                </div>
-                <div class="mt-1 text-sm text-slate-600">
-                    Observe a tração comercial do produto.
-                </div>
-            </div>
-
-            <div class="bg-white border border-slate-200 rounded-2xl p-4">
-                <div class="text-xs uppercase tracking-wide text-slate-400 font-bold">
-                    Avaliação
-                </div>
-                <div class="mt-1 text-sm text-slate-600">
-                    Use a reputação como proteção da curadoria.
-                </div>
-            </div>
-        </section>
-
-        <section class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-            <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
-                    <h2 class="font-extrabold">
-                        Produtos disponíveis para Marketing
-                    </h2>
-                    <p class="text-sm text-slate-500">
-                        Mesmos produtos publicados no catálogo, vistos pelos quatro indicadores principais.
-                    </p>
+                    <table class="w-full">
+
+                        <thead
+                            id="marketingTableHead"
+                            class="
+                                bg-slate-50
+                                border-b
+                                border-slate-200
+                            "
+                        >
+                            <tr
+                                class="
+                                    text-left
+                                    text-xs
+                                    uppercase
+                                    tracking-wide
+                                    text-slate-500
+                                "
+                            >
+                                <th class="px-3 py-3">
+                                    Produto
+                                </th>
+
+                                <th class="px-3 py-3">
+                                    Comissão
+                                </th>
+
+                                <th class="px-3 py-3">
+                                    Estimada
+                                </th>
+
+                                <th class="px-3 py-3">
+                                    Vendas
+                                </th>
+
+                                <th class="px-3 py-3">
+                                    Avaliação
+                                </th>
+
+                                <th class="px-3 py-3">
+                                    Oportunidade
+                                </th>
+
+                                <th class="px-3 py-3">
+                                    Nota
+                                </th>
+
+                                <th class="px-3 py-3">
+                                    Canais
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody
+                            id="overviewProducts"
+                            class="divide-y divide-slate-100"
+                        >
+                            <tr>
+                                <td
+                                    colspan="8"
+                                    class="
+                                        px-3
+                                        py-10
+                                        text-center
+                                        text-slate-500
+                                    "
+                                >
+                                    Carregando produtos...
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
                 </div>
 
-                <select
-                    id="overviewSort"
-                    class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm"
-                >
-                    <option value="commissionRate">Maior comissão</option>
-                    <option value="commission">Maior estimada</option>
-                    <option value="sales">Mais vendidos</option>
-                    <option value="ratingStar">Melhor avaliação</option>
-                </select>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-                        <tr>
-                            <th class="px-4 py-3">Produto</th>
-                            <th class="px-4 py-3">Comissão</th>
-                            <th class="px-4 py-3">Estimada</th>
-                            <th class="px-4 py-3">Vendas</th>
-                            <th class="px-4 py-3">Avaliação</th>
-                            <th class="px-4 py-3">Canais</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="overviewProducts" class="divide-y divide-slate-100">
-                        <tr>
-                            <td colspan="6" class="px-4 py-10 text-center text-slate-500">
-                                Carregando produtos...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </section>
 
     </main>
+
 
     <script>
         function escapeHtml(value) {
@@ -180,8 +612,10 @@
                 .replace(/'/g, '&#039;');
         }
 
+
         function formatPrice(value) {
-            const number = Number(value);
+            const number =
+                Number(value);
 
             if (!Number.isFinite(number)) {
                 return '—';
@@ -196,39 +630,267 @@
             ).format(number);
         }
 
+
         function formatCommission(value) {
-            const number = Number(value);
+            const number =
+                Number(value);
 
             if (!Number.isFinite(number)) {
                 return '—';
             }
 
-            return `${(number * 100).toFixed(1).replace('.0', '')}%`;
+            return `${(number * 100)
+                .toFixed(1)
+                .replace('.0', '')}%`;
         }
+
 
         function formatSales(value) {
-            const number = Number(value);
+            const number =
+                Number(value);
 
             if (!Number.isFinite(number)) {
                 return '—';
             }
 
-            return new Intl.NumberFormat('pt-BR').format(number);
+            return new Intl.NumberFormat(
+                'pt-BR'
+            ).format(number);
         }
+
 
         function formatRating(value) {
-            const number = Number(value);
+            const number =
+                Number(value);
 
             if (!Number.isFinite(number)) {
                 return '—';
             }
 
-            return `${number.toFixed(1).replace('.', ',')} ★`;
+            return `${number
+                .toFixed(1)
+                .replace('.', ',')} ★`;
         }
 
+
         function productLink(product) {
-            return product?.metadata?.productLink || product?.affiliateLink || '#';
+            return (
+                product?.metadata?.productLink ||
+                product?.affiliateLink ||
+                '#'
+            );
         }
+
+
+        function updateStickyTableOffset() {
+            const header =
+                document.getElementById(
+                    'adminHeader'
+                );
+
+            if (!header) {
+                return;
+            }
+
+            document.documentElement.style.setProperty(
+                '--admin-header-height',
+                `${header.offsetHeight}px`
+            );
+        }
+
+
+        function normalizedScore(
+            value,
+            maxValue
+        ) {
+            const number =
+                Number(value);
+
+            const max =
+                Number(maxValue);
+
+            if (
+                !Number.isFinite(number) ||
+                !Number.isFinite(max) ||
+                max <= 0
+            ) {
+                return 0;
+            }
+
+            return Math.max(
+                0,
+                Math.min(
+                    100,
+                    (number / max) * 100
+                )
+            );
+        }
+
+
+        function calculateOpportunityScores(
+            items
+        ) {
+            const maxCommissionRate =
+                Math.max(
+                    0,
+                    ...items.map(
+                        item =>
+                            Number(
+                                item.product?.commissionRate
+                            ) || 0
+                    )
+                );
+
+            const maxCommission =
+                Math.max(
+                    0,
+                    ...items.map(
+                        item =>
+                            Number(
+                                item.product?.commission
+                            ) || 0
+                    )
+                );
+
+            const maxSales =
+                Math.max(
+                    0,
+                    ...items.map(
+                        item =>
+                            Number(
+                                item.product?.sales
+                            ) || 0
+                    )
+                );
+
+            return items.map(
+                item => {
+                    const product =
+                        item.product || {};
+
+                    const commissionRateScore =
+                        normalizedScore(
+                            product.commissionRate,
+                            maxCommissionRate
+                        );
+
+                    const commissionScore =
+                        normalizedScore(
+                            product.commission,
+                            maxCommission
+                        );
+
+                    const salesScore =
+                        normalizedScore(
+                            product.sales,
+                            maxSales
+                        );
+
+                    const ratingScore =
+                        normalizedScore(
+                            product.ratingStar,
+                            5
+                        );
+
+                    const opportunityScore =
+                        (
+                            commissionRateScore * 0.30 +
+                            commissionScore * 0.30 +
+                            salesScore * 0.25 +
+                            ratingScore * 0.15
+                        );
+
+                    let opportunityLevel =
+                        'Baixa';
+
+                    if (
+                        opportunityScore >= 80
+                    ) {
+                        opportunityLevel =
+                            'Alta';
+                    }
+                    else if (
+                        opportunityScore >= 55
+                    ) {
+                        opportunityLevel =
+                            'Média';
+                    }
+
+                    return {
+                        ...item,
+
+                        opportunityScore:
+                            Math.round(
+                                opportunityScore
+                            ),
+
+                        opportunityLevel
+                    };
+                }
+            );
+        }
+
+
+        function opportunityBadge(level) {
+            if (level === 'Alta') {
+                return `
+                    <span
+                        class="
+                            inline-flex
+                            items-center
+                            rounded-full
+                            bg-emerald-50
+                            text-emerald-700
+                            px-2.5
+                            py-1
+                            text-xs
+                            font-bold
+                        "
+                    >
+                        Alta
+                    </span>
+                `;
+            }
+
+            if (level === 'Média') {
+                return `
+                    <span
+                        class="
+                            inline-flex
+                            items-center
+                            rounded-full
+                            bg-amber-50
+                            text-amber-700
+                            px-2.5
+                            py-1
+                            text-xs
+                            font-bold
+                        "
+                    >
+                        Média
+                    </span>
+                `;
+            }
+
+            return `
+                <span
+                    class="
+                        inline-flex
+                        items-center
+                        rounded-full
+                        bg-slate-100
+                        text-slate-600
+                        px-2.5
+                        py-1
+                        text-xs
+                        font-bold
+                    "
+                >
+                    Baixa
+                </span>
+            `;
+        }
+
 
         async function fetchCatalogProducts() {
             const response =
@@ -250,7 +912,9 @@
             }
 
             return (
-                Array.isArray(data.products)
+                Array.isArray(
+                    data.products
+                )
                     ? data.products
                     : []
             )
@@ -270,6 +934,7 @@
 
         let overviewItems = [];
 
+
         function renderOverview() {
             const sortKey =
                 document
@@ -281,13 +946,34 @@
             const items =
                 [...overviewItems]
                     .sort(
-                        (a, b) =>
-                            (
-                                Number(b.product?.[sortKey]) || 0
+                        (a, b) => {
+                            if (
+                                sortKey ===
+                                'opportunityScore'
+                            ) {
+                                return (
+                                    Number(
+                                        b.opportunityScore
+                                    ) || 0
+                                ) -
+                                (
+                                    Number(
+                                        a.opportunityScore
+                                    ) || 0
+                                );
+                            }
+
+                            return (
+                                Number(
+                                    b.product?.[sortKey]
+                                ) || 0
                             ) -
                             (
-                                Number(a.product?.[sortKey]) || 0
-                            )
+                                Number(
+                                    a.product?.[sortKey]
+                                ) || 0
+                            );
+                        }
                     );
 
             const body =
@@ -295,17 +981,57 @@
                     'overviewProducts'
                 );
 
+            if (items.length === 0) {
+                body.innerHTML =
+                    `
+                        <tr>
+                            <td
+                                colspan="8"
+                                class="
+                                    px-3
+                                    py-10
+                                    text-center
+                                    text-slate-500
+                                "
+                            >
+                                Nenhum produto publicado disponível para Marketing.
+                            </td>
+                        </tr>
+                    `;
+
+                return;
+            }
+
             body.innerHTML =
                 items
                     .map(
-                        ({ product }) => `
+                        ({
+                            product,
+                            opportunityScore,
+                            opportunityLevel
+                        }) => `
                             <tr>
-                                <td class="px-4 py-4">
-                                    <div class="flex items-center gap-3 min-w-[320px]">
+
+                                <td class="px-3 py-4">
+                                    <div
+                                        class="
+                                            flex
+                                            items-center
+                                            gap-3
+                                            min-w-[250px]
+                                        "
+                                    >
                                         <img
                                             src="${escapeHtml(product.image)}"
                                             alt=""
-                                            class="w-14 h-14 rounded-xl object-cover bg-slate-100"
+                                            class="
+                                                w-12
+                                                h-12
+                                                rounded-xl
+                                                object-cover
+                                                bg-slate-100
+                                                flex-shrink-0
+                                            "
                                         >
 
                                         <div>
@@ -313,56 +1039,195 @@
                                                 href="${escapeHtml(productLink(product))}"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                class="font-bold text-sm hover:text-sky-700 hover:underline"
+                                                class="
+                                                    font-bold
+                                                    text-sm
+                                                    text-slate-900
+                                                    hover:text-sky-700
+                                                    hover:underline
+                                                "
                                             >
                                                 ${escapeHtml(product.title)}
                                             </a>
 
-                                            <div class="mt-1 text-xs text-slate-400">
+                                            <div
+                                                class="
+                                                    mt-1
+                                                    text-xs
+                                                    text-slate-400
+                                                "
+                                            >
                                                 ID ${escapeHtml(product.itemId)}
                                             </div>
                                         </div>
                                     </div>
                                 </td>
 
-                                <td class="px-4 py-4 text-sky-700 whitespace-nowrap">
+                                <td
+                                    class="
+                                        px-3
+                                        py-4
+                                        text-slate-700
+                                        whitespace-nowrap
+                                    "
+                                >
                                     ${formatCommission(product.commissionRate)}
                                 </td>
 
-                                <td class="px-4 py-4 text-emerald-700 whitespace-nowrap">
+                                <td
+                                    class="
+                                        px-3
+                                        py-4
+                                        text-slate-700
+                                        whitespace-nowrap
+                                    "
+                                >
                                     ${formatPrice(product.commission)}
                                 </td>
 
-                                <td class="px-4 py-4 whitespace-nowrap">
+                                <td
+                                    class="
+                                        px-3
+                                        py-4
+                                        text-slate-700
+                                        whitespace-nowrap
+                                    "
+                                >
                                     ${formatSales(product.sales)}
                                 </td>
 
-                                <td class="px-4 py-4 text-amber-600 whitespace-nowrap">
+                                <td
+                                    class="
+                                        px-3
+                                        py-4
+                                        text-slate-700
+                                        whitespace-nowrap
+                                    "
+                                >
                                     ${formatRating(product.ratingStar)}
                                 </td>
 
-                                <td class="px-4 py-4">
-                                    <div class="flex flex-wrap gap-1.5">
-                                        <span class="rounded-full bg-pink-50 text-pink-700 px-2 py-1 text-xs font-bold">Instagram</span>
-                                        <span class="rounded-full bg-blue-50 text-blue-700 px-2 py-1 text-xs font-bold">Facebook</span>
-                                        <span class="rounded-full bg-slate-100 text-slate-700 px-2 py-1 text-xs font-bold">TikTok</span>
-                                        <span class="rounded-full bg-orange-50 text-orange-700 px-2 py-1 text-xs font-bold">Kwai</span>
+                                <td
+                                    class="
+                                        px-3
+                                        py-4
+                                        whitespace-nowrap
+                                    "
+                                >
+                                    ${opportunityBadge(opportunityLevel)}
+                                </td>
+
+                                <td
+                                    class="
+                                        px-3
+                                        py-4
+                                        whitespace-nowrap
+                                    "
+                                >
+                                    <span
+                                        class="
+                                            font-bold
+                                            text-slate-900
+                                        "
+                                    >
+                                        ${escapeHtml(opportunityScore)}
+                                    </span>
+
+                                    <span
+                                        class="
+                                            text-xs
+                                            text-slate-400
+                                        "
+                                    >
+                                        /100
+                                    </span>
+                                </td>
+
+                                <td class="px-3 py-4">
+                                    <div
+                                        class="
+                                            flex
+                                            flex-wrap
+                                            gap-1.5
+                                        "
+                                    >
+                                        <span
+                                            class="
+                                                rounded-full
+                                                bg-pink-50
+                                                text-pink-700
+                                                px-2
+                                                py-1
+                                                text-xs
+                                                font-bold
+                                            "
+                                        >
+                                            Instagram
+                                        </span>
+
+                                        <span
+                                            class="
+                                                rounded-full
+                                                bg-blue-50
+                                                text-blue-700
+                                                px-2
+                                                py-1
+                                                text-xs
+                                                font-bold
+                                            "
+                                        >
+                                            Facebook
+                                        </span>
+
+                                        <span
+                                            class="
+                                                rounded-full
+                                                bg-slate-100
+                                                text-slate-700
+                                                px-2
+                                                py-1
+                                                text-xs
+                                                font-bold
+                                            "
+                                        >
+                                            TikTok
+                                        </span>
+
+                                        <span
+                                            class="
+                                                rounded-full
+                                                bg-orange-50
+                                                text-orange-700
+                                                px-2
+                                                py-1
+                                                text-xs
+                                                font-bold
+                                            "
+                                        >
+                                            Kwai
+                                        </span>
                                     </div>
                                 </td>
+
                             </tr>
                         `
                     )
                     .join('');
+
+            updateStickyTableOffset();
         }
 
 
         async function loadOverview() {
             try {
                 overviewItems =
-                    await fetchCatalogProducts();
+                    calculateOpportunityScores(
+                        await fetchCatalogProducts()
+                    );
 
                 renderOverview();
-            } catch (error) {
+            }
+            catch (error) {
                 document
                     .getElementById(
                         'overviewProducts'
@@ -370,7 +1235,15 @@
                     .innerHTML =
                         `
                             <tr>
-                                <td colspan="6" class="px-4 py-10 text-center text-red-600">
+                                <td
+                                    colspan="8"
+                                    class="
+                                        px-3
+                                        py-10
+                                        text-center
+                                        text-red-600
+                                    "
+                                >
                                     ${escapeHtml(error.message)}
                                 </td>
                             </tr>
@@ -389,8 +1262,21 @@
             );
 
 
+        window.addEventListener(
+            'resize',
+            updateStickyTableOffset
+        );
+
+        window.addEventListener(
+            'load',
+            updateStickyTableOffset
+        );
+
+
+        updateStickyTableOffset();
         loadOverview();
 
     </script>
+
 </body>
 </html>
