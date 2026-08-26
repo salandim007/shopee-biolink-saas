@@ -412,16 +412,30 @@
                 min-height: 30px;
             }
 
-            .product-card .mt-3 {
-                margin-top: 8px;
-            }
+            .product-card .mt-3,
+            .product-card .mt-2,
+            .product-card .mt-1 {
+            margin-top: 2px;
+}
 
-            .product-card .mt-auto.pt-4 {
-                padding-top: 10px;
-            }
-        }
+            .product-card .mt-auto.pt-4,
+            .product-card .mt-auto.pt-3,
+            .product-card .mt-auto.pt-2 {
+            padding-top: 6px;
+}
+      }
+}
 
-    
+
+/* Ajuste fino do preco no desktop */
+@media (min-width: 1024px) {
+    .product-card h3 + div {
+        margin-top: 2px !important;
+    }
+}
+
+
+
         @media (min-width: 768px) {
             #stickyMainHeader .container-main {
                 justify-content: flex-start;
@@ -752,6 +766,9 @@
 
             <button
                 onclick="mobileNavigate('todos')"
+                
+                
+                
                 class="
                     w-full
                     text-left
@@ -1196,54 +1213,56 @@
         <!-- ================================================== -->
         <!-- ALL PRODUCTS                                       -->
         <!-- ================================================== -->
+<section
+    id="todos"
+    class="container-main pt-3 pb-8"
+>
 
-        <section
-            id="todos"
-            class="container-main pt-5 pb-8"
-        >
+    <div
+        class="
+            flex
+            flex-col
+            sm:flex-row
+            sm:items-end
+            sm:justify-between
+            gap-2
+            mb-3
+        "
+    >
 
-            <div
+        <div>
+
+            <div class="flex items-center">
+
+                <h2
+                    class="
+                        section-title
+                        flex
+                        items-center
+                        text-2xl
+                        md:text-3xl
+                        font-extrabold
+                        tracking-tight
+                    "
+                >
+                    Produtos para você
+                </h2>
+
+            </div>
+
+            <p
+                id="productCounter"
                 class="
-                    flex
-                    flex-col
-                    sm:flex-row
-                    sm:items-end
-                    sm:justify-between
-                    gap-4
-                    mb-7
+                    text-slate-500
+                    mt-1
                 "
             >
+                Carregando achadinhos...
+            </p>
 
-                <div>
+        </div>
 
-                    <div class="flex items-center">
-
-                        <h2
-                            class="
-                                section-title
-                                flex
-                                items-center
-                                text-2xl
-                                md:text-3xl
-                                font-extrabold
-                                tracking-tight
-                            "
-                        >
-                            Produtos para você
-                        </h2>
-
-                    </div>
-
-                    <p
-                        id="productCounter"
-                        class="
-                            text-slate-500
-                            mt-2
-                        "
-                    >
-                        Carregando achadinhos...
-                    </p>
-
+    </div>
                 </div>
 
 
@@ -1364,9 +1383,11 @@
                 class="
                     grid
                     grid-cols-2
-                    lg:grid-cols-4
+                    md:grid-cols-3
+                    lg:grid-cols-5
                     gap-2.5
-                    md:gap-4
+                    md:gap-3
+                    lg:gap-3
                 "
             ></div>
 
@@ -2028,6 +2049,7 @@ const sortProducts =
                         class="
                             relative
                             aspect-square
+                            lg:aspect-[4/3]
                             bg-slate-50
                             overflow-hidden
                         "
@@ -2128,7 +2150,8 @@ const sortProducts =
                                 leading-snug
                                 line-clamp-2
                                 min-h-[40px]
-                                md:min-h-[44px]
+                                md:min-h-[42px]
+                                lg:min-h-[38px]
                             "
                             title="${escapeHtml(product.title)}"
                         >
@@ -2136,7 +2159,7 @@ const sortProducts =
                         </h3>
 
 
-                        <div class="mt-3">
+                        <div class="mt-1.5">
 
                             ${
                                 showOriginalPrice
@@ -2172,7 +2195,7 @@ const sortProducts =
                         </div>
 
 
-                        <div class="mt-auto pt-4">
+                        <div class="mt-auto pt-3 lg:pt-2">
 
                             <a
                                 href="#"
