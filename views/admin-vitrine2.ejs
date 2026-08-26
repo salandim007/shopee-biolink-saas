@@ -552,31 +552,43 @@
                                     text-slate-500
                                 "
                             >
-                                <th class="px-4 py-3">
+                                <th class="px-3 py-3">
                                     Produto
                                 </th>
 
-                                <th class="px-4 py-3">
+                                <th class="px-3 py-3">
                                     Preço
                                 </th>
 
-                                <th class="px-4 py-3">
+                                <th class="px-3 py-3">
                                     Comissão
                                 </th>
 
-                                <th class="px-4 py-3">
+                                <th class="px-3 py-3">
+                                    Estimada
+                                </th>
+
+                                <th class="px-3 py-3">
+                                    Vendas
+                                </th>
+
+                                <th class="px-3 py-3">
+                                    Avaliação
+                                </th>
+
+                                <th class="px-3 py-3">
                                     Status
                                 </th>
 
-                                <th class="px-4 py-3">
+                                <th class="px-3 py-3">
                                     Posição
                                 </th>
 
-                                <th class="px-4 py-3">
+                                <th class="px-3 py-3">
                                     Publicação
                                 </th>
 
-                                <th class="px-4 py-3">
+                                <th class="px-3 py-3">
                                     Ações
                                 </th>
                             </tr>
@@ -725,6 +737,46 @@
                 '.0',
                 ''
             )}%`;
+        }
+
+
+        function formatSales(
+            value
+        ) {
+            const number =
+                Number(value);
+
+            if (
+                !Number.isFinite(
+                    number
+                )
+            ) {
+                return '—';
+            }
+
+            return new Intl.NumberFormat(
+                'pt-BR'
+            ).format(
+                number
+            );
+        }
+
+
+        function formatRating(
+            value
+        ) {
+            const number =
+                Number(value);
+
+            if (
+                !Number.isFinite(
+                    number
+                )
+            ) {
+                return '—';
+            }
+
+            return `${number.toFixed(1).replace('.', ',')} ★`;
         }
 
 
@@ -1427,13 +1479,13 @@
 
             return `
                 <tr class="align-middle">
-                    <td class="px-4 py-4">
+                    <td class="px-3 py-4">
                         <div
                             class="
                                 flex
                                 items-center
                                 gap-3
-                                min-w-[320px]
+                                min-w-[250px]
                             "
                         >
                             <img
@@ -1457,7 +1509,26 @@
                                         line-clamp-2
                                     "
                                 >
-                                    ${escapeHtml(product.title)}
+                                    ${
+                                        product?.metadata?.productLink
+                                            ? `
+                                                <a
+                                                    href="${escapeHtml(product.metadata.productLink)}"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    title="Abrir produto na Shopee"
+                                                    class="
+                                                        hover:text-sky-700
+                                                        hover:underline
+                                                        cursor-pointer
+                                                        transition
+                                                    "
+                                                >
+                                                    ${escapeHtml(product.title)}
+                                                </a>
+                                            `
+                                            : escapeHtml(product.title)
+                                    }
                                 </div>
 
                                 <div
@@ -1475,9 +1546,8 @@
 
                     <td
                         class="
-                            px-4
+                            px-3
                             py-4
-                            font-bold
                             whitespace-nowrap
                         "
                     >
@@ -1486,9 +1556,8 @@
 
                     <td
                         class="
-                            px-4
+                            px-3
                             py-4
-                            font-extrabold
                             text-sky-700
                             whitespace-nowrap
                         "
@@ -1496,11 +1565,43 @@
                         ${formatCommission(product.commissionRate)}
                     </td>
 
-                    <td class="px-4 py-4">
+                    <td
+                        class="
+                            px-3
+                            py-4
+                            text-emerald-700
+                            whitespace-nowrap
+                        "
+                    >
+                        ${formatPrice(product.commission)}
+                    </td>
+
+                    <td
+                        class="
+                            px-3
+                            py-4
+                            whitespace-nowrap
+                        "
+                    >
+                        ${formatSales(product.sales)}
+                    </td>
+
+                    <td
+                        class="
+                            px-3
+                            py-4
+                            text-amber-600
+                            whitespace-nowrap
+                        "
+                    >
+                        ${formatRating(product.ratingStar)}
+                    </td>
+
+                    <td class="px-3 py-4">
                         ${createStatusBadge(entry)}
                     </td>
 
-                    <td class="px-4 py-4">
+                    <td class="px-3 py-4">
                         <input
                             type="number"
                             min="1"
@@ -1508,7 +1609,7 @@
                             data-position-marketplace="${escapeHtml(marketplace)}"
                             data-position-item-id="${escapeHtml(itemId)}"
                             class="
-                                w-20
+                                w-16
                                 rounded-lg
                                 border
                                 border-slate-200
@@ -1519,7 +1620,7 @@
                         >
                     </td>
 
-                    <td class="px-4 py-4">
+                    <td class="px-3 py-4">
                         <select
                             aria-label="Ação de publicação"
                             onchange="handlePublicationAction(
@@ -1532,10 +1633,9 @@
                                 border
                                 border-slate-200
                                 bg-white
-                                px-3
+                                px-2
                                 py-2
                                 text-xs
-                                font-bold
                                 outline-none
                                 ${
                                     isPublished(entry)
@@ -1572,7 +1672,7 @@
                         </select>
                     </td>
 
-                    <td class="px-4 py-4">
+                    <td class="px-3 py-4">
                         <button
                             type="button"
                             onclick="savePosition(
@@ -1584,13 +1684,13 @@
                                 bg-sky-50
                                 text-sky-700
                                 hover:bg-sky-100
-                                px-3
+                                px-2
                                 py-2
                                 text-xs
-                                font-bold
+                                font-semibold
                             "
                         >
-                            Salvar posição
+                            Salvar
                         </button>
                     </td>
                 </tr>
@@ -1657,13 +1757,31 @@
                                     line-clamp-2
                                 "
                             >
-                                ${escapeHtml(product.title)}
+                                ${
+                                    product?.metadata?.productLink
+                                        ? `
+                                            <a
+                                                href="${escapeHtml(product.metadata.productLink)}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                title="Abrir produto na Shopee"
+                                                class="
+                                                    hover:text-sky-700
+                                                    hover:underline
+                                                    cursor-pointer
+                                                    transition
+                                                "
+                                            >
+                                                ${escapeHtml(product.title)}
+                                            </a>
+                                        `
+                                        : escapeHtml(product.title)
+                                }
                             </h2>
 
                             <div
                                 class="
                                     mt-1
-                                    font-extrabold
                                 "
                             >
                                 ${formatPrice(product.price)}
@@ -1671,14 +1789,65 @@
 
                             <div
                                 class="
-                                    mt-1
+                                    mt-2
+                                    grid
+                                    grid-cols-2
+                                    gap-x-4
+                                    gap-y-1
                                     text-xs
-                                    font-bold
-                                    text-sky-700
                                 "
                             >
-                                Comissão:
-                                ${formatCommission(product.commissionRate)}
+                                <div>
+                                    <span class="text-slate-500">
+                                        Comissão:
+                                    </span>
+
+                                    <span
+                                        class="
+                                            text-sky-700
+                                        "
+                                    >
+                                        ${formatCommission(product.commissionRate)}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span class="text-slate-500">
+                                        Estimada:
+                                    </span>
+
+                                    <span
+                                        class="
+                                            text-emerald-700
+                                        "
+                                    >
+                                        ${formatPrice(product.commission)}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span class="text-slate-500">
+                                        Vendas:
+                                    </span>
+
+                                    <span>
+                                        ${formatSales(product.sales)}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span class="text-slate-500">
+                                        Avaliação:
+                                    </span>
+
+                                    <span
+                                        class="
+                                            text-amber-600
+                                        "
+                                    >
+                                        ${formatRating(product.ratingStar)}
+                                    </span>
+                                </div>
                             </div>
 
                             <div class="mt-2">

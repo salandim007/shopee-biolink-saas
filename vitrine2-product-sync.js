@@ -18,8 +18,8 @@ const {
  *
  * - consultar um produto atual na Shopee pelo itemId;
  * - transformar a resposta em um snapshot simples;
- * - resolver as categorias oficiais da Shopee;
- * - entregar category1/category2/category3 em pt-BR;
+ * - resolver categorias oficiais da Shopee;
+ * - trazer dados comerciais úteis para o Admin;
  * - NÃO alterar o catálogo;
  * - NÃO alterar a Vitrine;
  * - NÃO salvar dados.
@@ -27,13 +27,6 @@ const {
  */
 
 
-/**
- * Tenta localizar o produto dentro da resposta retornada por
- * fetchProductOfferByItemId().
- *
- * Mantemos esta função isolada para que mudanças no formato
- * interno da resposta da API não se espalhem pelo projeto.
- */
 function extractApiProduct(result) {
     if (!result) {
         return null;
@@ -69,9 +62,6 @@ function extractApiProduct(result) {
 }
 
 
-/**
- * Converte um valor para número quando possível.
- */
 function toNullableNumber(value) {
     if (
         value === null ||
@@ -90,9 +80,6 @@ function toNullableNumber(value) {
 }
 
 
-/**
- * Cria estrutura vazia de categorias.
- */
 function createEmptyCategories() {
     return {
         category1: null,
@@ -112,11 +99,6 @@ function createEmptyCategories() {
 }
 
 
-/**
- * Cria um snapshot atualizado do produto na Shopee.
- *
- * Esse snapshot ainda NÃO é salvo automaticamente.
- */
 async function fetchShopeeProductSnapshot(
     itemId
 ) {
@@ -180,6 +162,52 @@ async function fetchShopeeProductSnapshot(
 
 
     // ========================================================
+    // COMISSÃO / DESEMPENHO
+    // ========================================================
+
+    const commissionRate =
+        toNullableNumber(
+            apiProduct.commissionRate
+        );
+
+
+    const commission =
+        toNullableNumber(
+            apiProduct.commission
+        );
+
+
+    const sellerCommissionRate =
+        toNullableNumber(
+            apiProduct.sellerCommissionRate
+        );
+
+
+    const shopeeCommissionRate =
+        toNullableNumber(
+            apiProduct.shopeeCommissionRate
+        );
+
+
+    const sales =
+        toNullableNumber(
+            apiProduct.sales
+        );
+
+
+    const ratingStar =
+        toNullableNumber(
+            apiProduct.ratingStar
+        );
+
+
+    const priceDiscountRate =
+        toNullableNumber(
+            apiProduct.priceDiscountRate
+        );
+
+
+    // ========================================================
     // CATEGORIAS
     // ========================================================
 
@@ -240,6 +268,8 @@ async function fetchShopeeProductSnapshot(
 
         maxPrice,
 
+        priceDiscountRate,
+
         image:
             apiProduct.imageUrl ??
             null,
@@ -256,10 +286,17 @@ async function fetchShopeeProductSnapshot(
             apiProduct.shopName ??
             null,
 
-        commissionRate:
-            toNullableNumber(
-                apiProduct.commissionRate
-            ),
+        commissionRate,
+
+        commission,
+
+        sellerCommissionRate,
+
+        shopeeCommissionRate,
+
+        sales,
+
+        ratingStar,
 
         category1:
             categories.category1,
@@ -305,14 +342,6 @@ async function fetchShopeeProductSnapshot(
 /*
  * ============================================================
  * TESTE DIRETO PELO TERMINAL
- * ============================================================
- *
- * Exemplo:
- *
- * node vitrine2-product-sync.js 43173265179
- *
- * Apenas consulta e imprime.
- * Não modifica nenhum dado do projeto.
  * ============================================================
  */
 

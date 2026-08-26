@@ -19,7 +19,7 @@ const {
  * - localizar o produto atual no catálogo;
  * - consultar os dados atuais na Shopee;
  * - preservar configurações internas da Vitrine;
- * - atualizar preço, comissão, links e categorias;
+ * - atualizar preço, comissão, desempenho e categorias;
  * - permitir prévia sem salvar;
  * - salvar somente quando solicitado.
  *
@@ -108,6 +108,11 @@ function mergeShopeeSnapshot(
             snapshot.price ??
             current.price,
 
+        priceDiscountRate:
+            snapshot.priceDiscountRate ??
+            current.priceDiscountRate ??
+            null,
+
         image:
             snapshot.image ??
             current.image,
@@ -120,9 +125,39 @@ function mergeShopeeSnapshot(
             snapshot.shopName ??
             current.shopName,
 
+
+        // ====================================================
+        // COMISSÃO / DESEMPENHO
+        // ====================================================
+
         commissionRate:
             snapshot.commissionRate ??
             current.commissionRate,
+
+        commission:
+            snapshot.commission ??
+            current.commission ??
+            null,
+
+        sellerCommissionRate:
+            snapshot.sellerCommissionRate ??
+            current.sellerCommissionRate ??
+            null,
+
+        shopeeCommissionRate:
+            snapshot.shopeeCommissionRate ??
+            current.shopeeCommissionRate ??
+            null,
+
+        sales:
+            snapshot.sales ??
+            current.sales ??
+            null,
+
+        ratingStar:
+            snapshot.ratingStar ??
+            current.ratingStar ??
+            null,
 
 
         // ====================================================
@@ -295,6 +330,26 @@ async function previewProductSync(
                     .product?.price ??
                 null,
 
+            commissionRate:
+                prepared.currentEntry
+                    .product?.commissionRate ??
+                null,
+
+            commission:
+                prepared.currentEntry
+                    .product?.commission ??
+                null,
+
+            sales:
+                prepared.currentEntry
+                    .product?.sales ??
+                null,
+
+            ratingStar:
+                prepared.currentEntry
+                    .product?.ratingStar ??
+                null,
+
             category1:
                 prepared.currentEntry
                     .product?.category1 ??
@@ -308,11 +363,6 @@ async function previewProductSync(
             category3:
                 prepared.currentEntry
                     .product?.category3 ??
-                null,
-
-            affiliateLink:
-                prepared.currentEntry
-                    .product?.affiliateLink ??
                 null
         },
 
@@ -325,6 +375,41 @@ async function previewProductSync(
             price:
                 prepared.updatedProduct
                     .price ??
+                null,
+
+            commissionRate:
+                prepared.updatedProduct
+                    .commissionRate ??
+                null,
+
+            commission:
+                prepared.updatedProduct
+                    .commission ??
+                null,
+
+            sellerCommissionRate:
+                prepared.updatedProduct
+                    .sellerCommissionRate ??
+                null,
+
+            shopeeCommissionRate:
+                prepared.updatedProduct
+                    .shopeeCommissionRate ??
+                null,
+
+            sales:
+                prepared.updatedProduct
+                    .sales ??
+                null,
+
+            ratingStar:
+                prepared.updatedProduct
+                    .ratingStar ??
+                null,
+
+            priceDiscountRate:
+                prepared.updatedProduct
+                    .priceDiscountRate ??
                 null,
 
             category1:
@@ -340,11 +425,6 @@ async function previewProductSync(
             category3:
                 prepared.updatedProduct
                     .category3 ??
-                null,
-
-            affiliateLink:
-                prepared.updatedProduct
-                    .affiliateLink ??
                 null,
 
             lastSyncedAt:
@@ -406,11 +486,11 @@ async function syncProduct(
  *
  * Prévia segura:
  *
- * node vitrine2-product-sync-service.js 43173265179
+ * node vitrine2-product-sync-service.js 22193593141
  *
  * Sincronização real:
  *
- * node vitrine2-product-sync-service.js 43173265179 --save
+ * node vitrine2-product-sync-service.js 22193593141 --save
  * ============================================================
  */
 
@@ -425,6 +505,7 @@ async function main() {
 
     if (!itemId) {
         console.log('');
+
         console.log(
             'Uso:'
         );
@@ -434,6 +515,7 @@ async function main() {
         );
 
         console.log('');
+
         console.log(
             'Para salvar:'
         );
@@ -534,6 +616,34 @@ async function main() {
                     entry.product
                         ?.price,
 
+                commissionRate:
+                    entry.product
+                        ?.commissionRate,
+
+                commission:
+                    entry.product
+                        ?.commission,
+
+                sellerCommissionRate:
+                    entry.product
+                        ?.sellerCommissionRate,
+
+                shopeeCommissionRate:
+                    entry.product
+                        ?.shopeeCommissionRate,
+
+                sales:
+                    entry.product
+                        ?.sales,
+
+                ratingStar:
+                    entry.product
+                        ?.ratingStar,
+
+                priceDiscountRate:
+                    entry.product
+                        ?.priceDiscountRate,
+
                 category1:
                     entry.product
                         ?.category1,
@@ -545,10 +655,6 @@ async function main() {
                 category3:
                     entry.product
                         ?.category3,
-
-                affiliateLink:
-                    entry.product
-                        ?.affiliateLink,
 
                 visibility:
                     entry.visibility,

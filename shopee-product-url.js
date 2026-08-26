@@ -247,19 +247,29 @@ async function fetchProductOfferByItemId(
                 limit: 1
             ) {
                 nodes {
-                    itemId
-                    shopId
-                    productName
-                    price
-                    priceMin
-                    priceMax
-                    commissionRate
-                    imageUrl
-                    offerLink
-                    productLink
-                    shopName
-                    productCatIds
-                }
+    itemId
+    shopId
+    productName
+
+    price
+    priceMin
+    priceMax
+    priceDiscountRate
+
+    commissionRate
+    commission
+    sellerCommissionRate
+    shopeeCommissionRate
+
+    sales
+    ratingStar
+
+    imageUrl
+    offerLink
+    productLink
+    shopName
+    productCatIds
+}
 
                 pageInfo {
                     scrollId
