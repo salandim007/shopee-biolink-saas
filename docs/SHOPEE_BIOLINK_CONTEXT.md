@@ -1,18 +1,10 @@
 \# Shopee BioLink SaaS — Contexto Oficial do Projeto
 
-
-
 \## Regra básica de continuidade
-
-
 
 Este arquivo é a fonte oficial de continuidade do projeto Shopee BioLink SaaS.
 
-
-
 Em todo novo chat ou nova sessão de desenvolvimento:
-
-
 
 1\. Ler este arquivo antes de investigar novamente a arquitetura.
 
@@ -44,91 +36,47 @@ Em todo novo chat ou nova sessão de desenvolvimento:
 
 &#x20;  - fazer push.
 
-
-
 A finalidade é evitar reinvestigação e perda de contexto entre chats.
 
-
-
 \---
-
-
 
 \# Estado atual
 
-
-
 Data de referência: 25/08/2026.
-
-
 
 Branch principal:
 
-
-
 main
-
-
 
 Último commit estável:
 
-
-
 3635ec3 — Add automatic Vitrine 2 API importer
-
-
 
 Commit anterior relevante:
 
-
-
 dcbe2de — Add Shopee product pagination and affiliate URL support
-
-
 
 Commit anterior:
 
-
-
 23c0b86 — Handle temporary failures in Vitrine 2 sync
 
-
-
 \---
-
-
 
 \# Objetivo do projeto
 
-
-
 Criar um SaaS de Link na Bio / mini vitrine para afiliados Shopee.
-
-
 
 Prioridade atual:
 
-
-
 Vitrine 2 como MVP funcional, profissional e monetizável.
-
-
 
 A Vitrine 1 não deve ser alterada durante o desenvolvimento da Vitrine 2.
 
-
-
 \---
-
-
 
 \# Metodologia de desenvolvimento
 
-
-
 Regra de trabalho adotada:
-
-
 
 \- um arquivo por vez;
 
@@ -148,27 +96,15 @@ Regra de trabalho adotada:
 
 \- manter este documento atualizado.
 
-
-
 \---
-
-
 
 \# Ambiente local
 
-
-
 Projeto:
-
-
 
 C:\\Users\\Douglas\\App Shopee\\shopee-biolink-saas
 
-
-
 Stack principal:
-
-
 
 \- Node.js
 
@@ -184,121 +120,65 @@ Stack principal:
 
 \- CSV/Data Feed como fonte complementar
 
-
-
 Servidor local:
-
-
 
 http://localhost:3000
 
-
-
 Vitrine pública:
-
-
 
 http://localhost:3000/vitrine2
 
-
-
 Admin Vitrine 2:
-
-
 
 http://localhost:3000/admin/vitrine2
 
-
-
 \---
-
-
 
 \# Credenciais Shopee
 
-
-
 As credenciais estão salvas como variáveis de ambiente do usuário do Windows.
 
-
-
 Variáveis:
-
-
 
 SHOPEE\_AFFILIATE\_APP\_ID
 
 SHOPEE\_AFFILIATE\_SECRET
 
-
-
 Quando um novo PowerShell não enxergar as variáveis, carregar com:
-
-
 
 $env:SHOPEE\_AFFILIATE\_APP\_ID = \[Environment]::GetEnvironmentVariable("SHOPEE\_AFFILIATE\_APP\_ID", "User")
 
 $env:SHOPEE\_AFFILIATE\_SECRET = \[Environment]::GetEnvironmentVariable("SHOPEE\_AFFILIATE\_SECRET", "User")
 
-
-
 Nunca registrar os valores das credenciais neste documento ou no Git.
-
-
 
 \---
 
-
-
 \# Shopee Affiliate Open API
-
-
 
 Endpoint Brasil:
 
-
-
 https://open-api.affiliate.shopee.com.br/graphql
 
-
-
 Autenticação:
-
-
 
 Authorization:
 
 SHA256 Credential={AppId}, Timestamp={Timestamp}, Signature={Signature}
 
-
-
 Assinatura:
-
-
 
 SHA256(AppId + Timestamp + Payload + Secret)
 
-
-
 Operação principal atualmente usada:
-
-
 
 productOfferV2
 
-
-
 \---
-
-
 
 \# productOfferV2
 
-
-
 Argumentos confirmados pelo próprio schema GraphQL:
-
-
 
 \- listType
 
@@ -322,39 +202,21 @@ Argumentos confirmados pelo próprio schema GraphQL:
 
 \- isKeySeller
 
-
-
 Paginação confirmada:
-
-
 
 page + limit
 
-
-
 scrollId não é argumento de entrada de productOfferV2.
-
-
 
 Teste validado:
 
-
-
 page 1 e page 2 retornaram produtos diferentes.
-
-
 
 \---
 
-
-
 \# Campos disponíveis em ProductOfferV2
 
-
-
 Introspecção GraphQL confirmou:
-
-
 
 \- itemId
 
@@ -406,11 +268,7 @@ Introspecção GraphQL confirmou:
 
 \- shopeeCommissionRate
 
-
-
 Campos importantes para evolução futura:
-
-
 
 \- sales
 
@@ -426,27 +284,15 @@ Campos importantes para evolução futura:
 
 \- productCatIds
 
-
-
 \---
-
-
 
 \# shopee-api-test.js
 
-
-
 Arquivo:
-
-
 
 shopee-api-test.js
 
-
-
 Funções atuais:
-
-
 
 \- consulta por --item;
 
@@ -474,95 +320,51 @@ Funções atuais:
 
 \- priceMax.
 
-
-
 Exemplo:
-
-
 
 node .\\shopee-api-test.js --keyword "casa" --page 1 --limit 10
 
-
-
 \---
-
-
 
 \# Links de afiliado
 
-
-
 A Affiliate API retorna offerLink no formato:
-
-
 
 https://s.shopee.com.br/...
 
-
-
 O adaptador:
-
-
 
 shopee-product-url.js
 
-
-
 resolve links curtos Shopee.
 
-
-
 Domínios reconhecidos:
-
-
 
 \- s.shopee.com.br
 
 \- shope.ee
 
-
-
 Foi descoberto e corrigido um formato adicional de URL resolvida:
-
-
 
 /slug/shopId/itemId
 
-
-
 Exemplo real:
-
-
 
 https://shopee.com.br/opaanlp/1340075916/43173265179
 
-
-
 Nesse formato:
-
-
 
 1340075916 = shopId
 
 43173265179 = itemId
 
-
-
 Este formato já está suportado em shopee-product-url.js.
-
-
 
 \---
 
-
-
 \# Fluxo de importação validado
 
-
-
 Fluxo completo validado:
-
-
 
 Shopee Affiliate API
 
@@ -582,11 +384,7 @@ Shopee Affiliate API
 
 → Vitrine 2
 
-
-
 Teste real:
-
-
 
 20 produtos
 
@@ -594,39 +392,21 @@ Teste real:
 
 → 21 produtos
 
-
-
 Funcionou.
-
-
 
 \---
 
-
-
 \# Importador automático
-
-
 
 Arquivo:
 
-
-
 importar-vitrine2-api.ps1
-
-
 
 Objetivo:
 
-
-
 buscar produtos diretamente pela Affiliate API e publicar automaticamente na Vitrine 2.
 
-
-
 Comportamento:
-
-
 
 \- consulta por palavras-chave;
 
@@ -642,19 +422,11 @@ Comportamento:
 
 \- para ao atingir a meta.
 
-
-
 Primeira meta validada:
-
-
 
 21 → 50 produtos.
 
-
-
 Resultado:
-
-
 
 Produtos antes: 21
 
@@ -666,55 +438,29 @@ Tentativas com falha: 0
 
 Total publicado agora: 50
 
-
-
 A diferença de 30 requisições aceitas para 29 produtos adicionados indica produto já existente/duplicado, comportamento esperado.
-
-
 
 \---
 
-
-
 \# Estado atual da Vitrine 2
-
-
 
 Total:
 
-
-
 50 produtos
-
-
 
 Publicados:
 
-
-
 50
-
-
 
 Ocultos:
 
-
-
 0
-
-
 
 Admin funcionando em:
 
-
-
 /admin/vitrine2
 
-
-
 Recursos do Admin já funcionando:
-
-
 
 \- busca;
 
@@ -738,27 +484,15 @@ Recursos do Admin já funcionando:
 
 \- último horário de sync.
 
-
-
 Visual aprovado da Vitrine 2 não deve ser alterado nesta etapa.
-
-
 
 \---
 
-
-
 \# Product Sync
-
-
 
 Product Sync está funcionando com a Shopee Affiliate Open API.
 
-
-
 Últimos testes validados anteriormente:
-
-
 
 Total: 20
 
@@ -768,71 +502,37 @@ Indisponíveis ocultados: 0
 
 Falhas temporárias: 0
 
-
-
 Após expansão:
-
-
 
 Admin mostrou 50 produtos publicados.
 
-
-
 A lógica de mensagem de sync foi corrigida.
-
-
 
 Arquivo:
 
-
-
 vitrine2-sync-routes.js
-
-
 
 Regra atual:
 
-
-
 Se summary.failed > 0:
-
-
 
 não informar sucesso completo.
 
-
-
 Deve mostrar erro/aviso de falhas temporárias.
-
-
 
 Commit:
 
-
-
 23c0b86 — Handle temporary failures in Vitrine 2 sync
-
-
 
 \---
 
-
-
 \# Catálogo
-
-
 
 Arquivo de dados:
 
-
-
 data\\vitrine2-catalog.json
 
-
-
 Estrutura:
-
-
 
 version
 
@@ -840,11 +540,7 @@ savedAt
 
 entries
 
-
-
 Cada entry contém:
-
-
 
 product
 
@@ -852,27 +548,15 @@ visibility
 
 collections
 
-
-
 O catálogo é alterado naturalmente por importações e sync.
-
-
 
 Não incluir automaticamente data\\vitrine2-catalog.json em commits de código sem decisão explícita.
 
-
-
 \---
-
-
 
 \# Estrutura normalizada do produto
 
-
-
 Campos observados:
-
-
 
 \- source
 
@@ -920,19 +604,11 @@ Campos observados:
 
 \- metadata
 
-
-
 Arquivo principal:
-
-
 
 product-normalizer.js
 
-
-
 O normalizador já aceita:
-
-
 
 category1
 
@@ -940,23 +616,13 @@ category2
 
 category3
 
-
-
 O problema atual não está no normalizador.
-
-
 
 \---
 
-
-
 \# Problema atual de categorias
 
-
-
 Os 50 produtos importados pela Affiliate API estão atualmente com:
-
-
 
 category1 = null
 
@@ -964,19 +630,11 @@ category2 = null
 
 category3 = null
 
-
-
 A causa foi localizada em:
-
-
 
 shopee-product-url.js
 
-
-
 A montagem do produto coloca atualmente:
-
-
 
 category1: null
 
@@ -984,61 +642,33 @@ category2: null
 
 category3: null
 
-
-
 Não corrigir isso inventando categoria pelo título.
-
-
 
 Usar os IDs oficiais da Shopee.
 
-
-
 \---
-
-
 
 \# productCatIds
 
-
-
 A Affiliate API retorna:
-
-
 
 productCatIds
 
-
-
 A ordem foi confirmada como hierarquia:
-
-
 
 \[category1, category2, category3]
 
-
-
 Exemplo real:
-
-
 
 productCatIds:
 
 \[100636, 100716, 101209]
 
-
-
 Produto:
-
-
 
 Pano Bate Mão em Formato de Pirulito com Alça e Alta Absorção
 
-
-
 Mapeamento confirmado via CSV:
-
-
 
 100636 → Home \& Living
 
@@ -1046,95 +676,55 @@ Mapeamento confirmado via CSV:
 
 101209 → Cleaning Cloths
 
-
-
 \---
-
-
 
 \# CSV Shopee / Data Feed
 
-
-
 Pasta:
-
-
 
 data\\shopee-feed
 
-
-
 Arquivo analisado anteriormente:
-
-
 
 1005\_200149\_Shopee Brasil - 2022\_20260820T045807\_1.csv
 
-
-
 Tamanho aproximado:
-
-
 
 188 MB
 
-
-
 Quantidade analisada anteriormente:
-
-
 
 aproximadamente 2 milhões de produtos.
 
-
-
 O CSV contém:
-
-
 
 global\_catid1
 
 global\_category1
 
-
-
 global\_catid2
 
 global\_category2
-
-
 
 global\_catid3
 
 global\_category3
 
-
-
 Exemplo:
-
-
 
 global\_catid1: 100638
 
 global\_category1: Stationery
 
-
-
 global\_catid2: 100734
 
 global\_category2: Notebooks \& Papers
-
-
 
 global\_catid3: 101375
 
 global\_category3: Loose Leaf
 
-
-
 Portanto existe uma ponte oficial:
-
-
 
 Affiliate API productCatIds
 
@@ -1142,103 +732,59 @@ Affiliate API productCatIds
 
 → nomes oficiais da Shopee
 
-
-
 \---
-
-
 
 \# Sistema de tradução de categorias existente
 
-
-
 Não criar outro sistema de tradução.
-
-
 
 Arquivo:
 
-
-
 shopee-category-map.js
 
-
-
 Possui:
-
-
 
 CATEGORY\_MAP
 
 SUBCATEGORY\_MAP
 
-
-
 Funções:
-
-
 
 translateCategory()
 
 translateSubcategory()
 
-
-
 Exemplos:
-
-
 
 Home \& Living
 
 → Casa e Decoração
 
-
-
 Stationery
 
 → Papelaria
-
-
 
 Beauty
 
 → Beleza
 
-
-
 Mobile \& Gadgets
 
 → Celulares e Acessórios
 
-
-
 \---
-
-
 
 \# Category Registry
 
-
-
 Arquivo gerador:
-
-
 
 build-category-registry.js
 
-
-
 Arquivo de dados:
-
-
 
 data\\category-registry.json
 
-
-
 Estrutura:
-
-
 
 sourceName
 
@@ -1250,21 +796,13 @@ subcategories
 
 level3
 
-
-
 Status:
-
-
 
 translated
 
 pending
 
-
-
 Pipeline existente:
-
-
 
 CSV Shopee
 
@@ -1278,27 +816,15 @@ CSV Shopee
 
 → category-registry.json
 
-
-
 O registry guarda nomes e traduções.
-
-
 
 Ele não guarda atualmente os IDs numéricos das categorias.
 
-
-
 \---
-
-
 
 \# Pipeline correto de categorias
 
-
-
 Arquitetura decidida:
-
-
 
 Shopee Affiliate Open API
 
@@ -1318,123 +844,63 @@ Shopee Affiliate Open API
 
 → Admin / Vitrine 2
 
-
-
 Não criar tradução paralela.
-
-
 
 Não classificar por título se houver ID oficial disponível.
 
-
-
 \---
-
-
 
 \# Arquivos-chave
 
-
-
 server.js
-
-
 
 shopee-api-test.js
 
-
-
 shopee-product-url.js
-
-
 
 product-source.js
 
-
-
 product-normalizer.js
-
-
 
 product-catalog.js
 
-
-
 product-catalog-store.js
-
-
 
 vitrine2-service.js
 
-
-
 vitrine2-routes.js
-
-
 
 vitrine2-product-sync.js
 
-
-
 vitrine2-product-sync-service.js
-
-
 
 vitrine2-product-sync-batch.js
 
-
-
 vitrine2-sync-routes.js
-
-
 
 importar-vitrine2-api.ps1
 
-
-
 importar-20-vitrine2.ps1
-
-
 
 feed-test.js
 
-
-
 build-category-registry.js
-
-
 
 shopee-category-map.js
 
-
-
 data\\category-registry.json
-
-
 
 data\\vitrine2-catalog.json
 
-
-
 views\\admin-vitrine2.ejs
-
-
 
 views\\vitrine2.ejs
 
-
-
 \---
-
-
 
 \# Vitrine 2 — regras visuais
 
-
-
 Não alterar sem aprovação explícita:
-
-
 
 \- visual atual;
 
@@ -1452,23 +918,13 @@ Não alterar sem aprovação explícita:
 
 \- estrutura pública.
 
-
-
 Não mexer na Vitrine 1.
-
-
 
 \---
 
-
-
 \# Roadmap futuro
 
-
-
 Após o catálogo e sync estarem estáveis:
-
-
 
 \- ampliar catálogo para 100 produtos;
 
@@ -1510,27 +966,15 @@ Após o catálogo e sync estarem estáveis:
 
 \- produção.
 
-
-
 Comissão deve permanecer somente no Admin.
-
-
 
 \---
 
-
-
 \# Próximo passo exato
-
-
 
 NÃO aumentar para 100 produtos ainda.
 
-
-
 Primeiro:
-
-
 
 1\. Criar uma ponte reutilizável entre productCatIds e as categorias do CSV.
 
@@ -1556,53 +1000,29 @@ Primeiro:
 
 8\. Só depois avaliar expansão de 50 para 100 produtos.
 
-
-
 \---
-
-
 
 \# Regra para próximo chat
 
-
-
 Ao abrir um novo chat:
-
-
 
 Informar:
 
-
-
 "Continuar o projeto Shopee BioLink SaaS. Primeiro leia o arquivo docs\\SHOPEE\_BIOLINK\_CONTEXT.md e continue exatamente da seção Próximo passo exato."
-
-
 
 Não reinvestigar arquitetura já registrada neste documento.
 
 ---
 
-
-
 \## Atualização — Categorias Shopee e Tradução Automática
-
-
 
 Data: 25/08/2026
 
-
-
 \### Situação concluída
-
-
 
 A integração de categorias da Shopee foi implementada e validada.
 
-
-
 Fluxo atual:
-
-
 
 Shopee Affiliate Open API
 
@@ -1618,11 +1038,7 @@ Shopee Affiliate Open API
 
 → produto normalizado com `category1`, `category2` e `category3`
 
-
-
 \### Arquivos principais
-
-
 
 \- `category-id-resolver.js`
 
@@ -1638,15 +1054,9 @@ Shopee Affiliate Open API
 
 \- `import-category-translations.js`
 
-
-
 \### Category ID Resolver
 
-
-
 O arquivo `category-id-resolver.js` passou a:
-
-
 
 \- receber `productCatIds` vindos da Affiliate Open API;
 
@@ -1670,15 +1080,9 @@ O arquivo `category-id-resolver.js` passou a:
 
 \- preservar o nome oficial da Shopee como fallback para evitar quebra da importação.
 
-
-
 \### Estrutura real de categorias encontrada no Data Feed
 
-
-
 Total atual:
-
-
 
 \- Categorias principais: 29
 
@@ -1688,15 +1092,9 @@ Total atual:
 
 \- Total geral: 1.294
 
-
-
 \### Traduções
 
-
-
 Antes da nova etapa existiam:
-
-
 
 \- Categorias principais pendentes: 0
 
@@ -1706,43 +1104,23 @@ Antes da nova etapa existiam:
 
 \- Total pendente: 1.215
 
-
-
 Foi criado:
-
-
 
 `export-pending-category-translations.js`
 
-
-
 Esse script exportou as 1.215 pendências para:
-
-
 
 `data/category-translations-pending.json`
 
-
-
 As 1.215 traduções foram preenchidas em pt-BR e salvas em:
-
-
 
 `data/category-translations-complete.json`
 
-
-
 Depois foi criado:
-
-
 
 `import-category-translations.js`
 
-
-
 Resultado da importação:
-
-
 
 \- Total recebido: 1.215
 
@@ -1752,11 +1130,7 @@ Resultado da importação:
 
 \- Inválidos: 0
 
-
-
 Resultado final do Registry:
-
-
 
 \- Categorias pendentes: 0
 
@@ -1766,23 +1140,13 @@ Resultado final do Registry:
 
 \- Total pendente: 0
 
-
-
 \### Teste real validado
-
-
 
 Produto:
 
-
-
 `Pano Bate Mão em Formato de Pirulito com Alça e Alta Absorção`
 
-
-
 IDs Shopee:
-
-
 
 \- categoryId1: `100636`
 
@@ -1790,11 +1154,7 @@ IDs Shopee:
 
 \- categoryId3: `101209`
 
-
-
 Nomes oficiais Shopee:
-
-
 
 \- `Home \& Living`
 
@@ -1802,11 +1162,7 @@ Nomes oficiais Shopee:
 
 \- `Cleaning Cloths`
 
-
-
 Resultado final pt-BR:
-
-
 
 \- `Casa e Decoração`
 
@@ -1814,11 +1170,7 @@ Resultado final pt-BR:
 
 \- `Panos de Limpeza`
 
-
-
 O produto normalizado retornou corretamente:
-
-
 
 ```text
 
@@ -1960,3 +1312,201 @@ Push realizado com sucesso para `origin/main`.
 
 ---
 
+
+# Futuro Próximo — Radar de Oportunidades
+
+## Objetivo
+
+Criar um motor interno no Admin capaz de descobrir produtos com maior potencial comercial antes de publicá-los na Vitrine.
+
+O Radar não será uma pesquisa manual ou pontual.
+Ele deverá fazer parte do sistema e funcionar como uma camada permanente de descoberta e análise de oportunidades.
+
+## Problema que resolve
+
+Hoje o sistema consegue analisar produtos que já entraram no catálogo, utilizando dados como:
+
+- vendas;
+- avaliação;
+- comissão;
+- comissão estimada;
+- preço;
+- disponibilidade.
+
+Porém, ainda não existe um mecanismo que responda automaticamente:
+
+- quais produtos estão mais quentes no momento;
+- quais estão sendo mais pesquisados;
+- quais estão crescendo em interesse;
+- quais têm alta aceitação;
+- quais estão vendendo mais;
+- quais produtos merecem entrar na Vitrine.
+
+## Arquitetura conceitual
+
+Fontes externas de tendência
+        ↓
+Descoberta de produtos/termos em alta
+        ↓
+Busca e validação correspondente na Shopee
+        ↓
+Métricas comerciais da Shopee
+        ↓
+Nota de Tendência
+        +
+Nota Comercial
+        ↓
+Nota Final de Oportunidade
+        ↓
+Admin
+        ↓
+Aprovação manual / assistida / automática
+        ↓
+Vitrine
+        ↓
+Central de Marketing
+
+## Fontes de dados previstas
+
+Priorizar fontes oficiais e integrações oficiais sempre que possível.
+
+Fontes inicialmente consideradas:
+
+- Google Trends;
+- dados de popularidade/produtos do ecossistema Google;
+- Shopee Affiliate Open API;
+- Shopee Data Feed;
+- futuramente sinais públicos de outras plataformas, quando houver integração oficial adequada.
+
+Cada fonte deverá ter sua função claramente definida.
+
+Exemplo:
+
+Google / fontes externas:
+- tendência;
+- crescimento de interesse;
+- popularidade;
+- procura.
+
+Shopee:
+- vendas;
+- avaliação;
+- preço;
+- desconto;
+- comissão;
+- comissão estimada;
+- disponibilidade.
+
+## Notas do motor
+
+O Radar deverá trabalhar com pelo menos três avaliações separadas:
+
+### Nota de Tendência
+
+Mede a força externa do produto.
+
+Exemplos de fatores:
+
+- crescimento das pesquisas;
+- popularidade recente;
+- velocidade de crescimento;
+- presença em tendências.
+
+### Nota Comercial Shopee
+
+Mede a qualidade da oportunidade dentro da Shopee.
+
+Exemplos:
+
+- vendas;
+- avaliação;
+- comissão;
+- comissão estimada;
+- desconto;
+- preço;
+- disponibilidade.
+
+### Nota Final de Oportunidade
+
+Combina tendência externa e força comercial da oferta Shopee.
+
+O modelo de pesos será definido e testado antes da implementação definitiva.
+
+## Movimento da oportunidade
+
+Além da nota atual, o Radar deverá analisar evolução ao longo do tempo.
+
+Estados previstos:
+
+- Em alta;
+- Crescendo;
+- Estável;
+- Perdendo força.
+
+Isso evita escolher apenas produtos com números históricos altos que já estejam esfriando.
+
+## Decisão de publicação
+
+O administrador deverá manter controle sobre a automação.
+
+Modos previstos:
+
+### Manual
+
+O Radar recomenda.
+O administrador decide se o produto entra na Vitrine.
+
+### Assistido
+
+O sistema pré-seleciona produtos que atendem às regras.
+O administrador confirma a publicação.
+
+### Automático
+
+Produtos que atendem aos critérios definidos podem entrar automaticamente na Vitrine.
+
+A automação deverá poder ser ligada/desligada globalmente e futuramente por categoria.
+
+## Ações previstas no Admin
+
+Para cada oportunidade:
+
+- Publicar na Vitrine;
+- Selecionar para Marketing;
+- Ignorar;
+- Bloquear produto;
+- acompanhar evolução da oportunidade.
+
+## Curadoria contínua
+
+O motor não deverá apenas inserir produtos.
+
+Também deverá identificar produtos que:
+
+- ficaram indisponíveis;
+- perderam força;
+- tiveram queda significativa de avaliação;
+- deixaram de atender aos critérios definidos.
+
+De acordo com as regras do administrador, esses produtos poderão ser sinalizados ou retirados automaticamente da Vitrine.
+
+## Posição no projeto
+
+O Radar de Oportunidades é considerado uma etapa futura próxima e de alta prioridade.
+
+Entretanto, sua implementação NÃO deve começar antes da conclusão funcional da Central de Marketing.
+
+Ordem definida:
+
+1. concluir seleção persistente para Marketing;
+2. concluir status do fluxo de Marketing;
+3. concluir escolha/organização por canais;
+4. concluir preparação de conteúdo;
+5. evoluir agendamento/publicação;
+6. considerar a Central de Marketing funcional;
+7. iniciar o Radar de Oportunidades.
+
+Regra de desenvolvimento:
+
+Não iniciar um novo braço principal enquanto o braço atual não estiver funcional, testado, documentado e salvo no Git.
+```
