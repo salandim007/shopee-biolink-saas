@@ -568,6 +568,10 @@
                                 </th>
 
                                 <th class="px-3 py-3">
+                                    Marketing
+                                </th>
+
+                                <th class="px-3 py-3">
                                     Canais
                                 </th>
                             </tr>
@@ -579,7 +583,7 @@
                         >
                             <tr>
                                 <td
-                                    colspan="8"
+                                    colspan="9"
                                     class="
                                         px-3
                                         py-10
@@ -986,7 +990,7 @@
                     `
                         <tr>
                             <td
-                                colspan="8"
+                                colspan="9"
                                 class="
                                     px-3
                                     py-10
@@ -1006,6 +1010,7 @@
                 items
                     .map(
                         ({
+                            entry,
                             product,
                             opportunityScore,
                             opportunityLevel
@@ -1143,6 +1148,74 @@
                                     </span>
                                 </td>
 
+                                <td
+                                    class="
+                                        px-3
+                                        py-4
+                                        whitespace-nowrap
+                                    "
+                                >
+                                    ${
+                                        entry?.marketing?.selected
+                                            ? `
+                                                <button
+                                                    type="button"
+                                                    onclick="setMarketingSelected(
+                                                        '${escapeHtml(product.marketplace || 'shopee')}',
+                                                        '${escapeHtml(product.itemId || '')}',
+                                                        false
+                                                    )"
+                                                    class="
+                                                        inline-flex
+                                                        items-center
+                                                        justify-center
+                                                        gap-2
+                                                        rounded-xl
+                                                        bg-emerald-50
+                                                        hover:bg-emerald-100
+                                                        text-emerald-700
+                                                        px-3
+                                                        py-2
+                                                        text-xs
+                                                        font-bold
+                                                        transition
+                                                    "
+                                                >
+                                                    <i class="fa-solid fa-check"></i>
+                                                    Remover
+                                                </button>
+                                            `
+                                            : `
+                                                <button
+                                                    type="button"
+                                                    onclick="setMarketingSelected(
+                                                        '${escapeHtml(product.marketplace || 'shopee')}',
+                                                        '${escapeHtml(product.itemId || '')}',
+                                                        true
+                                                    )"
+                                                    class="
+                                                        inline-flex
+                                                        items-center
+                                                        justify-center
+                                                        gap-2
+                                                        rounded-xl
+                                                        bg-sky-50
+                                                        hover:bg-sky-100
+                                                        text-sky-700
+                                                        px-3
+                                                        py-2
+                                                        text-xs
+                                                        font-bold
+                                                        transition
+                                                    "
+                                                >
+                                                    <i class="fa-solid fa-plus"></i>
+                                                    Selecionar
+                                                </button>
+                                            `
+                                    }
+                                </td>
+
                                 <td class="px-3 py-4">
                                     <div
                                         class="
@@ -1218,6 +1291,116 @@
         }
 
 
+        async function setMarketingSelected(
+            marketplace,
+            itemId,
+            selected
+        ) {
+            try {
+                const response =
+                    await fetch(
+                        `/api/vitrine2/products/${encodeURIComponent(
+                            marketplace
+                        )}/${encodeURIComponent(
+                            itemId
+                        )}/marketing/selected`,
+                        {
+                            method: 'PATCH',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    selected
+                                })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        'Não foi possível alterar a seleção de Marketing.'
+                    );
+                }
+
+                const updatedEntry =
+                    data.entry;
+
+                overviewItems =
+                    overviewItems.map(
+                        item => {
+                            const sameMarketplace =
+                                String(
+                                    item.product
+                                        ?.marketplace ||
+                                    'shopee'
+                                )
+                                    .toLowerCase() ===
+                                String(
+                                    marketplace ||
+                                    ''
+                                )
+                                    .toLowerCase();
+
+                            const sameItemId =
+                                String(
+                                    item.product
+                                        ?.itemId ||
+                                    ''
+                                ) ===
+                                String(
+                                    itemId ||
+                                    ''
+                                );
+
+                            if (
+                                !sameMarketplace ||
+                                !sameItemId
+                            ) {
+                                return item;
+                            }
+
+                            return {
+                                ...item,
+
+                                entry: {
+                                    ...item.entry,
+
+                                    marketing:
+                                        updatedEntry
+                                            ?.marketing ||
+                                        item.entry
+                                            ?.marketing
+                                }
+                            };
+                        }
+                    );
+
+                renderOverview();
+            }
+            catch (error) {
+                console.error(
+                    '[MARKETING] Erro ao alterar seleção:',
+                    error
+                );
+
+                window.alert(
+                    error.message ||
+                    'Não foi possível alterar a seleção de Marketing.'
+                );
+            }
+        }
+
+
         async function loadOverview() {
             try {
                 overviewItems =
@@ -1236,7 +1419,7 @@
                         `
                             <tr>
                                 <td
-                                    colspan="8"
+                                    colspan="9"
                                     class="
                                         px-3
                                         py-10

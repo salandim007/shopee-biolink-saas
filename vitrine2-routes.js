@@ -573,6 +573,180 @@ function createVitrine2Router(options = {}) {
 
     /*
      * ============================================================
+     * MARKETING
+     * ============================================================
+     *
+     * GET
+     * /api/vitrine2/marketing/selected
+     *
+     * Lista os produtos selecionados para Marketing.
+     */
+    router.get(
+        '/marketing/selected',
+        (req, res) => {
+            try {
+                const products =
+                    service.listMarketingSelected();
+
+                res.json({
+                    success: true,
+                    count: products.length,
+                    products
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao listar produtos selecionados para Marketing:',
+                    error
+                );
+
+                res.status(500).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível listar os produtos selecionados para Marketing.'
+                });
+            }
+        }
+    );
+
+
+    /*
+     * PATCH
+     * /api/vitrine2/products/:marketplace/:itemId/marketing/selected
+     *
+     * Body:
+     *
+     * {
+     *   "selected": true
+     * }
+     */
+    router.patch(
+        '/products/:marketplace/:itemId/marketing/selected',
+        (req, res) => {
+            try {
+                const {
+                    marketplace,
+                    itemId
+                } = req.params;
+
+                const {
+                    selected
+                } = req.body || {};
+
+                if (
+                    typeof selected !==
+                    'boolean'
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        error:
+                            'selected deve ser true ou false.'
+                    });
+                }
+
+                const entry =
+                    service.setMarketingSelected(
+                        marketplace,
+                        itemId,
+                        selected
+                    );
+
+                res.json({
+                    success: true,
+                    entry
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao alterar seleção de Marketing:',
+                    error
+                );
+
+                res.status(500).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível alterar a seleção de Marketing.'
+                });
+            }
+        }
+    );
+
+
+    /*
+     * PATCH
+     * /api/vitrine2/products/:marketplace/:itemId/marketing/status
+     *
+     * Body:
+     *
+     * {
+     *   "status": "selected"
+     * }
+     *
+     * Status preparados:
+     *
+     * not_selected
+     * selected
+     * preparing
+     * scheduled
+     * published
+     * error
+     */
+    router.patch(
+        '/products/:marketplace/:itemId/marketing/status',
+        (req, res) => {
+            try {
+                const {
+                    marketplace,
+                    itemId
+                } = req.params;
+
+                const status =
+                    String(
+                        req.body?.status ||
+                        ''
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                if (!status) {
+                    return res.status(400).json({
+                        success: false,
+                        error:
+                            'Status de Marketing não informado.'
+                    });
+                }
+
+                const entry =
+                    service.setMarketingStatus(
+                        marketplace,
+                        itemId,
+                        status
+                    );
+
+                res.json({
+                    success: true,
+                    entry
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao alterar status de Marketing:',
+                    error
+                );
+
+                res.status(500).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível alterar o status de Marketing.'
+                });
+            }
+        }
+    );
+
+
+
+    /*
+     * ============================================================
      * REMOVER PRODUTO
      * ============================================================
      *

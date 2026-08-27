@@ -198,7 +198,15 @@ function loadCatalog(
 
                 collections:
                     entry.collections ||
-                    []
+                    [],
+
+                marketing:
+                    entry.marketing || {
+                        selected: false,
+                        selectedAt: null,
+                        status:
+                            'not_selected'
+                    }
             }
         );
     }

@@ -5,6 +5,23 @@ const DEFAULT_VISIBILITY = Object.freeze({
 });
 
 
+const DEFAULT_MARKETING = Object.freeze({
+    selected: false,
+    selectedAt: null,
+    status: 'not_selected'
+});
+
+
+const MARKETING_STATUSES = Object.freeze([
+    'not_selected',
+    'selected',
+    'preparing',
+    'scheduled',
+    'published',
+    'error'
+]);
+
+
 function normalizeBoolean(value, fallback = false) {
     if (typeof value === 'boolean') {
         return value;
@@ -45,6 +62,115 @@ function normalizePosition(value) {
 }
 
 
+function normalizeMarketingStatus(
+    value,
+    fallback =
+        DEFAULT_MARKETING.status
+) {
+    const status =
+        String(
+            value || ''
+        )
+            .trim()
+            .toLowerCase();
+
+    if (
+        MARKETING_STATUSES.includes(
+            status
+        )
+    ) {
+        return status;
+    }
+
+    return fallback;
+}
+
+
+function normalizeSelectedAt(value) {
+    if (
+        value === undefined ||
+        value === null ||
+        value === ''
+    ) {
+        return null;
+    }
+
+    const date =
+        new Date(
+            value
+        );
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return null;
+    }
+
+    return date.toISOString();
+}
+
+
+function normalizeMarketing(
+    marketing = {}
+) {
+    const source =
+        marketing &&
+        typeof marketing === 'object'
+            ? marketing
+            : {};
+
+    const selected =
+        normalizeBoolean(
+            source.selected,
+            DEFAULT_MARKETING.selected
+        );
+
+    let status =
+        normalizeMarketingStatus(
+            source.status,
+            selected
+                ? 'selected'
+                : 'not_selected'
+        );
+
+    let selectedAt =
+        normalizeSelectedAt(
+            source.selectedAt
+        );
+
+    if (!selected) {
+        status =
+            'not_selected';
+
+        selectedAt =
+            null;
+    }
+    else {
+        if (
+            status ===
+            'not_selected'
+        ) {
+            status =
+                'selected';
+        }
+
+        if (!selectedAt) {
+            selectedAt =
+                new Date()
+                    .toISOString();
+        }
+    }
+
+    return {
+        selected,
+        selectedAt,
+        status
+    };
+}
+
+
 function createCatalogEntry({
     product,
     published =
@@ -53,7 +179,9 @@ function createCatalogEntry({
         DEFAULT_VISIBILITY.featured,
     position =
         DEFAULT_VISIBILITY.position,
-    collections = []
+    collections = [],
+    marketing =
+        DEFAULT_MARKETING
 } = {}) {
     if (
         !product ||
@@ -114,7 +242,12 @@ function createCatalogEntry({
         },
 
         collections:
-            normalizedCollections
+            normalizedCollections,
+
+        marketing:
+            normalizeMarketing(
+                marketing
+            )
     };
 }
 
@@ -138,7 +271,11 @@ class ProductCatalog {
         }
 
         return (
-            `${product.marketplace}:${product.itemId}`
+            `${String(
+                product.marketplace
+            ).toLowerCase()}:${String(
+                product.itemId
+            )}`
         );
     }
 
@@ -272,6 +409,116 @@ class ProductCatalog {
             normalizePosition(
                 position
             );
+
+        return entry;
+    }
+
+
+    setMarketingSelected(
+        marketplace,
+        itemId,
+        selected
+    ) {
+        const entry =
+            this.getProduct(
+                marketplace,
+                itemId
+            );
+
+        if (!entry) {
+            throw new Error(
+                'Produto não encontrado no catálogo.'
+            );
+        }
+
+        const normalizedSelected =
+            normalizeBoolean(
+                selected,
+                false
+            );
+
+        entry.marketing =
+            normalizeMarketing({
+                ...entry.marketing,
+
+                selected:
+                    normalizedSelected,
+
+                selectedAt:
+                    normalizedSelected
+                        ? (
+                            entry.marketing
+                                ?.selectedAt ||
+                            new Date()
+                                .toISOString()
+                        )
+                        : null,
+
+                status:
+                    normalizedSelected
+                        ? (
+                            entry.marketing
+                                ?.status ===
+                            'not_selected'
+                                ? 'selected'
+                                : (
+                                    entry.marketing
+                                        ?.status ||
+                                    'selected'
+                                )
+                        )
+                        : 'not_selected'
+            });
+
+        return entry;
+    }
+
+
+    setMarketingStatus(
+        marketplace,
+        itemId,
+        status
+    ) {
+        const entry =
+            this.getProduct(
+                marketplace,
+                itemId
+            );
+
+        if (!entry) {
+            throw new Error(
+                'Produto não encontrado no catálogo.'
+            );
+        }
+
+        const normalizedStatus =
+            normalizeMarketingStatus(
+                status
+            );
+
+        const selected =
+            normalizedStatus !==
+            'not_selected';
+
+        entry.marketing =
+            normalizeMarketing({
+                ...entry.marketing,
+
+                selected,
+
+                selectedAt:
+                    selected
+                        ? (
+                            entry.marketing
+                                ?.selectedAt ||
+                            new Date()
+                                .toISOString()
+                        )
+                        : null,
+
+                status:
+                    normalizedStatus
+            });
 
         return entry;
     }
@@ -420,6 +667,18 @@ class ProductCatalog {
     }
 
 
+    listMarketingSelected() {
+        return this
+            .listAll()
+            .filter(
+                entry =>
+                    entry.marketing
+                        ?.selected ===
+                    true
+            );
+    }
+
+
     removeProduct(
         marketplace,
         itemId
@@ -450,8 +709,13 @@ function createProductCatalog() {
 
 module.exports = {
     DEFAULT_VISIBILITY,
+    DEFAULT_MARKETING,
+    MARKETING_STATUSES,
     normalizeBoolean,
     normalizePosition,
+    normalizeMarketingStatus,
+    normalizeSelectedAt,
+    normalizeMarketing,
     createCatalogEntry,
     ProductCatalog,
     createProductCatalog
