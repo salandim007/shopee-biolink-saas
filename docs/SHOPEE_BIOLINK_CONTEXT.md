@@ -1509,4 +1509,57 @@ Ordem definida:
 Regra de desenvolvimento:
 
 Não iniciar um novo braço principal enquanto o braço atual não estiver funcional, testado, documentado e salvo no Git.
+
+
+## Decisão temporária de canais de Marketing
+
+Nesta fase, a chave interna `marketing.channels.outros`
+será reaproveitada visualmente como **Pinterest**.
+
+Motivo:
+- a estrutura de persistência, API e tela já existe para `outros`;
+- permite adicionar Pinterest sem criar uma nova camada agora.
+
+Regra temporária:
+- `outros = Pinterest` na interface;
+- futuramente, quando "Outros" voltar a existir,
+  criar uma nova chave separada e migrar Pinterest para `pinterest`.
 ```
+
+## Central de Marketing — Canais por produto concluídos — 27/08/2026
+
+Estado validado:
+
+- seleção independente de canais por produto;
+- canais atuais: Instagram, Facebook, TikTok, Kwai e Pinterest;
+- Pinterest usa temporariamente a chave interna `marketing.channels.outros`;
+- seleção geral de Marketing permanece independente dos canais;
+- marcação e desmarcação por canal persistem após recarregar a página;
+- confirmação visual ao adicionar/remover produto de um canal;
+- filtro da Visão Geral por canal funcionando;
+- opção "Sem canal" funcionando;
+- cada aba exibe somente seus respectivos produtos;
+- estado vazio validado quando um canal não possui produtos.
+
+Backend validado:
+
+- `setMarketingChannel`;
+- `listMarketingByChannel`;
+- PATCH `/api/vitrine2/products/:marketplace/:itemId/marketing/channel/:channel`;
+- GET `/api/vitrine2/marketing/channel/:channel`.
+
+Views validadas:
+
+- `views/marketing-overview.ejs`;
+- `views/marketing-instagram.ejs`;
+- `views/marketing-facebook.ejs`;
+- `views/marketing-tiktok.ejs`;
+- `views/marketing-kwai.ejs`;
+- `views/marketing-outros.ejs` — exibido visualmente como Pinterest.
+
+Próximo passo:
+
+- salvar esta etapa no Git;
+- continuar a Central de Marketing;
+- não iniciar o Radar de Oportunidades antes de concluir o braço de Marketing.
+

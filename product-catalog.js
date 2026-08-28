@@ -5,11 +5,30 @@ const DEFAULT_VISIBILITY = Object.freeze({
 });
 
 
+const DEFAULT_MARKETING_CHANNELS = Object.freeze({
+    instagram: false,
+    facebook: false,
+    tiktok: false,
+    kwai: false,
+    outros: false
+});
+
+
 const DEFAULT_MARKETING = Object.freeze({
     selected: false,
     selectedAt: null,
-    status: 'not_selected'
+    status: 'not_selected',
+    channels: DEFAULT_MARKETING_CHANNELS
 });
+
+
+const MARKETING_CHANNELS = Object.freeze([
+    'instagram',
+    'facebook',
+    'tiktok',
+    'kwai',
+    'outros'
+]);
 
 
 const MARKETING_STATUSES = Object.freeze([
@@ -112,6 +131,71 @@ function normalizeSelectedAt(value) {
 }
 
 
+function normalizeMarketingChannel(value) {
+    const channel =
+        String(
+            value || ''
+        )
+            .trim()
+            .toLowerCase();
+
+    if (
+        !MARKETING_CHANNELS.includes(
+            channel
+        )
+    ) {
+        throw new Error(
+            'Canal de Marketing inválido.'
+        );
+    }
+
+    return channel;
+}
+
+
+function normalizeMarketingChannels(
+    channels = {}
+) {
+    const source =
+        channels &&
+        typeof channels === 'object'
+            ? channels
+            : {};
+
+    return {
+        instagram:
+            normalizeBoolean(
+                source.instagram,
+                DEFAULT_MARKETING_CHANNELS.instagram
+            ),
+
+        facebook:
+            normalizeBoolean(
+                source.facebook,
+                DEFAULT_MARKETING_CHANNELS.facebook
+            ),
+
+        tiktok:
+            normalizeBoolean(
+                source.tiktok,
+                DEFAULT_MARKETING_CHANNELS.tiktok
+            ),
+
+        kwai:
+            normalizeBoolean(
+                source.kwai,
+                DEFAULT_MARKETING_CHANNELS.kwai
+            ),
+
+        outros:
+            normalizeBoolean(
+                source.outros,
+                DEFAULT_MARKETING_CHANNELS.outros
+            )
+    };
+}
+
+
 function normalizeMarketing(
     marketing = {}
 ) {
@@ -166,7 +250,11 @@ function normalizeMarketing(
     return {
         selected,
         selectedAt,
-        status
+        status,
+        channels:
+            normalizeMarketingChannels(
+                source.channels
+            )
     };
 }
 
@@ -524,6 +612,52 @@ class ProductCatalog {
     }
 
 
+    setMarketingChannel(
+        marketplace,
+        itemId,
+        channel,
+        enabled
+    ) {
+        const entry =
+            this.getProduct(
+                marketplace,
+                itemId
+            );
+
+        if (!entry) {
+            throw new Error(
+                'Produto não encontrado no catálogo.'
+            );
+        }
+
+        const normalizedChannel =
+            normalizeMarketingChannel(
+                channel
+            );
+
+        const normalizedEnabled =
+            normalizeBoolean(
+                enabled,
+                false
+            );
+
+        entry.marketing =
+            normalizeMarketing({
+                ...entry.marketing,
+
+                channels: {
+                    ...entry.marketing
+                        ?.channels,
+
+                    [normalizedChannel]:
+                        normalizedEnabled
+                }
+            });
+
+        return entry;
+    }
+
+
     addToCollection(
         marketplace,
         itemId,
@@ -679,6 +813,26 @@ class ProductCatalog {
     }
 
 
+    listMarketingByChannel(
+        channel
+    ) {
+        const normalizedChannel =
+            normalizeMarketingChannel(
+                channel
+            );
+
+        return this
+            .listAll()
+            .filter(
+                entry =>
+                    entry.marketing
+                        ?.channels
+                        ?.[normalizedChannel] ===
+                    true
+            );
+    }
+
+
     removeProduct(
         marketplace,
         itemId
@@ -709,12 +863,16 @@ function createProductCatalog() {
 
 module.exports = {
     DEFAULT_VISIBILITY,
+    DEFAULT_MARKETING_CHANNELS,
     DEFAULT_MARKETING,
+    MARKETING_CHANNELS,
     MARKETING_STATUSES,
     normalizeBoolean,
     normalizePosition,
     normalizeMarketingStatus,
     normalizeSelectedAt,
+    normalizeMarketingChannel,
+    normalizeMarketingChannels,
     normalizeMarketing,
     createCatalogEntry,
     ProductCatalog,

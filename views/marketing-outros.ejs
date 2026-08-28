@@ -8,7 +8,7 @@
     >
 
     <title>
-        Outros canais — Central de Marketing
+        Pinterest — Central de Marketing
     </title>
 
     <script
@@ -92,7 +92,7 @@
                                     text-slate-500
                                 "
                             >
-                                Produtos e estruturas próprias para Outros canais.
+                                Produtos e estruturas próprias para Pinterest.
                             </p>
                         </div>
                     </div>
@@ -265,7 +265,8 @@
 
 
                     <a
-                        href="/admin/vitrine2/marketing/outros"
+                        href="/admin/vitrine2/marketing/Pinterest
+"
                         class="
                             inline-flex
                             items-center
@@ -280,7 +281,8 @@
                         "
                     >
                         <i class="fa-solid fa-share-nodes"></i>
-                        Outros canais
+                        Pinterest
+
                     </a>
 
                 </div>
@@ -339,7 +341,8 @@
                                 font-extrabold
                             "
                         >
-                            Outros canais
+                            Pinterest
+
                         </h2>
 
                         <p
@@ -456,7 +459,8 @@
                         </h2>
 
                         <p class="text-sm text-slate-500">
-                            Produtos publicados no catálogo disponíveis para futuras ações em Outros canais.
+                        Produtos publicados no catálogo disponíveis para futuras ações em Pinterest
+.
                         </p>
                     </div>
 
@@ -587,44 +591,40 @@
         }
 
 
-        async function fetchCatalogProducts() {
-            const response =
-                await fetch(
-                    '/api/vitrine2/products'
-                );
+async function fetchCatalogProducts() {
+    const response =
+        await fetch(
+            '/api/vitrine2/marketing/channel/outros'
+        );
 
-            const data =
-                await response.json();
+    const data =
+        await response.json();
 
-            if (
-                !response.ok ||
-                !data.success
-            ) {
-                throw new Error(
-                    data.error ||
-                    'Falha ao carregar produtos.'
-                );
-            }
+    if (
+        !response.ok ||
+        !data.success
+    ) {
+        throw new Error(
+            data.error ||
+            'Falha ao carregar produtos do Pinterest.'
+        );
+    }
 
-            return (
-                Array.isArray(
-                    data.products
-                )
-                    ? data.products
-                    : []
-            )
-                .filter(
-                    entry =>
-                        entry?.visibility?.published
-                )
-                .map(
-                    entry => ({
-                        entry,
-                        product:
-                            entry.product || {}
-                    })
-                );
-        }
+    return (
+        Array.isArray(
+            data.products
+        )
+            ? data.products
+            : []
+    )
+        .map(
+            entry => ({
+                entry,
+                product:
+                    entry.product || {}
+            })
+        );
+}
 
 
         function renderChannelProducts(items) {
@@ -656,7 +656,7 @@
                                 xl:col-span-3
                             "
                         >
-                            Nenhum produto publicado disponível.
+                            Nenhum produto selecionado para Pinterest.
                         </div>
                     `;
 
@@ -777,7 +777,7 @@
                                         text-slate-400
                                     "
                                 >
-                                    Ação de Outros canais: próxima fase
+                                   Ação de Pinterest: próxima fase
                                 </div>
                             </article>
                         `
@@ -798,7 +798,7 @@
             catch (error) {
                 document
                     .getElementById(
-                        'outrosProducts'
+                        'PinterestProducts'
                     )
                     .innerHTML =
                         `
@@ -828,3 +828,6 @@
 
 </body>
 </html>
+
+
+

@@ -315,7 +315,7 @@
                         "
                     >
                         <i class="fa-solid fa-share-nodes"></i>
-                        Outros canais
+                        Pinterest
                     </a>
 
                 </div>
@@ -483,6 +483,46 @@
                             Ranking automático dos produtos publicados com base em comissão, estimada, vendas e avaliação.
                         </p>
                     </div>
+                    <select
+                        id="overviewChannelFilter"
+                        class="
+                            rounded-xl
+                            border
+                            border-slate-200
+                            bg-white
+                            px-4
+                            py-2.5
+                            text-sm
+                        "
+                    >
+                        <option value="all">
+                            Todos os canais
+                        </option>
+
+                        <option value="instagram">
+                            Instagram
+                        </option>
+
+                        <option value="facebook">
+                            Facebook
+                        </option>
+
+                        <option value="tiktok">
+                            TikTok
+                        </option>
+
+                        <option value="kwai">
+                            Kwai
+                        </option>
+
+                        <option value="outros">
+                            Pinterest
+                        </option>
+
+                        <option value="none">
+                            Sem canal
+                        </option>
+                    </select>
 
                     <select
                         id="overviewSort"
@@ -938,6 +978,208 @@
 
         let overviewItems = [];
 
+        const marketingChannelDefinitions = [
+            {
+                key: 'instagram',
+                label: 'Instagram',
+                selectedClass:
+                    'bg-pink-50 text-pink-700'
+            },
+            {
+                key: 'facebook',
+                label: 'Facebook',
+                selectedClass:
+                    'bg-blue-50 text-blue-700'
+            },
+            {
+                key: 'tiktok',
+                label: 'TikTok',
+                selectedClass:
+                    'bg-slate-100 text-slate-700'
+            },
+            {
+                key: 'kwai',
+                label: 'Kwai',
+                selectedClass:
+                    'bg-orange-50 text-orange-700'
+            },
+            {
+                key: 'outros',
+                label: 'Pinterest',
+                selectedClass:
+                    'bg-violet-50 text-violet-700'
+            }
+        ];
+
+
+        function renderMarketingChannels(
+            entry,
+            product
+        ) {
+            const channels =
+                entry?.marketing?.channels ||
+                {};
+
+            const selectedChannels =
+                marketingChannelDefinitions
+                    .filter(
+                        channel =>
+                            channels[channel.key] ===
+                            true
+                    );
+
+            const selectedHtml =
+                selectedChannels.length
+                    ? selectedChannels
+                        .map(
+                            channel => `
+                                <span
+                                    class="
+                                        inline-flex
+                                        items-center
+                                        rounded-full
+                                        ${channel.selectedClass}
+                                        px-2
+                                        py-1
+                                        text-xs
+                                        font-bold
+                                    "
+                                >
+                                    ${escapeHtml(channel.label)}
+                                </span>
+                            `
+                        )
+                        .join('')
+                    : `
+                        <span
+                            class="
+                                text-xs
+                                text-slate-400
+                            "
+                        >
+                            Nenhum
+                        </span>
+                    `;
+
+            const optionsHtml =
+                marketingChannelDefinitions
+                    .map(
+                        channel => {
+                            const enabled =
+                                channels[channel.key] ===
+                                true;
+
+                            return `
+                                <button
+                                    type="button"
+                                    onclick="setMarketingChannel(
+                                        '${escapeHtml(product.marketplace || 'shopee')}',
+                                        '${escapeHtml(product.itemId || '')}',
+                                        '${escapeHtml(channel.key)}',
+                                        ${enabled ? 'false' : 'true'}
+                                    )"
+                                    class="
+                                        w-full
+                                        flex
+                                        items-center
+                                        justify-between
+                                        gap-3
+                                        rounded-lg
+                                        px-3
+                                        py-2
+                                        text-left
+                                        text-xs
+                                        font-bold
+                                        transition
+                                        ${
+                                            enabled
+                                                ? channel.selectedClass
+                                                : 'bg-white text-slate-600 hover:bg-slate-50'
+                                        }
+                                    "
+                                >
+                                    <span>
+                                        ${escapeHtml(channel.label)}
+                                    </span>
+
+                                    <i
+                                        class="
+                                            fa-solid
+                                            ${
+                                                enabled
+                                                    ? 'fa-check'
+                                                    : 'fa-plus'
+                                            }
+                                        "
+                                    ></i>
+                                </button>
+                            `;
+                        }
+                    )
+                    .join('');
+
+            return `
+                <div
+                    class="
+                        flex
+                        flex-wrap
+                        items-center
+                        gap-1.5
+                    "
+                >
+                    ${selectedHtml}
+
+                    <details
+                        class="
+                            relative
+                            inline-block
+                        "
+                    >
+                        <summary
+                            class="
+                                list-none
+                                cursor-pointer
+                                inline-flex
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-slate-50
+                                hover:bg-slate-100
+                                text-slate-600
+                                px-2
+                                py-1
+                                text-xs
+                                font-bold
+                                transition
+                            "
+                            title="Selecionar canais"
+                        >
+                            <i class="fa-solid fa-pen"></i>
+                        </summary>
+
+                        <div
+                            class="
+                                absolute
+                                right-0
+                                z-30
+                                mt-2
+                                w-40
+                                rounded-xl
+                                border
+                                border-slate-200
+                                bg-white
+                                p-2
+                                shadow-lg
+                            "
+                        >
+                            <div class="space-y-1">
+                                ${optionsHtml}
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            `;
+        }
 
         function renderOverview() {
             const sortKey =
@@ -947,9 +1189,53 @@
                     )
                     .value;
 
+                        const channelFilter =
+                document
+                    .getElementById(
+                        'overviewChannelFilter'
+                    )
+                    .value;
+
             const items =
                 [...overviewItems]
+                    .filter(
+                        item => {
+                            const channels =
+                                item.entry
+                                    ?.marketing
+                                    ?.channels ||
+                                {};
+
+                            if (
+                                channelFilter ===
+                                'all'
+                            ) {
+                                return true;
+                            }
+
+                            if (
+                                channelFilter ===
+                                'none'
+                            ) {
+                                return !Object
+                                    .values(
+                                        channels
+                                    )
+                                    .some(
+                                        value =>
+                                            value === true
+                                    );
+                            }
+
+                            return (
+                                channels[
+                                    channelFilter
+                                ] === true
+                            );
+                        }
+                    )
                     .sort(
+
                         (a, b) => {
                             if (
                                 sortKey ===
@@ -1216,70 +1502,12 @@
                                     }
                                 </td>
 
-                                <td class="px-3 py-4">
-                                    <div
-                                        class="
-                                            flex
-                                            flex-wrap
-                                            gap-1.5
-                                        "
-                                    >
-                                        <span
-                                            class="
-                                                rounded-full
-                                                bg-pink-50
-                                                text-pink-700
-                                                px-2
-                                                py-1
-                                                text-xs
-                                                font-bold
-                                            "
-                                        >
-                                            Instagram
-                                        </span>
-
-                                        <span
-                                            class="
-                                                rounded-full
-                                                bg-blue-50
-                                                text-blue-700
-                                                px-2
-                                                py-1
-                                                text-xs
-                                                font-bold
-                                            "
-                                        >
-                                            Facebook
-                                        </span>
-
-                                        <span
-                                            class="
-                                                rounded-full
-                                                bg-slate-100
-                                                text-slate-700
-                                                px-2
-                                                py-1
-                                                text-xs
-                                                font-bold
-                                            "
-                                        >
-                                            TikTok
-                                        </span>
-
-                                        <span
-                                            class="
-                                                rounded-full
-                                                bg-orange-50
-                                                text-orange-700
-                                                px-2
-                                                py-1
-                                                text-xs
-                                                font-bold
-                                            "
-                                        >
-                                            Kwai
-                                        </span>
-                                    </div>
+                                    <td class="px-3 py-4">
+                                    ${renderMarketingChannels(
+                                        entry,
+                                        product
+                                    )}
+                                </td>
                                 </td>
 
                             </tr>
@@ -1385,7 +1613,8 @@
                         }
                     );
 
-                renderOverview();
+                                renderOverview();
+    
             }
             catch (error) {
                 console.error(
@@ -1400,6 +1629,138 @@
             }
         }
 
+        async function setMarketingChannel(
+            marketplace,
+            itemId,
+            channel,
+            enabled
+        ) {
+            try {
+                const response =
+                    await fetch(
+                        `/api/vitrine2/products/${encodeURIComponent(
+                            marketplace
+                        )}/${encodeURIComponent(
+                            itemId
+                        )}/marketing/channel/${encodeURIComponent(
+                            channel
+                        )}`,
+                        {
+                            method: 'PATCH',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    enabled
+                                })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        'Não foi possível alterar o canal de Marketing.'
+                    );
+                }
+
+                const updatedEntry =
+                    data.entry;
+
+                overviewItems =
+                    overviewItems.map(
+                        item => {
+                            const sameMarketplace =
+                                String(
+                                    item.product
+                                        ?.marketplace ||
+                                    'shopee'
+                                )
+                                    .toLowerCase() ===
+                                String(
+                                    marketplace ||
+                                    ''
+                                )
+                                    .toLowerCase();
+
+                            const sameItemId =
+                                String(
+                                    item.product
+                                        ?.itemId ||
+                                    ''
+                                ) ===
+                                String(
+                                    itemId ||
+                                    ''
+                                );
+
+                            if (
+                                !sameMarketplace ||
+                                !sameItemId
+                            ) {
+                                return item;
+                            }
+
+                            return {
+                                ...item,
+
+                                entry: {
+                                    ...item.entry,
+
+                                    marketing:
+                                        updatedEntry
+                                            ?.marketing ||
+                                        item.entry
+                                            ?.marketing
+                                }
+                            };
+                        }
+                    );
+
+                                renderOverview();
+
+                const channelLabelMap = {
+                    instagram: 'Instagram',
+                    facebook: 'Facebook',
+                    tiktok: 'TikTok',
+                    kwai: 'Kwai',
+                    outros: 'Pinterest'
+                };
+
+                const actionText =
+                    enabled
+                        ? 'adicionado ao'
+                        : 'removido do';
+
+                const channelLabel =
+                    channelLabelMap[channel] ||
+                    channel;
+
+                window.alert(
+                    `Produto ${actionText} ${channelLabel}.`
+                );
+            }
+            catch (error) {
+                console.error(
+                    '[MARKETING] Erro ao alterar canal:',
+                    error
+                );
+
+                window.alert(
+                    error.message ||
+                    'Não foi possível alterar o canal de Marketing.'
+                );
+            }
+        }
 
         async function loadOverview() {
             try {
@@ -1444,6 +1805,14 @@
                 renderOverview
             );
 
+                    document
+            .getElementById(
+                'overviewChannelFilter'
+            )
+            .addEventListener(
+                'change',
+                renderOverview
+            );
 
         window.addEventListener(
             'resize',
@@ -1463,3 +1832,4 @@
 
 </body>
 </html>
+

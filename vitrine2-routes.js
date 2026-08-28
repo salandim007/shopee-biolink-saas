@@ -743,7 +743,130 @@ function createVitrine2Router(options = {}) {
         }
     );
 
+    /*
+     * GET
+     * /api/vitrine2/marketing/channel/:channel
+     *
+     * Lista os produtos vinculados a um canal de Marketing.
+     *
+     * Canais:
+     *
+     * instagram
+     * facebook
+     * tiktok
+     * kwai
+     * outros
+     */
+    router.get(
+        '/marketing/channel/:channel',
+        (req, res) => {
+            try {
+                const channel =
+                    String(
+                        req.params.channel ||
+                        ''
+                    )
+                        .trim()
+                        .toLowerCase();
 
+                if (!channel) {
+                    return res.status(400).json({
+                        success: false,
+                        error:
+                            'Canal de Marketing não informado.'
+                    });
+                }
+
+                const products =
+                    service.listMarketingByChannel(
+                        channel
+                    );
+
+                res.json({
+                    success: true,
+                    channel,
+                    count: products.length,
+                    products
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao listar produtos por canal de Marketing:',
+                    error
+                );
+
+                res.status(500).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível listar os produtos do canal de Marketing.'
+                });
+            }
+        }
+    );
+
+
+    /*
+     * PATCH
+     * /api/vitrine2/products/:marketplace/:itemId/marketing/channel/:channel
+     *
+     * Body:
+     *
+     * {
+     *   "enabled": true
+     * }
+     */
+    router.patch(
+        '/products/:marketplace/:itemId/marketing/channel/:channel',
+        (req, res) => {
+            try {
+                const {
+                    marketplace,
+                    itemId,
+                    channel
+                } = req.params;
+
+                const {
+                    enabled
+                } = req.body || {};
+
+                if (
+                    typeof enabled !==
+                    'boolean'
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        error:
+                            'enabled deve ser true ou false.'
+                    });
+                }
+
+                const entry =
+                    service.setMarketingChannel(
+                        marketplace,
+                        itemId,
+                        channel,
+                        enabled
+                    );
+
+                res.json({
+                    success: true,
+                    entry
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao alterar canal de Marketing:',
+                    error
+                );
+
+                res.status(500).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível alterar o canal de Marketing.'
+                });
+            }
+        }
+    );
 
     /*
      * ============================================================

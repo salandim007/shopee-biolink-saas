@@ -280,7 +280,7 @@
                         "
                     >
                         <i class="fa-solid fa-share-nodes"></i>
-                        Outros canais
+                        Pinterest
                     </a>
 
                 </div>
@@ -579,7 +579,7 @@
         async function fetchCatalogProducts() {
             const response =
                 await fetch(
-                    '/api/vitrine2/products'
+                    '/api/vitrine2/marketing/channel/tiktok'
                 );
 
             const data =
@@ -591,7 +591,7 @@
             ) {
                 throw new Error(
                     data.error ||
-                    'Falha ao carregar produtos.'
+                    'Falha ao carregar produtos do TikTok.'
                 );
             }
 
@@ -602,10 +602,6 @@
                     ? data.products
                     : []
             )
-                .filter(
-                    entry =>
-                        entry?.visibility?.published
-                )
                 .map(
                     entry => ({
                         entry,
@@ -615,7 +611,7 @@
                 );
         }
 
-
+ 
         function renderChannelProducts(items) {
             const container =
                 document.getElementById(
@@ -645,7 +641,7 @@
                                 xl:col-span-3
                             "
                         >
-                            Nenhum produto publicado disponível.
+                            Nenhum produto selecionado para TikTok.
                         </div>
                     `;
 
@@ -817,3 +813,4 @@
 
 </body>
 </html>
+

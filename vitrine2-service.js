@@ -200,6 +200,31 @@ function createVitrine2Service(
     }
 
 
+    function setMarketingChannel(
+        marketplace,
+        itemId,
+        channel,
+        enabled
+    ) {
+        const catalog =
+            loadCatalog();
+
+        const entry =
+            catalog.setMarketingChannel(
+                marketplace,
+                itemId,
+                channel,
+                enabled
+            );
+
+        saveCatalog(
+            catalog
+        );
+
+        return entry;
+    }
+
+
     function addToCollection(
         marketplace,
         itemId,
@@ -325,6 +350,18 @@ function createVitrine2Service(
     }
 
 
+    function listMarketingByChannel(
+        channel
+    ) {
+        const catalog =
+            loadCatalog();
+
+        return catalog.listMarketingByChannel(
+            channel
+        );
+    }
+
+
     return {
         importFromApi,
         importFromCsvRow,
@@ -333,6 +370,7 @@ function createVitrine2Service(
         setPosition,
         setMarketingSelected,
         setMarketingStatus,
+        setMarketingChannel,
         addToCollection,
         removeFromCollection,
         removeProduct,
@@ -341,7 +379,8 @@ function createVitrine2Service(
         listPublished,
         listFeatured,
         listByCollection,
-        listMarketingSelected
+        listMarketingSelected,
+        listMarketingByChannel
     };
 }
 
