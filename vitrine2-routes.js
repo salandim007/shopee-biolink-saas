@@ -743,6 +743,112 @@ function createVitrine2Router(options = {}) {
         }
     );
 
+
+    /*
+     * ============================================================
+     * POLICY ENGINE — INSTAGRAM
+     * ============================================================
+     *
+     * GET
+     * /api/vitrine2/products/:marketplace/:itemId/policy/instagram
+     *
+     * Valida um produto do catálogo usando a política
+     * atualmente registrada para Instagram.
+     *
+     * Esta rota NÃO publica conteúdo.
+     *
+     * Ela apenas retorna a decisão de compliance:
+     *
+     * approved
+     * needs_review
+     * blocked
+     * revalidate
+     */
+    router.get(
+        '/products/:marketplace/:itemId/policy/instagram',
+        (req, res) => {
+            try {
+                const {
+                    marketplace,
+                    itemId
+                } = req.params;
+
+                const result =
+                    service.validateInstagramPolicy(
+                        marketplace,
+                        itemId
+                    );
+
+                res.json({
+                    success: true,
+                    ...result
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao validar política do Instagram:',
+                    error
+                );
+
+                const statusCode =
+                    error.message ===
+                    'Produto não encontrado no catálogo.'
+                        ? 404
+                        : 500;
+
+                res.status(statusCode).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível validar a política do Instagram.'
+                });
+            }
+        }
+    );
+
+
+    /*
+     * ============================================================
+     * CANDIDATOS AUTOMÁTICOS DO INSTAGRAM
+     * ============================================================
+     *
+     * GET
+     * /api/vitrine2/marketing/instagram/candidates
+     *
+     * Todos os produtos publicados entram como candidatos ao
+     * Instagram automaticamente. A seleção manual do canal não é
+     * usada nesta rota. Cada item já retorna com a decisão atual
+     * do Policy Engine do Instagram.
+     */
+    router.get(
+        '/marketing/instagram/candidates',
+        (req, res) => {
+            try {
+                const items =
+                    service.listInstagramMarketingCandidates();
+
+                res.json({
+                    success: true,
+                    channel: 'instagram',
+                    total: items.length,
+                    items
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao listar candidatos automáticos do Instagram:',
+                    error
+                );
+
+                res.status(500).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível listar os candidatos automáticos do Instagram.'
+                });
+            }
+        }
+    );
+
+
     /*
      * GET
      * /api/vitrine2/marketing/channel/:channel

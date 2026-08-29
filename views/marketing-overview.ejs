@@ -608,7 +608,7 @@
                                 </th>
 
                                 <th class="px-3 py-3">
-                                    Marketing
+                                    Política
                                 </th>
 
                                 <th class="px-3 py-3">
@@ -1181,6 +1181,175 @@
             `;
         }
 
+        async function fetchInstagramPolicy(
+            product
+        ) {
+            const marketplace =
+                product?.marketplace ||
+                'shopee';
+
+            const itemId =
+                product?.itemId;
+
+            if (!itemId) {
+                return {
+                    status: 'needs_review',
+                    label: 'Revisão necessária',
+                    reason: 'Produto sem itemId para validação.',
+                    policyVersion: null
+                };
+            }
+
+            try {
+                const response =
+                    await fetch(
+                        `/api/vitrine2/products/${encodeURIComponent(
+                            marketplace
+                        )}/${encodeURIComponent(
+                            itemId
+                        )}/policy/instagram`
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        'Falha ao validar política.'
+                    );
+                }
+
+                return (
+                    data.summary ||
+                    {
+                        status: 'needs_review',
+                        label: 'Revisão necessária',
+                        reason: 'A validação não retornou um resumo.',
+                        policyVersion: null
+                    }
+                );
+            }
+            catch (error) {
+                console.error(
+                    '[MARKETING] Erro ao validar política do Instagram:',
+                    error
+                );
+
+                return {
+                    status: 'error',
+                    label: 'Indisponível',
+                    reason:
+                        error.message ||
+                        'Não foi possível consultar a política.',
+                    policyVersion: null
+                };
+            }
+        }
+
+
+        function renderInstagramPolicyBadge(
+            policy
+        ) {
+            const status =
+                String(
+                    policy?.status ||
+                    'needs_review'
+                )
+                    .trim()
+                    .toLowerCase();
+
+            const reason =
+                policy?.reason ||
+                'Sem detalhes disponíveis.';
+
+            const definitions = {
+                approved: {
+                    label: 'Aprovado',
+                    icon: 'fa-circle-check',
+                    className:
+                        'bg-emerald-50 text-emerald-700'
+                },
+
+                needs_review: {
+                    label: 'Revisão',
+                    icon: 'fa-triangle-exclamation',
+                    className:
+                        'bg-amber-50 text-amber-700'
+                },
+
+                blocked: {
+                    label: 'Bloqueado',
+                    icon: 'fa-ban',
+                    className:
+                        'bg-red-50 text-red-700'
+                },
+
+                revalidate: {
+                    label: 'Revalidar',
+                    icon: 'fa-rotate',
+                    className:
+                        'bg-violet-50 text-violet-700'
+                },
+
+                error: {
+                    label: 'Indisponível',
+                    icon: 'fa-circle-exclamation',
+                    className:
+                        'bg-slate-100 text-slate-600'
+                }
+            };
+
+            const definition =
+                definitions[status] ||
+                definitions.needs_review;
+
+            return `
+                <div
+                    class="space-y-1"
+                    title="${escapeHtml(reason)}"
+                >
+                    <span
+                        class="
+                            inline-flex
+                            items-center
+                            gap-1.5
+                            rounded-full
+                            px-2.5
+                            py-1
+                            text-xs
+                            font-bold
+                            ${definition.className}
+                        "
+                    >
+                        <i class="fa-brands fa-instagram"></i>
+                        <i class="fa-solid ${definition.icon}"></i>
+                        ${escapeHtml(definition.label)}
+                    </span>
+
+                    ${
+                        policy?.policyVersion
+                            ? `
+                                <div
+                                    class="
+                                        text-[10px]
+                                        text-slate-400
+                                        whitespace-nowrap
+                                    "
+                                >
+                                    ${escapeHtml(policy.policyVersion)}
+                                </div>
+                            `
+                            : ''
+                    }
+                </div>
+            `;
+        }
+
+
         function renderOverview() {
             const sortKey =
                 document
@@ -1299,7 +1468,8 @@
                             entry,
                             product,
                             opportunityScore,
-                            opportunityLevel
+                            opportunityLevel,
+                            instagramPolicy
                         }) => `
                             <tr>
 
@@ -1441,73 +1611,16 @@
                                         whitespace-nowrap
                                     "
                                 >
-                                    ${
-                                        entry?.marketing?.selected
-                                            ? `
-                                                <button
-                                                    type="button"
-                                                    onclick="setMarketingSelected(
-                                                        '${escapeHtml(product.marketplace || 'shopee')}',
-                                                        '${escapeHtml(product.itemId || '')}',
-                                                        false
-                                                    )"
-                                                    class="
-                                                        inline-flex
-                                                        items-center
-                                                        justify-center
-                                                        gap-2
-                                                        rounded-xl
-                                                        bg-emerald-50
-                                                        hover:bg-emerald-100
-                                                        text-emerald-700
-                                                        px-3
-                                                        py-2
-                                                        text-xs
-                                                        font-bold
-                                                        transition
-                                                    "
-                                                >
-                                                    <i class="fa-solid fa-check"></i>
-                                                    Remover
-                                                </button>
-                                            `
-                                            : `
-                                                <button
-                                                    type="button"
-                                                    onclick="setMarketingSelected(
-                                                        '${escapeHtml(product.marketplace || 'shopee')}',
-                                                        '${escapeHtml(product.itemId || '')}',
-                                                        true
-                                                    )"
-                                                    class="
-                                                        inline-flex
-                                                        items-center
-                                                        justify-center
-                                                        gap-2
-                                                        rounded-xl
-                                                        bg-sky-50
-                                                        hover:bg-sky-100
-                                                        text-sky-700
-                                                        px-3
-                                                        py-2
-                                                        text-xs
-                                                        font-bold
-                                                        transition
-                                                    "
-                                                >
-                                                    <i class="fa-solid fa-plus"></i>
-                                                    Selecionar
-                                                </button>
-                                            `
-                                    }
+                                    ${renderInstagramPolicyBadge(
+                                        instagramPolicy
+                                    )}
                                 </td>
 
-                                    <td class="px-3 py-4">
+                                <td class="px-3 py-4">
                                     ${renderMarketingChannels(
                                         entry,
                                         product
                                     )}
-                                </td>
                                 </td>
 
                             </tr>
@@ -1518,116 +1631,6 @@
             updateStickyTableOffset();
         }
 
-
-        async function setMarketingSelected(
-            marketplace,
-            itemId,
-            selected
-        ) {
-            try {
-                const response =
-                    await fetch(
-                        `/api/vitrine2/products/${encodeURIComponent(
-                            marketplace
-                        )}/${encodeURIComponent(
-                            itemId
-                        )}/marketing/selected`,
-                        {
-                            method: 'PATCH',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-
-                            body:
-                                JSON.stringify({
-                                    selected
-                                })
-                        }
-                    );
-
-                const data =
-                    await response.json();
-
-                if (
-                    !response.ok ||
-                    !data.success
-                ) {
-                    throw new Error(
-                        data.error ||
-                        'Não foi possível alterar a seleção de Marketing.'
-                    );
-                }
-
-                const updatedEntry =
-                    data.entry;
-
-                overviewItems =
-                    overviewItems.map(
-                        item => {
-                            const sameMarketplace =
-                                String(
-                                    item.product
-                                        ?.marketplace ||
-                                    'shopee'
-                                )
-                                    .toLowerCase() ===
-                                String(
-                                    marketplace ||
-                                    ''
-                                )
-                                    .toLowerCase();
-
-                            const sameItemId =
-                                String(
-                                    item.product
-                                        ?.itemId ||
-                                    ''
-                                ) ===
-                                String(
-                                    itemId ||
-                                    ''
-                                );
-
-                            if (
-                                !sameMarketplace ||
-                                !sameItemId
-                            ) {
-                                return item;
-                            }
-
-                            return {
-                                ...item,
-
-                                entry: {
-                                    ...item.entry,
-
-                                    marketing:
-                                        updatedEntry
-                                            ?.marketing ||
-                                        item.entry
-                                            ?.marketing
-                                }
-                            };
-                        }
-                    );
-
-                                renderOverview();
-    
-            }
-            catch (error) {
-                console.error(
-                    '[MARKETING] Erro ao alterar seleção:',
-                    error
-                );
-
-                window.alert(
-                    error.message ||
-                    'Não foi possível alterar a seleção de Marketing.'
-                );
-            }
-        }
 
         async function setMarketingChannel(
             marketplace,
@@ -1764,9 +1767,23 @@
 
         async function loadOverview() {
             try {
-                overviewItems =
+                const scoredItems =
                     calculateOpportunityScores(
                         await fetchCatalogProducts()
+                    );
+
+                overviewItems =
+                    await Promise.all(
+                        scoredItems.map(
+                            async item => ({
+                                ...item,
+
+                                instagramPolicy:
+                                    await fetchInstagramPolicy(
+                                        item.product
+                                    )
+                            })
+                        )
                     );
 
                 renderOverview();

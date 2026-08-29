@@ -6,6 +6,11 @@ const {
     defaultCatalogStore
 } = require('./product-catalog-store');
 
+const {
+    validateInstagramProduct,
+    summarizeInstagramDecision
+} = require('./instagram-policy-validator');
+
 
 function createVitrine2Service(
     options = {}
@@ -225,6 +230,107 @@ function createVitrine2Service(
     }
 
 
+    /*
+     * ========================================================
+     * INSTAGRAM POLICY ENGINE
+     * ========================================================
+     */
+
+    function validateInstagramPolicy(
+        marketplace,
+        itemId
+    ) {
+        const catalog =
+            loadCatalog();
+
+        const entry =
+            catalog.getProduct(
+                marketplace,
+                itemId
+            );
+
+        if (!entry) {
+            throw new Error(
+                'Produto não encontrado no catálogo.'
+            );
+        }
+
+        if (!entry.product) {
+            throw new Error(
+                'Produto sem dados disponíveis para validação.'
+            );
+        }
+
+        const decision =
+            validateInstagramProduct(
+                entry.product
+            );
+
+        const summary =
+            summarizeInstagramDecision(
+                decision
+            );
+
+        return {
+            marketplace:
+                entry.product.marketplace ||
+                marketplace,
+
+            itemId:
+                String(
+                    entry.product.itemId ||
+                    itemId
+                ),
+
+            decision,
+            summary
+        };
+    }
+
+
+    /*
+     * Todos os produtos publicados tornam-se candidatos
+     * automáticos ao Instagram.
+     *
+     * A seleção manual do canal não é usada aqui.
+     * Cada candidato já retorna com sua decisão de política.
+     */
+    function listInstagramMarketingCandidates() {
+        const catalog =
+            loadCatalog();
+
+        const entries =
+            catalog.listPublished();
+
+        return entries.map(
+            entry => {
+                const product =
+                    entry?.product || {};
+
+                const decision =
+                    validateInstagramProduct(
+                        product
+                    );
+
+                const summary =
+                    summarizeInstagramDecision(
+                        decision
+                    );
+
+                return {
+                    ...entry,
+
+                    policy: {
+                        channel: 'instagram',
+                        decision,
+                        summary
+                    }
+                };
+            }
+        );
+    }
+
+
     function addToCollection(
         marketplace,
         itemId,
@@ -371,6 +477,8 @@ function createVitrine2Service(
         setMarketingSelected,
         setMarketingStatus,
         setMarketingChannel,
+        validateInstagramPolicy,
+        listInstagramMarketingCandidates,
         addToCollection,
         removeFromCollection,
         removeProduct,

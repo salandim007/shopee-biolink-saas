@@ -1563,3 +1563,79 @@ Próximo passo:
 - continuar a Central de Marketing;
 - não iniciar o Radar de Oportunidades antes de concluir o braço de Marketing.
 
+
+---
+
+## Atualização — 29/08/2026 — Instagram automático + Policy Engine
+
+### Instagram
+
+A integração do Marketing com Instagram deixou de depender da seleção manual de produtos por canal.
+
+Fluxo atual validado:
+
+Produto publicado
+-> candidato automático ao Instagram
+-> Instagram Policy Engine
+-> APPROVED / NEEDS_REVIEW / BLOCKED / REVALIDATE
+
+Implementado:
+
+- todos os produtos publicados entram automaticamente como candidatos ao Instagram;
+- criada função `listInstagramMarketingCandidates()` em `vitrine2-service.js`;
+- criada rota:
+  `GET /api/vitrine2/marketing/instagram/candidates`;
+- aba Instagram passou a consumir os candidatos automáticos;
+- Policy Engine do Instagram integrado ao backend;
+- validação individual disponível por produto;
+- resumo visual de políticas na aba Instagram;
+- filtros por status de política;
+- arquitetura antiga de seleção por canal foi preservada para compatibilidade.
+
+### Policy Engine Instagram
+
+Arquivos:
+
+- `policies/instagram-policy.js`
+- `instagram-policy-validator.js`
+
+Estados utilizados:
+
+- APPROVED
+- NEEDS_REVIEW
+- BLOCKED
+- REVALIDATE
+
+Princípios definidos:
+
+- bloqueio automático somente quando houver regra oficial aplicável;
+- ambiguidades ficam em NEEDS_REVIEW;
+- decisões possuem versão da política e fonte oficial;
+- produto deve ser revalidado antes de automações sensíveis;
+- política de cada canal será independente.
+
+### Teste validado
+
+Após reiniciar o servidor e abrir Marketing -> Instagram:
+
+- 100 produtos carregados automaticamente;
+- 100 produtos APPROVED;
+- 0 BLOCKED;
+- 0 NEEDS_REVIEW;
+- 0 REVALIDATE;
+- interface funcionando normalmente.
+
+### Próximo passo exato
+
+Automatizar a geração do pacote de conteúdo do Instagram para produtos APPROVED:
+
+Produto aprovado
+-> geração automática de conteúdo
+-> Feed
+-> Reels
+-> Stories
+-> fila/status
+-> futura publicação via integração oficial Meta/Instagram.
+
+Manter o desenvolvimento um arquivo por vez, sempre validando antes de avançar.
+
