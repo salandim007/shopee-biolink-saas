@@ -51,13 +51,25 @@ function normalizeBaseUrl(value) {
 }
 
 
-function normalizeTimeout(value) {
+function normalizeTimeout(
+    value,
+    errorCode = 'AI_INVALID_REQUEST'
+) {
     if (
         value === undefined ||
-        value === null ||
-        value === ''
+        value === null
     ) {
         return DEFAULT_TIMEOUT_MS;
+    }
+
+    if (
+        typeof value === 'string' &&
+        !value.trim()
+    ) {
+        throw new AIProviderError(
+            'Timeout de IA inválido.',
+            errorCode
+        );
     }
 
     const timeoutMs =
@@ -69,7 +81,7 @@ function normalizeTimeout(value) {
     ) {
         throw new AIProviderError(
             'Timeout de IA inválido.',
-            'AI_INVALID_REQUEST'
+            errorCode
         );
     }
 
@@ -90,7 +102,7 @@ class OllamaProvider extends AIProvider {
             globalThis.fetch;
 
         this.defaultTimeoutMs =
-            options.timeoutMs ||
+            options.timeoutMs ??
             DEFAULT_TIMEOUT_MS;
     }
 
@@ -118,6 +130,21 @@ class OllamaProvider extends AIProvider {
             );
         }
 
+        const environmentTimeout =
+            environment
+                ?.AI_TIMEOUT_MS;
+
+        const timeoutMs =
+            normalizeTimeout(
+                environmentTimeout ===
+                    undefined ||
+                environmentTimeout ===
+                    null
+                    ? this.defaultTimeoutMs
+                    : environmentTimeout,
+                'AI_INVALID_CONFIGURATION'
+            );
+
         return {
             baseUrl:
                 normalizeBaseUrl(
@@ -125,7 +152,8 @@ class OllamaProvider extends AIProvider {
                         ?.OLLAMA_BASE_URL
                 ),
 
-            model
+            model,
+            timeoutMs
         };
     }
 
@@ -138,7 +166,9 @@ class OllamaProvider extends AIProvider {
 
         const {
             baseUrl,
-            model
+            model,
+            timeoutMs:
+                configuredTimeoutMs
         } = this.getConfiguration();
 
         if (
@@ -160,7 +190,7 @@ class OllamaProvider extends AIProvider {
         const timeoutMs =
             normalizeTimeout(
                 requestedTimeout ??
-                this.defaultTimeoutMs
+                configuredTimeoutMs
             );
 
         const systemParts = [

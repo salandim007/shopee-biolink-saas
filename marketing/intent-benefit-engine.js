@@ -382,7 +382,12 @@ function createIntentBenefitEngine(
                     ),
 
                 format:
-                    INTENT_BENEFIT_FORMAT
+                    INTENT_BENEFIT_FORMAT,
+
+                options: {
+                    num_predict: 256,
+                    temperature: 0
+                }
             });
 
         const parsed =

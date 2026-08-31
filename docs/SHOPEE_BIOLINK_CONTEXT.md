@@ -1826,3 +1826,133 @@ Ao documentar ou implementar essa evolução, preservar claramente a diferença 
 
 Nenhuma funcionalidade descrita nesta atualização deverá ser marcada como implementada sem desenvolvimento e validação posteriores.
 
+---
+
+## Atualização — 30/08/2026 — Primeira IA local real validada
+
+### Marco alcançado
+
+Foi concluída com sucesso a primeira execução real ponta a ponta da camada local de IA:
+
+Produto
+→ Intent & Benefit Engine
+→ AI Service
+→ AI Provider
+→ Ollama Provider
+→ Ollama local
+→ JSON estruturado
+→ validação do Intent & Benefit Engine
+
+Status desta fundação: **IMPLEMENTADO E VALIDADO**.
+
+Esta validação comprova a integração local da camada de IA. Ela ainda não representa integração com Instagram, geração de conteúdo, publicação automática ou decisão permanente sobre o modelo de produção.
+
+### AI Provider e Ollama
+
+Estado validado:
+
+- Ollama local operacional;
+- integração real entre AI Service e Ollama Provider funcionando;
+- `AI_TIMEOUT_MS` implementado como timeout configurável;
+- timeout padrão preservado em `30000` ms quando `AI_TIMEOUT_MS` não está definida;
+- ambiente do teste real configurado com `AI_TIMEOUT_MS=90000`.
+
+O timeout configurável existe para permitir ajuste consciente por ambiente. Problemas de desempenho não deverão ser resolvidos apenas aumentando o timeout indefinidamente.
+
+### Intent & Benefit Engine
+
+A integração real do Intent & Benefit Engine com o AI Service e o Ollama Provider foi validada.
+
+Opções de geração atuais:
+
+```text
+num_predict: 256
+temperature: 0
+```
+
+Regras preservadas:
+
+- saída estruturada por JSON Schema continua obrigatória;
+- resposta da IA continua passando pela validação do Engine;
+- respostas livres ou estruturalmente inválidas não são aceitas como sucesso;
+- `problemSolved` pode e deve permanecer `null` quando não existir problema real claramente sustentado pelos dados;
+- não forçar artificialmente dor ou problema do consumidor.
+
+### Benchmark e diagnóstico — qwen2.5:3b
+
+Medições realizadas localmente:
+
+- prompt mínimo “Responda somente com OK”: aproximadamente `10,49 s`;
+- solicitação direta de JSON simples: aproximadamente `37,56 s`;
+- fluxo real do Intent & Benefit Engine: ultrapassou `90 s` e retornou `AI_TIMEOUT`;
+- diagnóstico direto: aproximadamente `80,69 s` no total;
+- geração de 150 tokens: aproximadamente `65,20 s`;
+- velocidade observada: aproximadamente `2,3 tokens/s`.
+
+A resposta direta também apresentou inconsistências de contrato. Por desempenho e confiabilidade do contrato, `qwen2.5:3b` não foi escolhido como modelo local atual de desenvolvimento para esta camada.
+
+### Benchmark e validação — gemma3:1b
+
+Estado local:
+
+- modelo instalado;
+- tamanho aproximado: `815 MB`;
+- teste simples após warm-up: aproximadamente `8,71 s`;
+- JSON simples: aproximadamente `29,87 s`;
+- primeiro teste real ponta a ponta aprovado: aproximadamente `64,92 s`.
+
+Produto utilizado no primeiro teste real:
+
+```text
+marketplace: shopee
+itemId: 18599566917
+title: Adesivo 3D De Fibra De Carbono
+```
+
+Resultado final validado pelo Intent & Benefit Engine:
+
+```json
+{
+  "primaryIntent": "informational",
+  "consumerNeed": "compreender o produto",
+  "benefit": "visualizar a estética do adesivo 3D de fibra de carbono",
+  "motivation": "estética e design",
+  "problemSolved": null,
+  "confidence": 0.95,
+  "cautions": []
+}
+```
+
+O resultado respeitou corretamente a regra de não inventar uma dor: `problemSolved` permaneceu `null` porque os dados disponíveis não sustentavam um problema real resolvido pelo produto.
+
+### Modelo local atual de desenvolvimento
+
+`gemma3:1b` passa a ser o **modelo local de desenvolvimento atual** para esta camada de IA.
+
+Essa escolha é operacional e temporária, baseada nos testes locais desta etapa. Não é uma decisão permanente de produção e permanece sujeita a novos benchmarks, otimizações, infraestrutura disponível e avaliação de qualidade.
+
+### Limitação atual
+
+O tempo observado de aproximadamente 65 segundos por análise ainda é lento para processamento em escala.
+
+Antes de processamento massivo será necessário:
+
+- continuar benchmarks;
+- medir gargalos de carregamento e geração;
+- otimizar latência e volume de saída;
+- avaliar execução em lote e capacidade da infraestrutura;
+- preservar qualidade e validação estrutural.
+
+Não resolver a limitação apenas por aumentos sucessivos de timeout.
+
+### Próximo passo técnico
+
+Ordem definida a partir deste marco:
+
+1. consolidar no Git a fundação de IA, o timeout configurável, as opções de geração e esta documentação;
+2. posteriormente continuar benchmark e otimização de latência;
+3. depois avançar para Motor de Ângulos e geração de conteúdo;
+4. manter o Policy Engine antes de qualquer geração sensível e antes de futura publicação.
+
+O avanço para conteúdo não altera a regra atual: não iniciar publicação automática nem outros braços principais sem implementação isolada, testes, documentação e controle do Admin.
+
