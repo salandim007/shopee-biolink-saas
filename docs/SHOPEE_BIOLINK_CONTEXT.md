@@ -1639,3 +1639,190 @@ Produto aprovado
 
 Manter o desenvolvimento um arquivo por vez, sempre validando antes de avançar.
 
+---
+
+## Atualização — 30/08/2026 — Arquitetura futura de IA e evolução do Marketing
+
+### Classificação desta atualização
+
+As decisões desta seção são de **ROADMAP/ARQUITETURA**.
+
+Status: **PLANEJADO/FUTURO**.
+
+Elas não devem ser interpretadas como funcionalidades já implementadas ou em funcionamento. O estado atual implementado e validado permanece descrito nas seções anteriores. O próximo passo atual do projeto também permanece inalterado: automatizar a geração do pacote de conteúdo do Instagram para produtos `APPROVED`, contemplando Feed, Reels, Stories e fila/status antes da futura publicação por integração oficial.
+
+### Ollama como motor preferencial de IA
+
+O Ollama será o motor de IA preferencial para produção na VPS, principalmente para geração de conteúdo e outras funcionalidades de IA.
+
+A aplicação não deverá ficar diretamente acoplada ao Ollama. A arquitetura planejada é:
+
+Marketing / demais módulos
+→ AI Service
+→ AI Provider
+→ Ollama Provider
+
+Responsabilidades previstas:
+
+- `AI Service`: oferecer aos módulos consumidores uma interface estável para as funcionalidades de IA;
+- `AI Provider`: abstrair o provedor utilizado;
+- `Ollama Provider`: implementar a comunicação específica com o Ollama.
+
+A camada `AI Provider` deverá permitir a inclusão ou substituição por outros provedores no futuro sem exigir alterações importantes nos módulos consumidores.
+
+Em produção, o acesso ao Ollama deverá ocorrer preferencialmente por `localhost`, rede interna ou rede Docker apropriada. O Ollama não deverá ser exposto diretamente à internet sem necessidade.
+
+### Intent & Benefit Engine
+
+Antes da geração de conteúdo, planejar um Motor de Intenção e Benefício.
+
+Para cada produto, o sistema deverá tentar identificar por que uma pessoa teria interesse nele. Entre as motivações possíveis estão:
+
+- dor ou problema real;
+- necessidade prática;
+- conveniência;
+- economia;
+- desejo;
+- estética;
+- presente;
+- ocasião;
+- entretenimento;
+- outras motivações coerentes com o produto e seu contexto.
+
+Regra importante: não inventar nem forçar uma “dor” quando o produto não resolver um problema real.
+
+O objetivo será produzir conteúdo útil primeiro e inserir o produto naturalmente como uma possível solução ou benefício.
+
+### Motor de Ângulos de Conteúdo
+
+Um mesmo produto não deverá gerar sempre a mesma propaganda. O sistema deverá planejar múltiplos ângulos de conteúdo quando forem adequados, incluindo:
+
+- dor → solução;
+- dica / educação;
+- erro comum;
+- antes e depois, quando aplicável;
+- economia;
+- curiosidade;
+- comparação;
+- ocasião / época;
+- desejo / estilo;
+- perguntas e ganchos.
+
+Um único produto poderá ser transformado em uma pequena campanha com diferentes conteúdos para:
+
+- Feed;
+- Reels;
+- Stories.
+
+### Aprendizado por resultados
+
+Planejar evolução futura para usar métricas como cliques, engajamento e outros resultados a fim de identificar quais ângulos de conteúdo funcionam melhor por produto e por categoria.
+
+Esses sinais poderão futuramente influenciar a escolha automática das estratégias de conteúdo, sem serem tratados nesta fase como um mecanismo já implementado.
+
+### Smart Cross-Sell Engine
+
+Planejar um Motor de Produtos Complementares capaz de compreender o contexto do produto principal e procurar no catálogo produtos relacionados que façam sentido para a mesma intenção de compra.
+
+Quando possível, a relação entre os produtos deverá ser classificada como:
+
+- `COMPLEMENTA`;
+- `PRECISA JUNTO`;
+- `MELHORA A EXPERIÊNCIA`.
+
+Exemplo conceitual:
+
+Produto principal: torneira gourmet.
+
+Possíveis complementares:
+
+- rodinho para pia;
+- dispenser;
+- organizador;
+- outros itens coerentes com a área da pia/cozinha.
+
+Cada produto continuará possuindo seu próprio link de afiliado. Não recomendar produtos aleatórios apenas para aumentar a quantidade de ofertas.
+
+### Kits Inteligentes
+
+Planejar coleções de solução compostas por vários produtos relacionados, mesmo quando vendidos separadamente na Shopee.
+
+Exemplos conceituais:
+
+“Renove sua pia”
+→ torneira
+→ dispenser
+→ rodinho
+→ organizador
+
+“Organize seu carro”
+→ organizador
+→ suporte de celular
+→ lixeira automotiva
+→ outros produtos coerentes
+
+Esses kits serão agrupamentos editoriais e recomendacionais. Eles não deverão ser apresentados necessariamente como kits comerciais vendidos em um único item.
+
+### Fluxo inverso: necessidade → produtos
+
+Além do fluxo planejado:
+
+Produto
+→ entender intenção
+→ gerar conteúdo
+
+planejar futuramente o fluxo inverso:
+
+Necessidade/problema
+→ IA entende o contexto
+→ procura produtos adequados no catálogo
+→ monta uma solução
+→ gera conteúdo
+→ associa os respectivos links de afiliado
+
+Exemplo: para a necessidade “Como organizar uma cozinha pequena?”, a IA poderá encontrar produtos adequados no catálogo e construir conteúdo útil em torno dessa necessidade.
+
+### Integração futura com Oportunidades do Admin
+
+No futuro, o Smart Cross-Sell Engine e os motores de conteúdo poderão trabalhar em conjunto com a área privada de Oportunidades do Admin.
+
+A seleção poderá considerar sinais como:
+
+- relevância para a necessidade do consumidor;
+- comissão;
+- desconto;
+- tendência;
+- cliques;
+- desempenho;
+- outros sinais comerciais disponíveis.
+
+A comissão permanece informação privada do Admin e não deve aparecer para visitantes da Vitrine.
+
+Essa integração continua subordinada à ordem já definida no projeto: concluir primeiro a Central de Marketing e somente depois iniciar o Radar de Oportunidades.
+
+### Visão de evolução do produto
+
+Essas decisões representam a evolução planejada do Shopee BioLink SaaS de uma vitrine/link na bio para um mini sistema mais completo de:
+
+catálogo
+→ curadoria
+→ identificação de intenção/necessidade
+→ recomendação complementar
+→ estratégia de conteúdo
+→ geração com IA
+→ Feed/Reels/Stories
+→ aprovação
+→ distribuição/publicação
+→ métricas
+→ otimização
+
+### Separação obrigatória de estados
+
+Ao documentar ou implementar essa evolução, preservar claramente a diferença entre:
+
+- **IMPLEMENTADO**: funcionalidade existente, validada e disponível no projeto;
+- **EM DESENVOLVIMENTO**: funcionalidade que está sendo construída na etapa atual;
+- **PLANEJADO/FUTURO**: decisão de roadmap ou arquitetura ainda não implementada.
+
+Nenhuma funcionalidade descrita nesta atualização deverá ser marcada como implementada sem desenvolvimento e validação posteriores.
+
