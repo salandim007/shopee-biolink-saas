@@ -92,7 +92,7 @@
                                     text-slate-500
                                 "
                             >
-                                Produtos e estruturas próprias para Instagram.
+                                Produtos selecionados para Instagram, com política e preparo por produto.
                             </p>
                         </div>
                     </div>
@@ -315,445 +315,55 @@
             "
         >
 
-            <section
-                class="
-                    bg-white
-                    rounded-2xl
-                    border
-                    border-slate-200
-                    p-4
-                    mb-6
-                "
-            >
-                <div
-                    class="
-                        flex
-                        flex-col
-                        lg:flex-row
-                        lg:items-center
-                        lg:justify-between
-                        gap-4
-                    "
-                >
+
+
+
+            <section class="bg-white rounded-2xl border border-slate-200 p-3 mb-4">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                     <div>
-                        <div
-                            class="
-                                text-xs
-                                uppercase
-                                tracking-wide
-                                font-bold
-                                text-pink-700
-                            "
-                        >
-                            Estrutura preparada
-                        </div>
-
-                        <h2
-                            class="
-                                mt-1
-                                text-xl
-                                font-extrabold
-                            "
-                        >
-                            Instagram
-                        </h2>
-
-                        <p
-                            class="
-                                mt-2
-                                text-sm
-                                text-slate-500
-                                max-w-3xl
-                            "
-                        >
-                            Feed, Reels e Stories terão ações e formatos próprios dentro deste canal.
+                        <h2 class="font-extrabold text-sm">Produtos do Instagram</h2>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Somente produtos marcados para Instagram na Visão Geral.
                         </p>
                     </div>
 
-                    <div
-                        class="
-                            rounded-xl
-                            bg-slate-50
-                            border
-                            border-slate-200
-                            px-4
-                            py-3
-                            text-sm
-                            text-slate-500
-                        "
-                    >
-                        Nesta fase os produtos publicados já aparecem no canal. Publicação, criativos e automações entram nas próximas etapas.
-                    </div>
-                </div>
-            </section>
-
-
-            <section
-                class="
-                    bg-white
-                    rounded-2xl
-                    border
-                    border-slate-200
-                    p-4
-                    mb-6
-                "
-            >
-                <div
-                    class="
-                        flex
-                        flex-col
-                        sm:flex-row
-                        sm:items-center
-                        sm:justify-between
-                        gap-3
-                    "
-                >
-                    <div>
-                        <div
-                            class="
-                                text-xs
-                                uppercase
-                                tracking-wide
-                                font-bold
-                                text-slate-400
-                            "
-                        >
-                            Política do canal
-                        </div>
-
-                        <p
-                            class="
-                                mt-1
-                                text-sm
-                                text-slate-500
-                            "
-                        >
-                            Toque em um indicador para filtrar os produtos pelo status.
-                        </p>
-                    </div>
-
-                    <div
-                        id="instagramPolicySummary"
-                        class="
-                            flex
-                            flex-wrap
-                            items-center
-                            gap-2
-                        "
-                    >
-                        <button
-                            type="button"
-                            data-policy-filter="all"
-                            title="Todos"
-                            aria-label="Mostrar todos"
-                            class="
-                                instagram-policy-filter
-                                min-w-16
-                                rounded-xl
-                                border
-                                border-sky-300
-                                bg-sky-50
-                                px-3
-                                py-2.5
-                                text-sky-700
-                                font-extrabold
-                                transition
-                            "
-                        >
-                            <i class="fa-solid fa-layer-group"></i>
-                            <span id="policyCountAll" class="ml-1">0</span>
+                    <div id="instagramPolicySummary" class="flex flex-wrap items-center gap-1.5">
+                        <button type="button" data-policy-filter="all" title="Todos"
+                            class="instagram-policy-filter rounded-lg border border-sky-300 bg-sky-50 px-2.5 py-2 text-sky-700 text-xs font-extrabold transition">
+                            Todos <span id="policyCountAll" class="ml-1">0</span>
                         </button>
 
-                        <button
-                            type="button"
-                            data-policy-filter="approved"
-                            title="Aprovados"
-                            aria-label="Filtrar aprovados"
-                            class="
-                                instagram-policy-filter
-                                min-w-16
-                                rounded-xl
-                                border
-                                border-slate-200
-                                bg-white
-                                px-3
-                                py-2.5
-                                text-emerald-700
-                                font-extrabold
-                                transition
-                                hover:bg-emerald-50
-                            "
-                        >
+                        <button type="button" data-policy-filter="approved" title="Aprovados"
+                            class="instagram-policy-filter rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-emerald-700 text-xs font-extrabold transition hover:bg-emerald-50">
                             <i class="fa-solid fa-circle-check"></i>
                             <span id="policyCountApproved" class="ml-1">0</span>
                         </button>
 
-                        <button
-                            type="button"
-                            data-policy-filter="blocked"
-                            title="Bloqueados"
-                            aria-label="Filtrar bloqueados"
-                            class="
-                                instagram-policy-filter
-                                min-w-16
-                                rounded-xl
-                                border
-                                border-slate-200
-                                bg-white
-                                px-3
-                                py-2.5
-                                text-red-700
-                                font-extrabold
-                                transition
-                                hover:bg-red-50
-                            "
-                        >
-                            <i class="fa-solid fa-ban"></i>
-                            <span id="policyCountBlocked" class="ml-1">0</span>
-                        </button>
-
-                        <button
-                            type="button"
-                            data-policy-filter="needs_review"
-                            title="Revisão necessária"
-                            aria-label="Filtrar revisão necessária"
-                            class="
-                                instagram-policy-filter
-                                min-w-16
-                                rounded-xl
-                                border
-                                border-slate-200
-                                bg-white
-                                px-3
-                                py-2.5
-                                text-amber-700
-                                font-extrabold
-                                transition
-                                hover:bg-amber-50
-                            "
-                        >
+                        <button type="button" data-policy-filter="needs_review" title="Revisão necessária"
+                            class="instagram-policy-filter rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-amber-700 text-xs font-extrabold transition hover:bg-amber-50">
                             <i class="fa-solid fa-triangle-exclamation"></i>
                             <span id="policyCountReview" class="ml-1">0</span>
                         </button>
 
-                        <button
-                            type="button"
-                            data-policy-filter="revalidate"
-                            title="Revalidar"
-                            aria-label="Filtrar produtos para revalidar"
-                            class="
-                                instagram-policy-filter
-                                min-w-16
-                                rounded-xl
-                                border
-                                border-slate-200
-                                bg-white
-                                px-3
-                                py-2.5
-                                text-sky-700
-                                font-extrabold
-                                transition
-                                hover:bg-sky-50
-                            "
-                        >
+                        <button type="button" data-policy-filter="blocked" title="Bloqueados"
+                            class="instagram-policy-filter rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-red-700 text-xs font-extrabold transition hover:bg-red-50">
+                            <i class="fa-solid fa-ban"></i>
+                            <span id="policyCountBlocked" class="ml-1">0</span>
+                        </button>
+
+                        <button type="button" data-policy-filter="revalidate" title="Revalidar"
+                            class="instagram-policy-filter rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-sky-700 text-xs font-extrabold transition hover:bg-sky-50">
                             <i class="fa-solid fa-rotate"></i>
                             <span id="policyCountRevalidate" class="ml-1">0</span>
                         </button>
 
-                        <button
-                            type="button"
-                            data-policy-filter="unavailable"
-                            title="Política indisponível"
-                            aria-label="Filtrar política indisponível"
-                            class="
-                                instagram-policy-filter
-                                min-w-16
-                                rounded-xl
-                                border
-                                border-slate-200
-                                bg-white
-                                px-3
-                                py-2.5
-                                text-slate-500
-                                font-extrabold
-                                transition
-                                hover:bg-slate-50
-                            "
-                        >
+                        <button type="button" data-policy-filter="unavailable" title="Política indisponível"
+                            class="instagram-policy-filter rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-slate-500 text-xs font-extrabold transition hover:bg-slate-50">
                             <i class="fa-solid fa-circle-question"></i>
                             <span id="policyCountUnavailable" class="ml-1">0</span>
                         </button>
                     </div>
                 </div>
-            </section>
-
-
-            <section
-                class="
-                    grid
-                    grid-cols-1
-                    md:grid-cols-2
-                    xl:grid-cols-3
-                    gap-3
-                    mb-6
-                "
-            >
-
-                <div
-                    class="
-                        bg-white
-                        border
-                        border-slate-200
-                        rounded-2xl
-                        p-4
-                    "
-                >
-                    <div
-                        class="
-                            w-10
-                            h-10
-                            rounded-xl
-                            bg-pink-50
-                            text-pink-700
-                            flex
-                            items-center
-                            justify-center
-                            mb-3
-                        "
-                    >
-                        <i class="fa-solid fa-image"></i>
-                    </div>
-
-                    <h3 class="font-extrabold">
-                        Feed
-                    </h3>
-
-                    <p class="mt-1 text-sm text-slate-500">
-                        Estrutura para peças de imagem e carrossel.
-                    </p>
-
-                    <button
-                        type="button"
-                        onclick="prepareInstagramFeed()"
-                        class="
-                            mt-3
-                            inline-flex
-                            items-center
-                            justify-center
-                            gap-2
-                            rounded-xl
-                            bg-pink-50
-                            hover:bg-pink-100
-                            text-pink-700
-                            px-4
-                            py-2.5
-                            text-xs
-                            font-bold
-                            transition
-    "
->
-    <i class="fa-solid fa-wand-magic-sparkles"></i>
-    Preparar conteúdo
-</button>
-                    </div>
-                </div>
-
-
-                <div
-                    class="
-                        bg-white
-                        border
-                        border-slate-200
-                        rounded-2xl
-                        p-4
-                    "
-                >
-                    <div
-                        class="
-                            w-10
-                            h-10
-                            rounded-xl
-                            bg-fuchsia-50
-                            text-fuchsia-700
-                            flex
-                            items-center
-                            justify-center
-                            mb-3
-                        "
-                    >
-                        <i class="fa-solid fa-clapperboard"></i>
-                    </div>
-
-                    <h3 class="font-extrabold">
-                        Reels
-                    </h3>
-
-                    <p class="mt-1 text-sm text-slate-500">
-                        Estrutura para vídeos verticais curtos.
-                    </p>
-
-                    <div
-                        class="
-                            mt-3
-                            text-xs
-                            font-bold
-                            text-slate-400
-                            uppercase
-                            tracking-wide
-                        "
-                    >
-                        Ação será definida depois
-                    </div>
-                </div>
-
-
-                <div
-                    class="
-                        bg-white
-                        border
-                        border-slate-200
-                        rounded-2xl
-                        p-4
-                    "
-                >
-                    <div
-                        class="
-                            w-10
-                            h-10
-                            rounded-xl
-                            bg-purple-50
-                            text-purple-700
-                            flex
-                            items-center
-                            justify-center
-                            mb-3
-                        "
-                    >
-                        <i class="fa-solid fa-mobile-screen"></i>
-                    </div>
-
-                    <h3 class="font-extrabold">
-                        Stories
-                    </h3>
-
-                    <p class="mt-1 text-sm text-slate-500">
-                        Estrutura para divulgação rápida e CTA.
-                    </p>
-
-                    <div
-                        class="
-                            mt-3
-                            text-xs
-                            font-bold
-                            text-slate-400
-                            uppercase
-                            tracking-wide
-                        "
-                    >
-                        Ação será definida depois
-                    </div>
-                </div>
-
             </section>
 
 
@@ -767,46 +377,13 @@
                 "
             >
                 <div
-                    class="
-                        p-4
-                        border-b
-                        border-slate-200
-                        flex
-                        items-center
-                        justify-between
-                        gap-3
-                    "
-                >
-                    <div>
-                        <h2 class="font-extrabold">
-                            Produtos disponíveis
-                        </h2>
-
-                        <p class="text-sm text-slate-500">
-                            Produtos publicados no catálogo disponíveis para futuras ações no Instagram.
-                        </p>
-                    </div>
-
-                    <div
-                        id="instagramCounter"
-                        class="
-                            text-sm
-                            font-bold
-                            text-slate-500
-                            whitespace-nowrap
-                        "
-                    >
-                        —
-                    </div>
-                </div>
-
-                <div
                     id="instagramProducts"
                     class="
                         grid
                         grid-cols-1
-                        md:grid-cols-2
-                        xl:grid-cols-3
+                        sm:grid-cols-2
+                        lg:grid-cols-3
+                        xl:grid-cols-4
                         gap-3
                         p-4
                     "
@@ -820,8 +397,9 @@
                             p-8
                             text-center
                             text-slate-500
-                            md:col-span-2
-                            xl:col-span-3
+                            sm:col-span-2
+                            lg:col-span-3
+                            xl:col-span-4
                         "
                     >
                         Carregando produtos...
@@ -917,7 +495,7 @@
         async function fetchCatalogProducts() {
             const response =
                 await fetch(
-                    '/api/vitrine2/marketing/instagram/candidates'
+                    '/api/vitrine2/marketing/channel/instagram'
                 );
 
             const data =
@@ -929,34 +507,74 @@
             ) {
                 throw new Error(
                     data.error ||
-                    'Falha ao carregar candidatos automáticos do Instagram.'
+                    'Falha ao carregar os produtos selecionados para Instagram.'
                 );
             }
 
-            return (
-                Array.isArray(
-                    data.items
-                )
-                    ? data.items
-                    : []
-            )
-                .map(
-                    entry => ({
-                        entry,
-                        product:
-                            entry.product || {},
-                        policy:
-                            entry?.policy?.summary
-                                ? {
-                                    ...entry.policy.summary,
-                                    status:
-                                        normalizePolicyStatus(
-                                            entry.policy.summary.status
-                                        )
-                                }
-                                : null
-                    })
-                );
+            const entries =
+                Array.isArray(data.products)
+                    ? data.products
+                    : Array.isArray(data.items)
+                        ? data.items
+                        : [];
+
+            return entries.map(
+                entry => ({
+                    entry,
+                    product:
+                        entry.product || entry || {},
+                    policy: (() => {
+                        const persistedPolicy =
+                            entry?.marketing
+                                ?.policies
+                                ?.instagram;
+
+                        if (
+                            !persistedPolicy ||
+                            typeof persistedPolicy !==
+                                'object'
+                        ) {
+                            return {
+                                status: 'unavailable',
+                                label: 'Política indisponível',
+                                reason:
+                                    'Produto ainda não possui validação persistida do Instagram.'
+                            };
+                        }
+
+                        return {
+                            ...persistedPolicy,
+                            ...(
+                                persistedPolicy.summary &&
+                                typeof persistedPolicy.summary ===
+                                    'object'
+                                    ? persistedPolicy.summary
+                                    : {}
+                            ),
+                            status:
+                                normalizePolicyStatus(
+                                    persistedPolicy.status ||
+                                    persistedPolicy.summary
+                                        ?.status
+                                ),
+                            policyVersion:
+                                persistedPolicy
+                                    .policyVersion ||
+                                persistedPolicy.summary
+                                    ?.policyVersion ||
+                                persistedPolicy.summary
+                                    ?.version ||
+                                null,
+                            reason:
+                                persistedPolicy.reason ||
+                                persistedPolicy.summary
+                                    ?.reason ||
+                                null
+                        };
+                    })()
+                })
+            );
+
         }
 
 
@@ -980,77 +598,6 @@
             }
 
             return 'unavailable';
-        }
-
-
-        async function fetchInstagramPolicy(
-            product
-        ) {
-            const marketplace =
-                product?.marketplace ||
-                'shopee';
-
-            const itemId =
-                product?.itemId;
-
-            if (!itemId) {
-                return {
-                    status: 'unavailable',
-                    label: 'Política indisponível',
-                    reason: 'Produto sem itemId.'
-                };
-            }
-
-            try {
-                const response =
-                    await fetch(
-                        `/api/vitrine2/products/${encodeURIComponent(
-                            marketplace
-                        )}/${encodeURIComponent(
-                            itemId
-                        )}/policy/instagram`
-                    );
-
-                const data =
-                    await response.json();
-
-                if (
-                    !response.ok ||
-                    !data.success
-                ) {
-                    throw new Error(
-                        data.error ||
-                        'Falha ao validar política.'
-                    );
-                }
-
-                const summary =
-                    data.summary ||
-                    {};
-
-                return {
-                    ...summary,
-                    status:
-                        normalizePolicyStatus(
-                            summary.status
-                        )
-                };
-            }
-            catch (error) {
-                console.error(
-                    '[INSTAGRAM] Erro ao consultar política:',
-                    product?.itemId,
-                    error
-                );
-
-                return {
-                    status: 'unavailable',
-                    label: 'Política indisponível',
-                    reason:
-                        error.message ||
-                        'Não foi possível consultar a política.'
-                };
-            }
         }
 
 
@@ -1202,14 +749,6 @@
                     'instagramProducts'
                 );
 
-            document
-                .getElementById(
-                    'instagramCounter'
-                )
-                .textContent =
-                    instagramPolicyFilter === 'all'
-                        ? `${items.length} produtos`
-                        : `${items.length} de ${instagramItems.length}`;
 
             if (items.length === 0) {
                 container.innerHTML =
@@ -1227,7 +766,7 @@
                                 xl:col-span-3
                             "
                         >
-                            Nenhum produto neste filtro.
+                            Nenhum produto selecionado para este filtro.
                         </div>
                     `;
 
@@ -1250,7 +789,7 @@
                                         border
                                         border-slate-200
                                         rounded-2xl
-                                        p-4
+                                        p-3
                                     "
                                 >
                                     <div
@@ -1315,7 +854,7 @@
                                                 rel="noopener noreferrer"
                                                 class="
                                                     font-bold
-                                                    text-sm
+                                                    text-xs
                                                     text-slate-900
                                                     line-clamp-2
                                                     hover:text-sky-700
@@ -1330,47 +869,47 @@
                                                     mt-2
                                                     grid
                                                     grid-cols-2
-                                                    gap-x-3
-                                                    gap-y-2
-                                                    text-sm
+                                                    gap-x-2
+                                                    gap-y-1.5
+                                                    text-xs
                                                 "
                                             >
                                                 <div>
-                                                    <span class="text-slate-500 text-sm">
+                                                    <span class="text-slate-500 text-xs">
                                                         Comissão
                                                     </span>
 
-                                                    <div class="text-slate-800 text-base font-medium">
+                                                    <div class="text-slate-800 text-sm font-medium">
                                                         ${formatCommission(product.commissionRate)}
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <span class="text-slate-500 text-sm">
+                                                    <span class="text-slate-500 text-xs">
                                                         Estimada
                                                     </span>
 
-                                                    <div class="text-slate-800 text-base font-medium">
+                                                    <div class="text-slate-800 text-sm font-medium">
                                                         ${formatPrice(product.commission)}
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <span class="text-slate-500 text-sm">
+                                                    <span class="text-slate-500 text-xs">
                                                         Vendas
                                                     </span>
 
-                                                    <div class="text-slate-800 text-base font-medium">
+                                                    <div class="text-slate-800 text-sm font-medium">
                                                         ${formatSales(product.sales)}
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <span class="text-slate-500 text-sm">
+                                                    <span class="text-slate-500 text-xs">
                                                         Avaliação
                                                     </span>
 
-                                                    <div class="text-amber-600 text-base font-medium">
+                                                    <div class="text-amber-600 text-sm font-medium">
                                                         ${formatRating(product.ratingStar)}
                                                     </div>
                                                 </div>
@@ -1412,27 +951,7 @@
                     .join('');
         }
 
-
-                function prepareInstagramFeed() {
-            const products =
-                document.getElementById(
-                    'instagramProducts'
-                );
-
-            if (products) {
-                products.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-
-            window.alert(
-                'Escolha abaixo o produto que deseja preparar para o Feed.'
-            );
-        }
-
-
-        function closeInstagramFeedDraft() {
+                function closeInstagramFeedDraft() {
             const modal =
                 document.getElementById(
                     'instagramFeedDraftModal'
@@ -1449,317 +968,441 @@
             itemId
         ) {
             try {
-                const items =
-                    await fetchCatalogProducts();
+                const oldModal =
+                    document.getElementById(
+                        'instagram-degrau4-modal'
+                    );
+
+                if (oldModal) {
+                    oldModal.remove();
+                }
+
+                const response =
+                    await fetch(
+                        '/api/vitrine2/marketing/channel/instagram'
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        'Falha ao carregar produto.'
+                    );
+                }
+
+                const payload =
+                    await response.json();
+
+                const products =
+                    Array.isArray(payload?.products)
+                        ? payload.products
+                        : [];
 
                 const selectedItem =
-                    items.find(
+                    products.find(
                         item =>
                             String(
-                                item.product
-                                    ?.marketplace ||
-                                'shopee'
-                            ).toLowerCase() ===
-                                String(
-                                    marketplace ||
-                                    ''
-                                ).toLowerCase() &&
-                            String(
-                                item.product
-                                    ?.itemId ||
-                                ''
+                                item?.product?.itemId || ''
                             ) ===
-                                String(
-                                    itemId ||
-                                    ''
-                                )
+                            String(itemId || '')
                     );
 
                 if (!selectedItem) {
                     throw new Error(
-                        'Produto não encontrado no canal Instagram.'
+                        'Produto não encontrado no Instagram.'
                     );
                 }
 
                 const product =
                     selectedItem.product || {};
 
+                const policy =
+                    selectedItem
+                        ?.marketing
+                        ?.policies
+                        ?.instagram ||
+                    null;
+
+                const overlay =
+                    document.createElement('div');
+
+                overlay.id =
+                    'instagram-degrau4-modal';
+
+                overlay.style.cssText = `
+                    position: fixed;
+                    inset: 0;
+                    z-index: 99999;
+                    background: rgba(15,23,42,.55);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                `;
+
+                const modal =
+                    document.createElement('div');
+
+                modal.style.cssText = `
+                    width: min(620px, 100%);
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    background: white;
+                    border-radius: 20px;
+                    padding: 28px;
+                    box-shadow: 0 24px 70px rgba(0,0,0,.25);
+                    font-family: Arial, sans-serif;
+                `;
+
+                const channel =
+                    document.createElement('div');
+
+                channel.textContent =
+                    'INSTAGRAM';
+
+                channel.style.cssText = `
+                    color: #e1306c;
+                    font-size: 13px;
+                    font-weight: 800;
+                    margin-bottom: 6px;
+                `;
+
+                const heading =
+                    document.createElement('h2');
+
+                heading.textContent =
+                    'Preparar Feed';
+
+                heading.style.cssText = `
+                    margin: 0 0 20px;
+                    color: #111827;
+                    font-size: 22px;
+                `;
+
+                const productBox =
+                    document.createElement('div');
+
+                productBox.style.cssText = `
+                    display: flex;
+                    gap: 16px;
+                    align-items: center;
+                    padding: 16px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 16px;
+                    background: #f8fafc;
+                `;
+
+                const image =
+                    document.createElement('img');
+
+                image.src =
+                    product.image || '';
+
+                image.alt =
+                    product.title || 'Produto';
+
+                image.style.cssText = `
+                    width: 90px;
+                    height: 90px;
+                    object-fit: contain;
+                    background: white;
+                    border-radius: 12px;
+                `;
+
                 const title =
+                    document.createElement('div');
+
+                title.textContent =
                     product.title ||
                     'Produto selecionado';
 
-                const caption =
-                    `✨ Olha esse achado!\n\n` +
-                    `${title}\n\n` +
-                    `Uma opção interessante para quem procura praticidade e bom custo-benefício.\n\n` +
-                    `🔎 Confira todos os detalhes, preço atual e disponibilidade na nossa vitrine.\n\n` +
-                    `👉 Acesse pelo link da bio.\n\n` +
-                    `#achadinhos #shopee #ofertas #dicas`;
-
-                const modal =
-                    document.createElement(
-                        'div'
-                    );
-
-                modal.id =
-                    'instagramFeedDraftModal';
-
-                modal.className =
-                    'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
-
-                modal.innerHTML = `
-                    <div
-                        class="
-                            bg-white
-                            w-full
-                            max-w-2xl
-                            rounded-2xl
-                            shadow-xl
-                            overflow-hidden
-                        "
-                    >
-                        <div
-                            class="
-                                px-5
-                                py-4
-                                border-b
-                                border-slate-200
-                                flex
-                                items-center
-                                justify-between
-                                gap-3
-                            "
-                        >
-                            <div>
-                                <div
-                                    class="
-                                        text-xs
-                                        uppercase
-                                        tracking-wide
-                                        font-bold
-                                        text-pink-700
-                                    "
-                                >
-                                    Instagram • Feed
-                                </div>
-
-                                <h2
-                                    class="
-                                        mt-1
-                                        text-lg
-                                        font-extrabold
-                                    "
-                                >
-                                    Rascunho do conteúdo
-                                </h2>
-                            </div>
-
-                            <button
-                                type="button"
-                                onclick="closeInstagramFeedDraft()"
-                                class="
-                                    w-9
-                                    h-9
-                                    rounded-full
-                                    bg-slate-100
-                                    hover:bg-slate-200
-                                    text-slate-600
-                                "
-                            >
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-
-                        <div
-                            class="
-                                p-5
-                                max-h-[75vh]
-                                overflow-y-auto
-                            "
-                        >
-                            <div
-                                class="
-                                    flex
-                                    gap-4
-                                    items-start
-                                "
-                            >
-                                <img
-                                    src="${escapeHtml(product.image || '')}"
-                                    alt=""
-                                    class="
-                                        w-28
-                                        h-28
-                                        rounded-2xl
-                                        object-cover
-                                        bg-slate-100
-                                        shrink-0
-                                    "
-                                >
-
-                                <div>
-                                    <div
-                                        class="
-                                            text-xs
-                                            font-bold
-                                            uppercase
-                                            tracking-wide
-                                            text-slate-400
-                                        "
-                                    >
-                                        Produto
-                                    </div>
-
-                                    <div
-                                        class="
-                                            mt-1
-                                            font-extrabold
-                                            text-slate-900
-                                        "
-                                    >
-                                        ${escapeHtml(title)}
-                                    </div>
-
-                                    <div
-                                        class="
-                                            mt-2
-                                            text-sm
-                                            text-slate-500
-                                        "
-                                    >
-                                        O preço e a disponibilidade serão conferidos na Shopee no momento da visita.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-5">
-                                <label
-                                    class="
-                                        block
-                                        text-sm
-                                        font-bold
-                                        text-slate-700
-                                        mb-2
-                                    "
-                                >
-                                    Legenda sugerida
-                                </label>
-
-                                <textarea
-                                    id="instagramFeedCaption"
-                                    rows="12"
-                                    class="
-                                        w-full
-                                        rounded-xl
-                                        border
-                                        border-slate-200
-                                        px-4
-                                        py-3
-                                        text-sm
-                                        resize-y
-                                    "
-                                >${escapeHtml(caption)}</textarea>
-                            </div>
-
-                            <div
-                                class="
-                                    mt-4
-                                    rounded-xl
-                                    bg-sky-50
-                                    border
-                                    border-sky-100
-                                    px-4
-                                    py-3
-                                    text-sm
-                                    text-sky-800
-                                "
-                            >
-                                <strong>CTA atual:</strong>
-                                acessar o link da bio e entrar na nossa Vitrine.
-                            </div>
-
-                            <div
-                                class="
-                                    mt-4
-                                    rounded-xl
-                                    bg-amber-50
-                                    border
-                                    border-amber-100
-                                    px-4
-                                    py-3
-                                    text-sm
-                                    text-amber-800
-                                "
-                            >
-                                Este é apenas um rascunho.
-                                Nada será publicado automaticamente nesta fase.
-                            </div>
-                        </div>
-
-                        <div
-                            class="
-                                px-5
-                                py-4
-                                border-t
-                                border-slate-200
-                                flex
-                                justify-end
-                                gap-2
-                            "
-                        >
-                            <button
-                                type="button"
-                                onclick="closeInstagramFeedDraft()"
-                                class="
-                                    rounded-xl
-                                    bg-slate-100
-                                    hover:bg-slate-200
-                                    px-4
-                                    py-2.5
-                                    text-sm
-                                    font-bold
-                                "
-                            >
-                                Fechar
-                            </button>
-
-                            <button
-                                type="button"
-                                onclick="
-                                    window.alert(
-                                        'Próxima etapa: salvar este conteúdo como rascunho.'
-                                    )
-                                "
-                                class="
-                                    rounded-xl
-                                    bg-pink-600
-                                    hover:bg-pink-700
-                                    text-white
-                                    px-4
-                                    py-2.5
-                                    text-sm
-                                    font-bold
-                                "
-                            >
-                                Aprovar rascunho
-                            </button>
-                        </div>
-                    </div>
+                title.style.cssText = `
+                    font-size: 15px;
+                    font-weight: 800;
+                    line-height: 1.4;
+                    color: #111827;
                 `;
 
-                document.body.appendChild(
-                    modal
+                productBox.appendChild(image);
+                productBox.appendChild(title);
+
+                const policyBox =
+                    document.createElement('div');
+
+                policyBox.textContent =
+                    policy?.status === 'approved'
+                        ? '✅ Política aprovada'
+                        : '⚠️ Política requer atenção';
+
+                policyBox.style.cssText = `
+                    margin-top: 16px;
+                    padding: 13px;
+                    border-radius: 12px;
+                    background: #f0fdf4;
+                    color: #166534;
+                    font-weight: 800;
+                `;
+
+                const generateButton =
+                    document.createElement('button');
+
+                generateButton.type =
+                    'button';
+
+                generateButton.textContent =
+                    'Gerar rascunho';
+
+                generateButton.style.cssText = `
+                    width: 100%;
+                    margin-top: 18px;
+                    padding: 13px;
+                    border: 0;
+                    border-radius: 12px;
+                    background: #e1306c;
+                    color: white;
+                    font-weight: 800;
+                    cursor: pointer;
+                `;
+
+                const statusBox =
+                    document.createElement('div');
+
+                statusBox.style.cssText = `
+                    margin-top: 14px;
+                    font-size: 13px;
+                    color: #64748b;
+                `;
+
+                const textarea =
+                    document.createElement('textarea');
+
+                textarea.placeholder =
+                    'O rascunho aparecerá aqui.';
+
+                textarea.style.cssText = `
+                    display: none;
+                    width: 100%;
+                    min-height: 190px;
+                    margin-top: 14px;
+                    padding: 14px;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 12px;
+                    resize: vertical;
+                    box-sizing: border-box;
+                    font-family: inherit;
+                    font-size: 14px;
+                    line-height: 1.5;
+                `;
+
+                const closeButton =
+                    document.createElement('button');
+
+                closeButton.type =
+                    'button';
+
+                closeButton.textContent =
+                    'Fechar';
+
+                closeButton.style.cssText = `
+                    width: 100%;
+                    margin-top: 14px;
+                    padding: 12px;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 12px;
+                    background: white;
+                    color: #334155;
+                    font-weight: 800;
+                    cursor: pointer;
+                `;
+
+                generateButton.addEventListener(
+                    'click',
+                    async () => {
+                        try {
+                            generateButton.disabled =
+                                true;
+
+                            generateButton.textContent =
+                                'Gerando...';
+
+                            statusBox.textContent =
+                                'Preparando conteúdo...';
+
+                            const prepareResponse =
+                                await fetch(
+                                    '/admin/vitrine2/marketing/prepare',
+                                    {
+                                        method:
+                                            'POST',
+
+                                        headers: {
+                                            'Content-Type':
+                                                'application/json'
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+                                                marketplace:
+                                                    marketplace ||
+                                                    'shopee',
+
+                                                itemId:
+                                                    String(
+                                                        itemId ||
+                                                        ''
+                                                    ),
+
+                                                channels: [
+                                                    'instagram'
+                                                ]
+                                            })
+                                    }
+                                );
+
+                            const preparePayload =
+                                await prepareResponse.json();
+
+                            const result =
+                                preparePayload
+                                    ?.channels
+                                    ?.instagram;
+
+                            if (
+                                !prepareResponse.ok ||
+                                !result
+                            ) {
+                                throw new Error(
+                                    preparePayload
+                                        ?.error
+                                        ?.message ||
+                                    'Falha na preparação.'
+                                );
+                            }
+
+                            if (
+                                result.status !==
+                                'READY'
+                            ) {
+                                throw new Error(
+                                    result.reason ||
+                                    `Status: ${result.status}`
+                                );
+                            }
+
+                            const caption =
+                                String(
+                                    result
+                                        ?.content
+                                        ?.caption ||
+                                    ''
+                                );
+
+                            const hashtags =
+                                Array.isArray(
+                                    result
+                                        ?.content
+                                        ?.hashtags
+                                )
+                                    ? result
+                                        .content
+                                        .hashtags
+                                        .join(' ')
+                                    : '';
+
+                            textarea.value =
+                                [
+                                    caption,
+                                    hashtags
+                                ]
+                                    .filter(Boolean)
+                                    .join('\n\n');
+
+                            textarea.style.display =
+                                'block';
+
+                            statusBox.textContent =
+                                `✅ Rascunho pronto • Auditoria: ${
+                                    result
+                                        ?.audit
+                                        ?.status ||
+                                    'sem status'
+                                }`;
+
+                            statusBox.style.color =
+                                '#166534';
+
+                            generateButton.textContent =
+                                'Rascunho gerado';
+                        } catch (error) {
+                            console.error(
+                                '[INSTAGRAM] Erro ao gerar rascunho:',
+                                error
+                            );
+
+                            statusBox.textContent =
+                                `❌ ${
+                                    error?.message ||
+                                    'Erro na preparação.'
+                                }`;
+
+                            statusBox.style.color =
+                                '#b91c1c';
+
+                            generateButton.disabled =
+                                false;
+
+                            generateButton.textContent =
+                                'Tentar novamente';
+                        }
+                    }
                 );
-            }
-            catch (error) {
+
+                closeButton.addEventListener(
+                    'click',
+                    () => overlay.remove()
+                );
+
+                overlay.addEventListener(
+                    'click',
+                    event => {
+                        if (
+                            event.target ===
+                            overlay
+                        ) {
+                            overlay.remove();
+                        }
+                    }
+                );
+
+                modal.appendChild(channel);
+                modal.appendChild(heading);
+                modal.appendChild(productBox);
+                modal.appendChild(policyBox);
+                modal.appendChild(generateButton);
+                modal.appendChild(statusBox);
+                modal.appendChild(textarea);
+                modal.appendChild(closeButton);
+
+                overlay.appendChild(modal);
+
+                document.body.appendChild(
+                    overlay
+                );
+
+                console.log(
+                    '[INSTAGRAM] Degrau 4 aberto',
+                    {
+                        marketplace,
+                        itemId
+                    }
+                );
+            } catch (error) {
                 console.error(
-                    '[INSTAGRAM] Erro ao preparar Feed:',
+                    '[INSTAGRAM] Erro no Degrau 4:',
                     error
                 );
 
                 window.alert(
-                    error.message ||
-                    'Não foi possível preparar o conteúdo.'
+                    error?.message ||
+                    'Erro ao abrir preparação.'
                 );
             }
         }
@@ -1770,19 +1413,7 @@
                     await fetchCatalogProducts();
 
                 instagramItems =
-                    await Promise.all(
-                        items.map(
-                            async item => ({
-                                ...item,
-
-                                policy:
-                                    item.policy ||
-                                    await fetchInstagramPolicy(
-                                        item.product
-                                    )
-                            })
-                        )
-                    );
+                    items;
 
                 applyPolicyFilter();
             }
@@ -1802,8 +1433,9 @@
                                     p-8
                                     text-center
                                     text-red-600
-                                    md:col-span-2
-                                    xl:col-span-3
+                                    sm:col-span-2
+                                    lg:col-span-3
+                                    xl:col-span-4
                                 "
                             >
                                 ${escapeHtml(error.message)}
@@ -1840,4 +1472,8 @@
 
 </body>
 </html>
+
+
+
+
 

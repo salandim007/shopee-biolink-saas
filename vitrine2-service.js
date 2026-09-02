@@ -36,6 +36,190 @@ function createVitrine2Service(
     }
 
 
+    function getInstagramPolicyVersion(
+        decision,
+        summary
+    ) {
+        const candidates = [
+            summary?.policyVersion,
+            summary?.version,
+            decision?.policyVersion,
+            decision?.version,
+            decision?.policy?.version,
+            decision?.policy?.policyVersion
+        ];
+
+        const value =
+            candidates.find(
+                candidate =>
+                    candidate !== undefined &&
+                    candidate !== null &&
+                    String(candidate).trim() !== ''
+            );
+
+        return value === undefined
+            ? null
+            : String(value).trim();
+    }
+
+
+    function getInstagramPolicyReason(
+        decision,
+        summary
+    ) {
+        const directCandidates = [
+            summary?.reason,
+            summary?.message,
+            decision?.reason,
+            decision?.message
+        ];
+
+        const directValue =
+            directCandidates.find(
+                candidate =>
+                    candidate !== undefined &&
+                    candidate !== null &&
+                    String(candidate).trim() !== ''
+            );
+
+        if (
+            directValue !== undefined
+        ) {
+            return String(
+                directValue
+            ).trim();
+        }
+
+        const possibleArrays = [
+            summary?.reasons,
+            summary?.issues,
+            decision?.reasons,
+            decision?.issues,
+            decision?.violations
+        ];
+
+        for (
+            const values
+            of possibleArrays
+        ) {
+            if (
+                !Array.isArray(values) ||
+                values.length === 0
+            ) {
+                continue;
+            }
+
+            const reason =
+                values
+                    .map(value => {
+                        if (
+                            value === undefined ||
+                            value === null
+                        ) {
+                            return '';
+                        }
+
+                        if (
+                            typeof value ===
+                            'string'
+                        ) {
+                            return value.trim();
+                        }
+
+                        if (
+                            typeof value ===
+                            'object'
+                        ) {
+                            return String(
+                                value.reason ||
+                                value.message ||
+                                value.label ||
+                                value.code ||
+                                ''
+                            ).trim();
+                        }
+
+                        return String(
+                            value
+                        ).trim();
+                    })
+                    .filter(Boolean)
+                    .join(' | ');
+
+            if (reason) {
+                return reason;
+            }
+        }
+
+        return null;
+    }
+
+
+    function buildInstagramPolicySnapshot(
+        entry
+    ) {
+        if (!entry) {
+            throw new Error(
+                'Produto não encontrado no catálogo.'
+            );
+        }
+
+        if (!entry.product) {
+            throw new Error(
+                'Produto sem dados disponíveis para validação.'
+            );
+        }
+
+        const decision =
+            validateInstagramProduct(
+                entry.product
+            );
+
+        const summary =
+            summarizeInstagramDecision(
+                decision
+            );
+
+        const status =
+            String(
+                summary?.status ||
+                decision?.status ||
+                ''
+            )
+                .trim()
+                .toLowerCase();
+
+        if (!status) {
+            throw new Error(
+                'Policy Engine do Instagram retornou decisão sem status.'
+            );
+        }
+
+        return {
+            status,
+
+            policyVersion:
+                getInstagramPolicyVersion(
+                    decision,
+                    summary
+                ),
+
+            reason:
+                getInstagramPolicyReason(
+                    decision,
+                    summary
+                ),
+
+            validatedAt:
+                new Date()
+                    .toISOString(),
+
+            decision,
+            summary
+        };
+    }
+
+
     async function importFromApi(
         url,
         catalogOptions = {}
@@ -214,19 +398,57 @@ function createVitrine2Service(
         const catalog =
             loadCatalog();
 
+        const normalizedChannel =
+            String(
+                channel || ''
+            )
+                .trim()
+                .toLowerCase();
+
         const entry =
             catalog.setMarketingChannel(
                 marketplace,
                 itemId,
-                channel,
+                normalizedChannel,
                 enabled
             );
+
+        /*
+         * Instagram:
+         *
+         * Ao entrar no canal, o produto passa imediatamente
+         * pelo Policy Engine e a decisão fica persistida
+         * em marketing.policies.instagram.
+         *
+         * Ao sair do canal, o histórico da última validação
+         * é preservado. Apenas channels.instagram muda para false.
+         */
+        if (
+            normalizedChannel ===
+                'instagram' &&
+            enabled === true
+        ) {
+            const policy =
+                buildInstagramPolicySnapshot(
+                    entry
+                );
+
+            catalog.setMarketingPolicy(
+                marketplace,
+                itemId,
+                'instagram',
+                policy
+            );
+        }
 
         saveCatalog(
             catalog
         );
 
-        return entry;
+        return catalog.getProduct(
+            marketplace,
+            itemId
+        );
     }
 
 
@@ -249,51 +471,60 @@ function createVitrine2Service(
                 itemId
             );
 
-        if (!entry) {
-            throw new Error(
-                'Produto não encontrado no catálogo.'
-            );
-        }
-
-        if (!entry.product) {
-            throw new Error(
-                'Produto sem dados disponíveis para validação.'
-            );
-        }
-
-        const decision =
-            validateInstagramProduct(
-                entry.product
+        const policy =
+            buildInstagramPolicySnapshot(
+                entry
             );
 
-        const summary =
-            summarizeInstagramDecision(
-                decision
+        const updatedEntry =
+            catalog.setMarketingPolicy(
+                marketplace,
+                itemId,
+                'instagram',
+                policy
             );
+
+        saveCatalog(
+            catalog
+        );
 
         return {
             marketplace:
-                entry.product.marketplace ||
+                updatedEntry.product.marketplace ||
                 marketplace,
 
             itemId:
                 String(
-                    entry.product.itemId ||
+                    updatedEntry.product.itemId ||
                     itemId
                 ),
 
-            decision,
-            summary
+            decision:
+                policy.decision,
+
+            summary:
+                policy.summary,
+
+            policy:
+                updatedEntry.marketing
+                    ?.policies
+                    ?.instagram ||
+                policy
         };
     }
 
 
     /*
-     * Todos os produtos publicados tornam-se candidatos
-     * automáticos ao Instagram.
+     * Mantido temporariamente por compatibilidade com
+     * rotas antigas.
      *
-     * A seleção manual do canal não é usada aqui.
-     * Cada candidato já retorna com sua decisão de política.
+     * O fluxo oficial da Central de Marketing agora usa
+     * seleção manual por canal:
+     *
+     * Visão Geral
+     * -> Instagram selecionado
+     * -> Policy Engine
+     * -> marketing.policies.instagram persistido
      */
     function listInstagramMarketingCandidates() {
         const catalog =

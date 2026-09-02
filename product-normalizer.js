@@ -39,6 +39,65 @@ function normalizeMarketplace(value) {
 }
 
 
+function normalizeStringList(value) {
+    const source =
+        Array.isArray(value)
+            ? value
+            : value === undefined ||
+              value === null ||
+              value === ''
+                ? []
+                : [value];
+
+    const normalized = [];
+
+    for (const item of source) {
+        const text =
+            toNullableString(item);
+
+        if (
+            text &&
+            !normalized.includes(text)
+        ) {
+            normalized.push(text);
+        }
+    }
+
+    return normalized;
+}
+
+
+function normalizeMedia({
+    primary,
+    list
+}) {
+    const primaryValue =
+        toNullableString(primary);
+
+    const items =
+        normalizeStringList(list);
+
+    if (
+        primaryValue &&
+        !items.includes(primaryValue)
+    ) {
+        items.unshift(primaryValue);
+    }
+
+    const resolvedPrimary =
+        primaryValue ||
+        items[0] ||
+        null;
+
+    return {
+        primary:
+            resolvedPrimary,
+
+        items
+    };
+}
+
+
 function normalizeProduct(input = {}) {
     const price =
         toNullableNumber(input.price);
@@ -55,6 +114,24 @@ function normalizeProduct(input = {}) {
         toNullableNumber(
             input.maxPrice ?? price
         );
+
+    const imageMedia =
+        normalizeMedia({
+            primary:
+                input.image,
+
+            list:
+                input.images
+        });
+
+    const videoMedia =
+        normalizeMedia({
+            primary:
+                input.video,
+
+            list:
+                input.videos
+        });
 
     return {
         source:
@@ -98,15 +175,31 @@ function normalizeProduct(input = {}) {
                 input.currency
             ) || 'BRL',
 
+        /*
+         * Compatibilidade:
+         * image continua sendo a imagem principal usada
+         * pelas telas e fluxos existentes.
+         *
+         * images passa a guardar a galeria completa.
+         */
         image:
-            toNullableString(
-                input.image
-            ),
+            imageMedia.primary,
 
+        images:
+            imageMedia.items,
+
+        /*
+         * Compatibilidade:
+         * video continua sendo o vídeo principal.
+         *
+         * videos deixa o catálogo preparado para receber
+         * mais de um vídeo no futuro, caso a fonte ofereça.
+         */
         video:
-            toNullableString(
-                input.video
-            ),
+            videoMedia.primary,
+
+        videos:
+            videoMedia.items,
 
         shopName:
             toNullableString(
@@ -242,6 +335,9 @@ function createCatalogProduct(input) {
 module.exports = {
     toNullableNumber,
     toNullableString,
+    normalizeMarketplace,
+    normalizeStringList,
+    normalizeMedia,
     normalizeProduct,
     validateNormalizedProduct,
     createCatalogProduct

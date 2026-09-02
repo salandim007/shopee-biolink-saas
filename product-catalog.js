@@ -14,11 +14,17 @@ const DEFAULT_MARKETING_CHANNELS = Object.freeze({
 });
 
 
+const DEFAULT_MARKETING_POLICIES = Object.freeze({
+    instagram: null
+});
+
+
 const DEFAULT_MARKETING = Object.freeze({
     selected: false,
     selectedAt: null,
     status: 'not_selected',
-    channels: DEFAULT_MARKETING_CHANNELS
+    channels: DEFAULT_MARKETING_CHANNELS,
+    policies: DEFAULT_MARKETING_POLICIES
 });
 
 
@@ -196,6 +202,138 @@ function normalizeMarketingChannels(
 }
 
 
+function normalizePolicyStatus(value) {
+    const status =
+        String(
+            value || ''
+        )
+            .trim()
+            .toLowerCase();
+
+    const allowed = [
+        'approved',
+        'needs_review',
+        'blocked',
+        'revalidate',
+        'unavailable'
+    ];
+
+    return allowed.includes(status)
+        ? status
+        : null;
+}
+
+
+function normalizePolicyDate(value) {
+    if (
+        value === undefined ||
+        value === null ||
+        value === ''
+    ) {
+        return null;
+    }
+
+    const date =
+        new Date(
+            value
+        );
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return null;
+    }
+
+    return date.toISOString();
+}
+
+
+function normalizeMarketingPolicy(
+    policy
+) {
+    if (
+        !policy ||
+        typeof policy !== 'object'
+    ) {
+        return null;
+    }
+
+    const status =
+        normalizePolicyStatus(
+            policy.status
+        );
+
+    if (!status) {
+        return null;
+    }
+
+    const policyVersion =
+        policy.policyVersion === undefined ||
+        policy.policyVersion === null ||
+        policy.policyVersion === ''
+            ? null
+            : String(
+                policy.policyVersion
+            ).trim();
+
+    const reason =
+        policy.reason === undefined ||
+        policy.reason === null ||
+        policy.reason === ''
+            ? null
+            : String(
+                policy.reason
+            ).trim();
+
+    return {
+        status,
+
+        policyVersion,
+
+        reason,
+
+        validatedAt:
+            normalizePolicyDate(
+                policy.validatedAt
+            ) ||
+            new Date()
+                .toISOString(),
+
+        decision:
+            policy.decision &&
+            typeof policy.decision === 'object'
+                ? policy.decision
+                : null,
+
+        summary:
+            policy.summary &&
+            typeof policy.summary === 'object'
+                ? policy.summary
+                : null
+    };
+}
+
+
+function normalizeMarketingPolicies(
+    policies = {}
+) {
+    const source =
+        policies &&
+        typeof policies === 'object'
+            ? policies
+            : {};
+
+    return {
+        instagram:
+            normalizeMarketingPolicy(
+                source.instagram
+            )
+    };
+}
+
+
 function normalizeMarketing(
     marketing = {}
 ) {
@@ -205,11 +343,27 @@ function normalizeMarketing(
             ? marketing
             : {};
 
-    const selected =
-        normalizeBoolean(
-            source.selected,
-            DEFAULT_MARKETING.selected
+    const channels =
+        normalizeMarketingChannels(
+            source.channels
         );
+
+    const policies =
+        normalizeMarketingPolicies(
+            source.policies
+        );
+
+    /*
+     * A seleção de Marketing é consequência dos canais.
+     *
+     * Com pelo menos um canal marcado, o produto está
+     * selecionado. Sem canais marcados, ele volta para
+     * not_selected.
+     */
+    const selected =
+        Object.values(
+            channels
+        ).some(Boolean);
 
     let status =
         normalizeMarketingStatus(
@@ -251,10 +405,8 @@ function normalizeMarketing(
         selected,
         selectedAt,
         status,
-        channels:
-            normalizeMarketingChannels(
-                source.channels
-            )
+        channels,
+        policies
     };
 }
 
@@ -525,6 +677,26 @@ class ProductCatalog {
                 false
             );
 
+        const currentChannels =
+            normalizeMarketingChannels(
+                entry.marketing
+                    ?.channels
+            );
+
+        const hasEnabledChannel =
+            Object.values(
+                currentChannels
+            ).some(Boolean);
+
+        if (
+            normalizedSelected &&
+            !hasEnabledChannel
+        ) {
+            throw new Error(
+                'Selecione pelo menos um canal de Marketing.'
+            );
+        }
+
         entry.marketing =
             normalizeMarketing({
                 ...entry.marketing,
@@ -555,7 +727,12 @@ class ProductCatalog {
                                     'selected'
                                 )
                         )
-                        : 'not_selected'
+                        : 'not_selected',
+
+                channels:
+                    normalizedSelected
+                        ? currentChannels
+                        : DEFAULT_MARKETING_CHANNELS
             });
 
         return entry;
@@ -651,6 +828,60 @@ class ProductCatalog {
 
                     [normalizedChannel]:
                         normalizedEnabled
+                }
+            });
+
+        return entry;
+    }
+
+
+    setMarketingPolicy(
+        marketplace,
+        itemId,
+        channel,
+        policy
+    ) {
+        const entry =
+            this.getProduct(
+                marketplace,
+                itemId
+            );
+
+        if (!entry) {
+            throw new Error(
+                'Produto não encontrado no catálogo.'
+            );
+        }
+
+        const normalizedChannel =
+            normalizeMarketingChannel(
+                channel
+            );
+
+        if (
+            normalizedChannel !==
+            'instagram'
+        ) {
+            throw new Error(
+                'Policy Engine ainda não disponível para este canal.'
+            );
+        }
+
+        const normalizedPolicy =
+            normalizeMarketingPolicy(
+                policy
+            );
+
+        entry.marketing =
+            normalizeMarketing({
+                ...entry.marketing,
+
+                policies: {
+                    ...entry.marketing
+                        ?.policies,
+
+                    [normalizedChannel]:
+                        normalizedPolicy
                 }
             });
 
@@ -864,6 +1095,7 @@ function createProductCatalog() {
 module.exports = {
     DEFAULT_VISIBILITY,
     DEFAULT_MARKETING_CHANNELS,
+    DEFAULT_MARKETING_POLICIES,
     DEFAULT_MARKETING,
     MARKETING_CHANNELS,
     MARKETING_STATUSES,
@@ -873,6 +1105,10 @@ module.exports = {
     normalizeSelectedAt,
     normalizeMarketingChannel,
     normalizeMarketingChannels,
+    normalizePolicyStatus,
+    normalizePolicyDate,
+    normalizeMarketingPolicy,
+    normalizeMarketingPolicies,
     normalizeMarketing,
     createCatalogEntry,
     ProductCatalog,

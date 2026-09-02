@@ -79,6 +79,60 @@ function createProduct(
 }
 
 
+function createProductEvidence(
+    overrides = {}
+) {
+    return {
+        marketplace: 'shopee',
+        itemId: '23398011229',
+        commercial: {
+            itemId: 23398011229,
+            productName:
+                'Mousepad ergonômico temático',
+            price: '32.5',
+            sales: 6,
+            ratingStar: '4.9',
+            commission: '4.225',
+            sellerCommissionRate: '0.1',
+            shopeeCommissionRate: '0.03'
+        },
+        factual: {
+            description:
+                'Mouse pad com apoio ergonômico para o pulso e base antiderrapante.',
+            globalItemAttributes:
+                '[{"formatted_value":"25CM"}]',
+            globalCategory1:
+                'Computers & Accessories',
+            globalCategory2:
+                'Computer Accessories'
+        },
+        provenance: {
+            commercialSource:
+                'Shopee Affiliate Open API',
+            factualSource:
+                'Shopee Data Feed',
+            matchedBy: 'itemId'
+        },
+        ...overrides
+    };
+}
+
+
+function getPromptProductData(prompt) {
+    const match =
+        prompt.match(
+            /PRODUCT_DATA_START\n([\s\S]*?)\nPRODUCT_DATA_END/
+        );
+
+    assert.ok(
+        match,
+        'bloco de dados do produto não encontrado'
+    );
+
+    return JSON.parse(match[1]);
+}
+
+
 test(
     'analisa produto com problema real',
     async () => {
@@ -257,6 +311,210 @@ test(
         assert.equal(
             serializedRequest.includes(
                 'internalSecret'
+            ),
+            false
+        );
+    }
+);
+
+
+test(
+    'envia projeção factual compacta sem alterar o Product Evidence',
+    async () => {
+        const capture = {};
+
+        const engine =
+            createIntentBenefitEngine({
+                aiService:
+                    createFakeAIService(
+                        validAnalysis(),
+                        capture
+                    )
+            });
+
+        const evidence =
+            createProductEvidence({
+                factual: {
+                    description:
+                        `${'Frase factual curta. '.repeat(40)}Detalhe que deve ficar fora da projeção por exceder o limite.`,
+                    globalItemAttributes:
+                        '[{"formatted_value":"DADO_CRU_NAO_ENVIAR"}]',
+                    globalCategory1:
+                        'Computers & Accessories',
+                    globalCategory2:
+                        'Computer Accessories'
+                }
+            });
+
+        const originalEvidence =
+            structuredClone(evidence);
+
+        await engine.analyze(evidence);
+
+        const promptProductData =
+            getPromptProductData(
+                capture.request.prompt
+            );
+
+        assert.match(
+            promptProductData.description,
+            /Frase factual curta\.$/
+        );
+
+        assert.ok(
+            promptProductData.description
+                .length <= 600
+        );
+
+        assert.equal(
+            promptProductData.description
+                .includes(
+                    'Detalhe que deve ficar fora'
+                ),
+            false
+        );
+
+        assert.equal(
+            Object.prototype.hasOwnProperty.call(
+                promptProductData,
+                'globalItemAttributes'
+            ),
+            false
+        );
+
+        assert.equal(
+            Object.prototype.hasOwnProperty.call(
+                promptProductData,
+                'commercialData'
+            ),
+            false
+        );
+
+        assert.equal(
+            capture.request.prompt.includes(
+                'DADO_CRU_NAO_ENVIAR'
+            ),
+            false
+        );
+
+        assert.match(
+            capture.request.prompt,
+            /"factualEvidenceAvailable": true/
+        );
+
+        assert.deepEqual(
+            evidence,
+            originalEvidence
+        );
+    }
+);
+
+
+test(
+    'remove todos os campos internos de comissão do Product Evidence',
+    async () => {
+        const capture = {};
+
+        const engine =
+            createIntentBenefitEngine({
+                aiService:
+                    createFakeAIService(
+                        validAnalysis(),
+                        capture
+                    )
+            });
+
+        await engine.analyze(
+            createProductEvidence()
+        );
+
+        const serializedRequest =
+            JSON.stringify(
+                capture.request
+            );
+
+        assert.equal(
+            serializedRequest.includes(
+                'commission'
+            ),
+            false
+        );
+
+        assert.equal(
+            serializedRequest.includes(
+                'sellerCommissionRate'
+            ),
+            false
+        );
+
+        assert.equal(
+            serializedRequest.includes(
+                'shopeeCommissionRate'
+            ),
+            false
+        );
+
+        assert.equal(
+            serializedRequest.includes(
+                '"price"'
+            ),
+            false
+        );
+    }
+);
+
+
+test(
+    'ausência de factual não autoriza invenção de características',
+    async () => {
+        const capture = {};
+
+        const engine =
+            createIntentBenefitEngine({
+                aiService:
+                    createFakeAIService(
+                        validAnalysis({
+                            problemSolved: null,
+                            cautions: []
+                        }),
+                        capture
+                    )
+            });
+
+        await engine.analyze(
+            createProductEvidence({
+                factual: null
+            })
+        );
+
+        assert.match(
+            capture.request.prompt,
+            /"factualEvidenceAvailable": false/
+        );
+
+        assert.match(
+            capture.request.system,
+            /não há evidência factual disponível/i
+        );
+
+        assert.match(
+            capture.request.prompt,
+            /não presuma nenhuma característica ausente/i
+        );
+
+        assert.match(
+            capture.request.system,
+            /suporte para pulsos não autoriza afirmar benefício para mãos, braços, ombros ou postura/i
+        );
+
+        assert.match(
+            capture.request.prompt,
+            /não amplie uma característica factual/i
+        );
+
+        assert.equal(
+            capture.request.prompt.includes(
+                'apoio ergonômico'
             ),
             false
         );

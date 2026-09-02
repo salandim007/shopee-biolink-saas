@@ -111,7 +111,7 @@
                                     text-slate-500
                                 "
                             >
-                                Seleção estratégica dos produtos antes das campanhas.
+                                Escolha os produtos e distribua cada um somente para os canais desejados.
                             </p>
                         </div>
                     </div>
@@ -481,6 +481,7 @@
 
                         <p class="text-sm text-slate-500">
                             Ranking automático dos produtos publicados com base em comissão, estimada, vendas e avaliação.
+                            A Visão Geral apenas distribui produtos aos canais; política, IA e preparo acontecem dentro de cada canal.
                         </p>
                     </div>
                     <select
@@ -608,10 +609,6 @@
                                 </th>
 
                                 <th class="px-3 py-3">
-                                    Política
-                                </th>
-
-                                <th class="px-3 py-3">
                                     Canais
                                 </th>
                             </tr>
@@ -623,7 +620,7 @@
                         >
                             <tr>
                                 <td
-                                    colspan="9"
+                                    colspan="8"
                                     class="
                                         px-3
                                         py-10
@@ -1181,174 +1178,6 @@
             `;
         }
 
-        async function fetchInstagramPolicy(
-            product
-        ) {
-            const marketplace =
-                product?.marketplace ||
-                'shopee';
-
-            const itemId =
-                product?.itemId;
-
-            if (!itemId) {
-                return {
-                    status: 'needs_review',
-                    label: 'Revisão necessária',
-                    reason: 'Produto sem itemId para validação.',
-                    policyVersion: null
-                };
-            }
-
-            try {
-                const response =
-                    await fetch(
-                        `/api/vitrine2/products/${encodeURIComponent(
-                            marketplace
-                        )}/${encodeURIComponent(
-                            itemId
-                        )}/policy/instagram`
-                    );
-
-                const data =
-                    await response.json();
-
-                if (
-                    !response.ok ||
-                    !data.success
-                ) {
-                    throw new Error(
-                        data.error ||
-                        'Falha ao validar política.'
-                    );
-                }
-
-                return (
-                    data.summary ||
-                    {
-                        status: 'needs_review',
-                        label: 'Revisão necessária',
-                        reason: 'A validação não retornou um resumo.',
-                        policyVersion: null
-                    }
-                );
-            }
-            catch (error) {
-                console.error(
-                    '[MARKETING] Erro ao validar política do Instagram:',
-                    error
-                );
-
-                return {
-                    status: 'error',
-                    label: 'Indisponível',
-                    reason:
-                        error.message ||
-                        'Não foi possível consultar a política.',
-                    policyVersion: null
-                };
-            }
-        }
-
-
-        function renderInstagramPolicyBadge(
-            policy
-        ) {
-            const status =
-                String(
-                    policy?.status ||
-                    'needs_review'
-                )
-                    .trim()
-                    .toLowerCase();
-
-            const reason =
-                policy?.reason ||
-                'Sem detalhes disponíveis.';
-
-            const definitions = {
-                approved: {
-                    label: 'Aprovado',
-                    icon: 'fa-circle-check',
-                    className:
-                        'bg-emerald-50 text-emerald-700'
-                },
-
-                needs_review: {
-                    label: 'Revisão',
-                    icon: 'fa-triangle-exclamation',
-                    className:
-                        'bg-amber-50 text-amber-700'
-                },
-
-                blocked: {
-                    label: 'Bloqueado',
-                    icon: 'fa-ban',
-                    className:
-                        'bg-red-50 text-red-700'
-                },
-
-                revalidate: {
-                    label: 'Revalidar',
-                    icon: 'fa-rotate',
-                    className:
-                        'bg-violet-50 text-violet-700'
-                },
-
-                error: {
-                    label: 'Indisponível',
-                    icon: 'fa-circle-exclamation',
-                    className:
-                        'bg-slate-100 text-slate-600'
-                }
-            };
-
-            const definition =
-                definitions[status] ||
-                definitions.needs_review;
-
-            return `
-                <div
-                    class="space-y-1"
-                    title="${escapeHtml(reason)}"
-                >
-                    <span
-                        class="
-                            inline-flex
-                            items-center
-                            gap-1.5
-                            rounded-full
-                            px-2.5
-                            py-1
-                            text-xs
-                            font-bold
-                            ${definition.className}
-                        "
-                    >
-                        <i class="fa-brands fa-instagram"></i>
-                        <i class="fa-solid ${definition.icon}"></i>
-                        ${escapeHtml(definition.label)}
-                    </span>
-
-                    ${
-                        policy?.policyVersion
-                            ? `
-                                <div
-                                    class="
-                                        text-[10px]
-                                        text-slate-400
-                                        whitespace-nowrap
-                                    "
-                                >
-                                    ${escapeHtml(policy.policyVersion)}
-                                </div>
-                            `
-                            : ''
-                    }
-                </div>
-            `;
-        }
-
 
         function renderOverview() {
             const sortKey =
@@ -1445,7 +1274,7 @@
                     `
                         <tr>
                             <td
-                                colspan="9"
+                                colspan="8"
                                 class="
                                     px-3
                                     py-10
@@ -1468,8 +1297,7 @@
                             entry,
                             product,
                             opportunityScore,
-                            opportunityLevel,
-                            instagramPolicy
+                            opportunityLevel
                         }) => `
                             <tr>
 
@@ -1602,18 +1430,6 @@
                                     >
                                         /100
                                     </span>
-                                </td>
-
-                                <td
-                                    class="
-                                        px-3
-                                        py-4
-                                        whitespace-nowrap
-                                    "
-                                >
-                                    ${renderInstagramPolicyBadge(
-                                        instagramPolicy
-                                    )}
                                 </td>
 
                                 <td class="px-3 py-4">
@@ -1772,19 +1588,7 @@
                         await fetchCatalogProducts()
                     );
 
-                overviewItems =
-                    await Promise.all(
-                        scoredItems.map(
-                            async item => ({
-                                ...item,
-
-                                instagramPolicy:
-                                    await fetchInstagramPolicy(
-                                        item.product
-                                    )
-                            })
-                        )
-                    );
+                overviewItems = scoredItems;
 
                 renderOverview();
             }
@@ -1797,7 +1601,7 @@
                         `
                             <tr>
                                 <td
-                                    colspan="9"
+                                    colspan="8"
                                     class="
                                         px-3
                                         py-10
@@ -1849,4 +1653,3 @@
 
 </body>
 </html>
-

@@ -1956,3 +1956,54 @@ Ordem definida a partir deste marco:
 
 O avanço para conteúdo não altera a regra atual: não iniciar publicação automática nem outros braços principais sem implementação isolada, testes, documentação e controle do Admin.
 
+
+---
+
+## Sessão 2026-09-01 — Central de Marketing / Instagram
+
+### Estado validado
+
+Fluxo do Instagram reconstruído por degraus e funcionando até geração de rascunho.
+
+Validado:
+
+- botão "Preparar Feed" abre modal;
+- produto correto carregado;
+- foto principal carregada;
+- Policy Instagram carregada e aprovada;
+- endpoint `/admin/vitrine2/marketing/prepare` funcionando;
+- evidência agora usa o produto já existente no catálogo;
+- removido do caminho crítico o custo de consultar Affiliate API + varrer Data Feed a cada preparo;
+- backend caiu de timeout >10s para ~304 ms sem IA;
+- Ollama reintegrado somente no Creator;
+- modelo atual: `llama3.2:1b`;
+- IA gera frase criativa;
+- restante dos dados factuais é montado pelo código;
+- auditoria é determinística em JavaScript, sem segunda chamada de IA;
+- geração real com IA validada em aproximadamente 32 segundos;
+- auditoria validada em aproximadamente 9 ms;
+- resposta HTTP validada com `headersSent: true` e `writableEnded: true`;
+- rascunho aparece corretamente no modal com legenda e hashtags.
+
+### Arquitetura atual do preparo Instagram
+
+Produto selecionado
+→ Policy Instagram
+→ evidência do catálogo
+→ Ollama cria parte criativa
+→ código monta fatos seguros
+→ auditoria determinística
+→ rascunho para revisão humana
+
+### Próximo passo exato
+
+Continuar o modal do Instagram adicionando:
+
+1. mídias reais do produto / Media Library;
+2. destino/link de afiliado ou estratégia "link na bio";
+3. revisão final;
+4. botão real "Aprovar rascunho";
+5. somente depois ligar publicação oficial via Meta `/meta/publish`.
+
+Não voltar a colocar Affiliate API + varredura do Data Feed no caminho crítico do botão Preparar Feed.
+
