@@ -4,6 +4,10 @@ const express =
     require('express');
 
 const {
+    captureShopeeMedia
+} = require('./shopee-browser-media-capture');
+
+const {
     createMetaPublisher
 } = require('./marketing/meta-publisher');
 
@@ -452,6 +456,85 @@ async function prepareChannel(
 
 
 router.post(
+    '/media/gallery',
+    async (req, res) => {
+        const body =
+            req.body || {};
+
+        const shopId =
+            String(
+                body.shopId || ''
+            ).trim();
+
+        const itemId =
+            String(
+                body.itemId || ''
+            ).trim();
+
+        if (
+            !/^\d+$/.test(shopId) ||
+            !/^\d+$/.test(itemId)
+        ) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'INVALID_PRODUCT_IDS',
+                    message:
+                        'shopId e itemId são obrigatórios.'
+                }
+            });
+        }
+
+        try {
+            const report =
+                await captureShopeeMedia(
+                    shopId,
+                    itemId
+                );
+
+            const images =
+                Array.isArray(report?.images)
+                    ? [...new Set(
+                        report.images
+                            .map(value =>
+                                String(value || '').trim()
+                            )
+                            .filter(Boolean)
+                    )]
+                    : [];
+
+            return res.json({
+                success: true,
+                shopId,
+                itemId,
+                images,
+                videos:
+                    Array.isArray(report?.videos)
+                        ? report.videos
+                        : [],
+                imageCount:
+                    images.length
+            });
+        } catch (error) {
+            console.error(
+                '[MARKETING MEDIA] Falha ao capturar galeria:',
+                error?.message || error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error: {
+                    code: 'SHOPEE_MEDIA_CAPTURE_FAILED',
+                    message:
+                        'Não foi possível carregar a galeria do produto.'
+                }
+            });
+        }
+    }
+);
+
+
+router.post(
     '/prepare',
     async (req, res) => {
         const body = req.body || {};
@@ -756,6 +839,3 @@ router.post(
 
 module.exports =
     router;
-
-
-

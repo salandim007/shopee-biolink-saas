@@ -1141,6 +1141,224 @@
                     font-weight: 800;
                 `;
 
+                let selectedImageUrl =
+                    String(
+                        product.image ||
+                        ''
+                    ).trim();
+
+                const galleryBox =
+                    document.createElement('div');
+
+                galleryBox.style.cssText = `
+                    margin-top: 16px;
+                    padding: 14px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 14px;
+                    background: #f8fafc;
+                `;
+
+                const galleryTitle =
+                    document.createElement('div');
+
+                galleryTitle.textContent =
+                    '📷 Fotos do produto — escolha a capa';
+
+                galleryTitle.style.cssText = `
+                    font-weight: 800;
+                    font-size: 14px;
+                    color: #0f172a;
+                    margin-bottom: 8px;
+                `;
+
+                const galleryStatus =
+                    document.createElement('div');
+
+                galleryStatus.textContent =
+                    'Carregando fotos da Shopee...';
+
+                galleryStatus.style.cssText = `
+                    font-size: 13px;
+                    color: #64748b;
+                `;
+
+                const galleryGrid =
+                    document.createElement('div');
+
+                galleryGrid.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(5, minmax(0, 1fr));
+                    gap: 8px;
+                    margin-top: 10px;
+                `;
+
+                galleryBox.appendChild(galleryTitle);
+                galleryBox.appendChild(galleryStatus);
+                galleryBox.appendChild(galleryGrid);
+
+                async function loadInstagramGallery() {
+                    const shopId =
+                        String(
+                            product.shopId ||
+                            ''
+                        ).trim();
+
+                    if (!shopId || !itemId) {
+                        galleryStatus.textContent =
+                            'Galeria indisponível. A imagem principal será usada.';
+                        return;
+                    }
+
+                    try {
+                        const response =
+                            await fetch(
+                                '/admin/vitrine2/marketing/media/gallery',
+                                {
+                                    method: 'POST',
+
+                                    headers: {
+                                        'Content-Type':
+                                            'application/json'
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+                                            shopId,
+                                            itemId
+                                        })
+                                }
+                            );
+
+                        const payload =
+                            await response.json();
+
+                        if (
+                            !response.ok ||
+                            !payload.success ||
+                            !Array.isArray(payload.images) ||
+                            payload.images.length === 0
+                        ) {
+                            throw new Error(
+                                payload?.error?.message ||
+                                'Galeria indisponível.'
+                            );
+                        }
+
+                        galleryStatus.textContent =
+                            `${payload.images.length} fotos encontradas. Clique na melhor imagem para definir a capa.`;
+
+                        galleryGrid.innerHTML =
+                            '';
+
+                        payload.images.forEach(
+                            (imageUrl, index) => {
+                                const button =
+                                    document.createElement('button');
+
+                                button.type =
+                                    'button';
+
+                                button.style.cssText = `
+                                    position: relative;
+                                    padding: 4px;
+                                    border: 2px solid #cbd5e1;
+                                    border-radius: 12px;
+                                    background: white;
+                                    cursor: pointer;
+                                    overflow: hidden;
+                                `;
+
+                                const thumb =
+                                    document.createElement('img');
+
+                                thumb.src =
+                                    imageUrl;
+
+                                thumb.alt =
+                                    `Foto ${index + 1}`;
+
+                                thumb.style.cssText = `
+                                    width: 100%;
+                                    aspect-ratio: 1 / 1;
+                                    object-fit: contain;
+                                    display: block;
+                                    background: white;
+                                    border-radius: 8px;
+                                `;
+
+                                const badge =
+                                    document.createElement('span');
+
+                                badge.textContent =
+                                    'CAPA';
+
+                                badge.style.cssText = `
+                                    display: none;
+                                    position: absolute;
+                                    left: 6px;
+                                    bottom: 6px;
+                                    padding: 3px 6px;
+                                    border-radius: 999px;
+                                    background: #16a34a;
+                                    color: white;
+                                    font-size: 10px;
+                                    font-weight: 800;
+                                `;
+
+                                function selectImage() {
+                                    selectedImageUrl =
+                                        imageUrl;
+
+                                    for (
+                                        const other
+                                        of galleryGrid.children
+                                    ) {
+                                        other.style.borderColor =
+                                            '#cbd5e1';
+
+                                        const otherBadge =
+                                            other.querySelector('span');
+
+                                        if (otherBadge) {
+                                            otherBadge.style.display =
+                                                'none';
+                                        }
+                                    }
+
+                                    button.style.borderColor =
+                                        '#e1306c';
+
+                                    badge.style.display =
+                                        'block';
+                                }
+
+                                button.addEventListener(
+                                    'click',
+                                    selectImage
+                                );
+
+                                button.appendChild(thumb);
+                                button.appendChild(badge);
+
+                                galleryGrid.appendChild(button);
+
+                                if (index === 0) {
+                                    selectImage();
+                                }
+                            }
+                        );
+                    } catch (error) {
+                        console.error(
+                            '[INSTAGRAM] Erro ao carregar galeria:',
+                            error
+                        );
+
+                        galleryStatus.textContent =
+                            'Não foi possível carregar a galeria. A imagem principal será usada.';
+                    }
+                }
+
+
                 const generateButton =
                     document.createElement('button');
 
@@ -1190,6 +1408,28 @@
                     font-family: inherit;
                     font-size: 14px;
                     line-height: 1.5;
+                `;
+
+                const publishButton =
+                    document.createElement('button');
+
+                publishButton.type =
+                    'button';
+
+                publishButton.textContent =
+                    'Aprovar e publicar no Instagram';
+
+                publishButton.style.cssText = `
+                    display: none;
+                    width: 100%;
+                    margin-top: 14px;
+                    padding: 13px;
+                    border: 0;
+                    border-radius: 12px;
+                    background: #16a34a;
+                    color: white;
+                    font-weight: 800;
+                    cursor: pointer;
                 `;
 
                 const closeButton =
@@ -1307,9 +1547,13 @@
                                         .join(' ')
                                     : '';
 
+                            const constructionNotice =
+                                '🔧 Nossa página de ofertas está em preparação. Em breve os links dos produtos estarão disponíveis na bio.';
+
                             textarea.value =
                                 [
                                     caption,
+                                    constructionNotice,
                                     hashtags
                                 ]
                                     .filter(Boolean)
@@ -1318,19 +1562,36 @@
                             textarea.style.display =
                                 'block';
 
+                            const auditStatus =
+                                result
+                                    ?.audit
+                                    ?.status ||
+                                'sem status';
+
+                            const auditStatusLabel =
+                                auditStatus === 'APPROVED'
+                                    ? 'APROVADA'
+                                    : auditStatus;
+
                             statusBox.textContent =
-                                `✅ Rascunho pronto • Auditoria: ${
-                                    result
-                                        ?.audit
-                                        ?.status ||
-                                    'sem status'
-                                }`;
+                                `✅ Rascunho pronto • Auditoria: ${auditStatusLabel}`;
 
                             statusBox.style.color =
                                 '#166534';
 
                             generateButton.textContent =
                                 'Rascunho gerado';
+
+                            if (
+                                result.status === 'READY' &&
+                                auditStatus === 'APPROVED'
+                            ) {
+                                publishButton.style.display =
+                                    'block';
+
+                                publishButton.disabled =
+                                    false;
+                            }
                         } catch (error) {
                             console.error(
                                 '[INSTAGRAM] Erro ao gerar rascunho:',
@@ -1355,6 +1616,163 @@
                     }
                 );
 
+                publishButton.addEventListener(
+                    'click',
+                    async () => {
+                        const confirmed =
+                            window.confirm(
+                                'Confirma a aprovação e publicação deste conteúdo no Instagram?'
+                            );
+
+                        if (!confirmed) {
+                            return;
+                        }
+
+                        const imageUrl =
+                            String(
+                                selectedImageUrl ||
+                                product.image ||
+                                ''
+                            ).trim();
+
+                        const finalCaption =
+                            String(
+                                textarea.value ||
+                                ''
+                            ).trim();
+
+                        if (!imageUrl) {
+                            window.alert(
+                                'O produto não possui imagem disponível para publicação.'
+                            );
+
+                            return;
+                        }
+
+                        if (!finalCaption) {
+                            window.alert(
+                                'A legenda está vazia.'
+                            );
+
+                            return;
+                        }
+
+                        try {
+                            publishButton.disabled =
+                                true;
+
+                            publishButton.textContent =
+                                'Publicando...';
+
+                            statusBox.textContent =
+                                '⏳ Enviando publicação para o Instagram...';
+
+                            statusBox.style.color =
+                                '#475569';
+
+                            const publishResponse =
+                                await fetch(
+                                    '/admin/vitrine2/marketing/meta/publish',
+                                    {
+                                        method: 'POST',
+
+                                        headers: {
+                                            'Content-Type':
+                                                'application/json'
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+                                                imageUrl,
+                                                caption:
+                                                    finalCaption,
+                                                channels: [
+                                                    'instagram'
+                                                ]
+                                            })
+                                    }
+                                );
+
+                            let publishPayload = {};
+
+                            try {
+                                publishPayload =
+                                    await publishResponse.json();
+                            } catch (_) {
+                                publishPayload = {};
+                            }
+
+                            const channelResult =
+                                publishPayload
+                                    ?.channels
+                                    ?.instagram ||
+                                publishPayload
+                                    ?.results
+                                    ?.instagram ||
+                                publishPayload
+                                    ?.instagram ||
+                                null;
+
+                            if (
+                                !publishResponse.ok ||
+                                publishPayload?.success === false ||
+                                channelResult?.success === false ||
+                                channelResult?.status === 'ERROR' ||
+                                channelResult?.error
+                            ) {
+                                throw new Error(
+                                    channelResult
+                                        ?.error
+                                        ?.message ||
+                                    publishPayload
+                                        ?.error
+                                        ?.message ||
+                                    'A publicação não foi concluída.'
+                                );
+                            }
+
+                            statusBox.textContent =
+                                '✅ Publicado no Instagram com sucesso.';
+
+                            statusBox.style.color =
+                                '#166534';
+
+                            publishButton.textContent =
+                                'Publicado';
+
+                            publishButton.style.background =
+                                '#15803d';
+
+                            textarea.disabled =
+                                true;
+
+                            generateButton.disabled =
+                                true;
+                        } catch (error) {
+                            console.error(
+                                '[INSTAGRAM] Erro ao publicar:',
+                                error
+                            );
+
+                            statusBox.textContent =
+                                `❌ ${
+                                    error?.message ||
+                                    'Erro na publicação.'
+                                }`;
+
+                            statusBox.style.color =
+                                '#b91c1c';
+
+                            publishButton.disabled =
+                                false;
+
+                            publishButton.textContent =
+                                'Tentar publicar novamente';
+                        }
+                    }
+                );
+
+
                 closeButton.addEventListener(
                     'click',
                     () => overlay.remove()
@@ -1376,9 +1794,11 @@
                 modal.appendChild(heading);
                 modal.appendChild(productBox);
                 modal.appendChild(policyBox);
+                modal.appendChild(galleryBox);
                 modal.appendChild(generateButton);
                 modal.appendChild(statusBox);
                 modal.appendChild(textarea);
+                modal.appendChild(publishButton);
                 modal.appendChild(closeButton);
 
                 overlay.appendChild(modal);
@@ -1386,6 +1806,8 @@
                 document.body.appendChild(
                     overlay
                 );
+
+                loadInstagramGallery();
 
                 console.log(
                     '[INSTAGRAM] Degrau 4 aberto',
@@ -1472,8 +1894,3 @@
 
 </body>
 </html>
-
-
-
-
-

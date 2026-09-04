@@ -353,41 +353,155 @@ Crie somente uma frase curta de abertura para apresentar este produto no Instagr
             });
         }
 
-        if (
-            product.discount !==
-                undefined &&
-            product.discount !==
-                null &&
-            Number(product.discount) > 0
-        ) {
-            captionParts.push(
-                `🏷️ Desconto informado: ${product.discount}%.`
-            );
-
-            claims.push({
-                text:
-                    `Desconto informado: ${product.discount}%`
-            });
-        }
 
         captionParts.push(
-            'Confira os detalhes, preço atual e disponibilidade na Shopee pelo link.'
+            'Confira os detalhes e o preço atual na Shopee.'
         );
 
         const hashtags = [
             '#achadinhos',
             '#shopee',
-            '#ofertas',
-            '#comprasonline'
+            '#ofertas'
         ];
+
+        const ignoredHashtagWords =
+            new Set([
+                'com',
+                'sem',
+                'para',
+                'por',
+                'em',
+                'de',
+                'da',
+                'do',
+                'das',
+                'dos',
+                'uma',
+                'um',
+                'e',
+                'a',
+                'o',
+                'kit',
+                'produto',
+                'produtos',
+                'pacote',
+                'unidade',
+                'unidades',
+                'envio',
+                'frete',
+                'original',
+                'novo',
+                'nova',
+                'personalizado',
+                'personalizada',
+                'nome',
+                'branco',
+                'branca',
+                'preto',
+                'preta'
+            ]);
+
+        const productWords =
+            String(
+                name ||
+                ''
+            )
+                .normalize('NFD')
+                .replace(
+                    /[\u0300-\u036f]/g,
+                    ''
+                )
+                .toLowerCase()
+                .replace(
+                    /[^a-z0-9]+/g,
+                    ' '
+                )
+                .trim()
+                .split(/\s+/)
+                .filter(
+                    word =>
+                        word &&
+                        word.length >= 3 &&
+                        !ignoredHashtagWords.has(
+                            word
+                        ) &&
+                        !/^\d+$/.test(
+                            word
+                        )
+                );
+
+        const productHashtags = [];
+
+        if (
+            productWords.length >= 2
+        ) {
+            const compoundTag =
+                `#${productWords[0]}${productWords[1]}`;
+
+            if (
+                compoundTag.length <= 28
+            ) {
+                productHashtags.push(
+                    compoundTag
+                );
+            }
+        }
+
+        for (
+            let index =
+                productWords.length - 1;
+            index >= 2 &&
+                productHashtags.length < 3;
+            index -= 1
+        ) {
+            const word =
+                productWords[index];
+
+            if (
+                /^\d/.test(word)
+            ) {
+                continue;
+            }
+
+            const tag =
+                `#${word}`;
+
+            if (
+                tag.length <= 28 &&
+                !productHashtags.includes(
+                    tag
+                )
+            ) {
+                productHashtags.push(
+                    tag
+                );
+            }
+        }
+
+        hashtags.push(
+            ...productHashtags
+        );
 
         const categoryTag =
             categoryHashtag(
                 product.category
             );
 
+        const ignoredCategoryTags =
+            new Set([
+                '#outros',
+                '#other',
+                '#others',
+                '#geral'
+            ]);
+
         if (
             categoryTag &&
+            !ignoredCategoryTags.has(
+                String(
+                    categoryTag
+                ).toLowerCase()
+            ) &&
             !hashtags.includes(
                 categoryTag
             )
@@ -432,4 +546,3 @@ module.exports = {
     validateContent,
     createInstagramContentCreator
 };
-
