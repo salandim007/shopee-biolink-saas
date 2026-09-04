@@ -1985,25 +1985,122 @@ Validado:
 - resposta HTTP validada com `headersSent: true` e `writableEnded: true`;
 - rascunho aparece corretamente no modal com legenda e hashtags.
 
-### Arquitetura atual do preparo Instagram
+### Arquitetura atual do Instagram
 
 Produto selecionado
-→ Policy Instagram
-→ evidência do catálogo
+→ Instagram Policy Engine
+→ evidência real do catálogo
+→ galeria real de mídias Shopee
+→ seleção editorial humana por formato
 → Ollama cria parte criativa
 → código monta fatos seguros
 → auditoria determinística
-→ rascunho para revisão humana
+→ rascunho editável
+→ aprovação humana
+→ publicação oficial Meta
+→ histórico persistente no SQLite
+→ estado PUBLISHED
+
+Formatos atuais:
+
+- Foto:
+  - seleção manual da imagem;
+  - publicação real no Instagram validada;
+  - histórico persistente;
+  - bloqueio contra publicação duplicada;
+  - botão azul `✓ Publicado`.
+
+- Carrossel:
+  - seleção independente de 2 a 5 fotos;
+  - remoção imediata de imagens indesejadas;
+  - prévia do carrossel;
+  - ordem das imagens preservada;
+  - publicação real no Instagram validada;
+  - histórico persistente;
+  - bloqueio contra publicação duplicada;
+  - botão azul `✓ Publicado`.
+
+- Reel:
+  - seleção independente das fotos;
+  - geração local de MP4 via FFmpeg;
+  - formato vertical 1080x1920;
+  - H.264, 30 fps;
+  - animação e transições validadas visualmente;
+  - rascunho, IA e auditoria funcionando;
+  - publicação real no Instagram ainda não implementada.
+
+### Histórico e proteção contra duplicidade
+
+Arquivo:
+
+`marketing/publication-history-store.js`
+
+Tabela SQLite:
+
+`marketing_publications`
+
+A publicação é controlada por:
+
+Produto + Canal + Formato
+
+Exemplo:
+
+- Shopee + itemId + Instagram + photo
+- Shopee + itemId + Instagram + carousel
+- Shopee + itemId + Instagram + reel
+
+Estados principais:
+
+- PROCESSING
+- PUBLISHED
+- FAILED
+
+Quando um formato já está PUBLISHED, o backend bloqueia nova publicação acidental antes de chamar a Meta.
+
+Publicações reais validadas nesta etapa:
+
+- Foto real publicada no Instagram;
+- Carrossel real publicado no Instagram;
+- Carrossel validado com `mediaId 18132746074656299`.
+
+### Marco Git atual
+
+Commit estável:
+
+`0ff391e - Add Instagram carousel publishing and publication history`
+
+Validação antes do commit:
+
+- 35 testes executados;
+- 35 aprovados;
+- 0 falhas;
+- `git diff --cached --check` sem erros.
 
 ### Próximo passo exato
 
-Continuar o modal do Instagram adicionando:
+Finalizar a publicação real do Reel no Instagram.
 
-1. mídias reais do produto / Media Library;
-2. destino/link de afiliado ou estratégia "link na bio";
-3. revisão final;
-4. botão real "Aprovar rascunho";
-5. somente depois ligar publicação oficial via Meta `/meta/publish`.
+Fluxo alvo:
 
-Não voltar a colocar Affiliate API + varredura do Data Feed no caminho crítico do botão Preparar Feed.
+Reel gerado pelo FFmpeg
+→ disponibilizar MP4 em URL pública acessível pela Meta
+→ criar container Instagram `REELS`
+→ aguardar processamento
+→ publicar
+→ gravar `PUBLISHED` no SQLite
+→ botão azul `✓ Publicado`
+→ impedir duplicidade por Produto + Canal + Formato
+
+Depois validar com um produto diferente dos usados nos testes de Foto e Carrossel.
+
+Após o Reel estar validado de ponta a ponta, seguir para Facebook reutilizando a mesma arquitetura de:
+
+- seleção editorial;
+- IA;
+- auditoria;
+- histórico;
+- proteção contra duplicidade;
+- estados de publicação.
+
+Não voltar a colocar Affiliate API + varredura do Data Feed no caminho crítico do preparo/publicação de Marketing.
 
