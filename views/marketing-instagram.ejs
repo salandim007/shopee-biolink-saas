@@ -1147,6 +1147,15 @@
                         ''
                     ).trim();
 
+                let galleryImageUrls =
+                    [];
+
+                let carouselSelectedImageUrls =
+                    [];
+
+                let reelSelectedImageUrls =
+                    [];
+
                 const galleryBox =
                     document.createElement('div');
 
@@ -1244,11 +1253,31 @@
                             );
                         }
 
+                        galleryImageUrls =
+                            payload.images
+                                .map(value =>
+                                    String(
+                                        value ||
+                                        ''
+                                    ).trim()
+                                )
+                                .filter(Boolean)
+                                .slice(0, 5);
+
                         galleryStatus.textContent =
-                            `${payload.images.length} fotos encontradas. Clique na melhor imagem para definir a capa.`;
+                            `${galleryImageUrls.length} fotos encontradas. Clique na melhor imagem para definir a capa.`;
 
                         galleryGrid.innerHTML =
                             '';
+
+                        reelButton.disabled =
+                            false;
+
+                        reelStatus.textContent =
+                            'Fotos prontas para gerar o Reel.';
+
+                        renderCarouselChoices();
+                        renderReelChoices();
 
                         payload.images.forEach(
                             (imageUrl, index) => {
@@ -1359,6 +1388,690 @@
                 }
 
 
+                function createInstagramReviewArea() {
+                    const status =
+                        document.createElement('div');
+
+                    status.style.cssText = `
+                        display: none;
+                        margin-top: 12px;
+                        font-size: 13px;
+                        color: #64748b;
+                    `;
+
+                    const textarea =
+                        document.createElement('textarea');
+
+                    textarea.placeholder =
+                        'O rascunho aparecerá aqui.';
+
+                    textarea.style.cssText = `
+                        display: none;
+                        width: 100%;
+                        min-height: 170px;
+                        margin-top: 10px;
+                        padding: 14px;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 12px;
+                        resize: vertical;
+                        box-sizing: border-box;
+                        font-family: inherit;
+                        font-size: 14px;
+                        line-height: 1.5;
+                    `;
+
+                    return {
+                        status,
+                        textarea
+                    };
+                }
+
+
+                async function prepareInstagramFormatReview(
+                    review
+                ) {
+                    try {
+                        review.status.style.display =
+                            'block';
+
+                        review.status.textContent =
+                            '⏳ Gerando rascunho e auditando conteúdo...';
+
+                        review.status.style.color =
+                            '#64748b';
+
+                        const response =
+                            await fetch(
+                                '/admin/vitrine2/marketing/prepare',
+                                {
+                                    method:
+                                        'POST',
+
+                                    headers: {
+                                        'Content-Type':
+                                            'application/json'
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+                                            marketplace:
+                                                marketplace ||
+                                                'shopee',
+
+                                            itemId:
+                                                String(
+                                                    itemId ||
+                                                    ''
+                                                ),
+
+                                            channels: [
+                                                'instagram'
+                                            ]
+                                        })
+                                }
+                            );
+
+                        const payload =
+                            await response.json();
+
+                        const result =
+                            payload
+                                ?.channels
+                                ?.instagram;
+
+                        if (
+                            !response.ok ||
+                            !result
+                        ) {
+                            throw new Error(
+                                payload
+                                    ?.error
+                                    ?.message ||
+                                'Falha na preparação.'
+                            );
+                        }
+
+                        if (
+                            result.status !==
+                            'READY'
+                        ) {
+                            throw new Error(
+                                result.reason ||
+                                `Status: ${result.status}`
+                            );
+                        }
+
+                        const caption =
+                            String(
+                                result
+                                    ?.content
+                                    ?.caption ||
+                                ''
+                            );
+
+                        const hashtags =
+                            Array.isArray(
+                                result
+                                    ?.content
+                                    ?.hashtags
+                            )
+                                ? result
+                                    .content
+                                    .hashtags
+                                    .join(' ')
+                                : '';
+
+                        const constructionNotice =
+                            '🔧 Nossa página de ofertas está em preparação. Em breve os links dos produtos estarão disponíveis na bio.';
+
+                        review.textarea.value =
+                            [
+                                caption,
+                                constructionNotice,
+                                hashtags
+                            ]
+                                .filter(Boolean)
+                                .join('\n\n');
+
+                        review.textarea.style.display =
+                            'block';
+
+                        const auditStatus =
+                            result
+                                ?.audit
+                                ?.status ||
+                            'sem status';
+
+                        const auditLabel =
+                            auditStatus ===
+                            'APPROVED'
+                                ? 'APROVADA'
+                                : auditStatus;
+
+                        review.status.textContent =
+                            `✅ Rascunho pronto • Auditoria: ${auditLabel}`;
+
+                        review.status.style.color =
+                            auditStatus === 'APPROVED'
+                                ? '#166534'
+                                : '#b91c1c';
+
+                        return (
+                            result.status ===
+                                'READY' &&
+                            auditStatus ===
+                                'APPROVED'
+                        );
+                    } catch (error) {
+                        console.error(
+                            '[INSTAGRAM REVIEW] Erro:',
+                            error
+                        );
+
+                        review.status.style.display =
+                            'block';
+
+                        review.status.textContent =
+                            `❌ ${
+                                error?.message ||
+                                'Erro na preparação.'
+                            }`;
+
+                        review.status.style.color =
+                            '#b91c1c';
+
+                        return false;
+                    }
+                }
+
+
+                const reelReview =
+                    createInstagramReviewArea();
+
+
+                const reelApproveButton =
+                    document.createElement('button');
+
+                reelApproveButton.type =
+                    'button';
+
+                reelApproveButton.textContent =
+                    '✓ Aprovado para publicar';
+
+                reelApproveButton.style.cssText = `
+                    display: none;
+                    width: 100%;
+                    margin-top: 14px;
+                    padding: 13px;
+                    border: 0;
+                    border-radius: 12px;
+                    background: #16a34a;
+                    color: white;
+                    font-weight: 800;
+                    cursor: pointer;
+                `;
+
+
+                const reelBox =
+                    document.createElement('div');
+
+                reelBox.style.cssText = `
+                    margin-top: 14px;
+                    padding: 14px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 14px;
+                    background: #ffffff;
+                `;
+
+                const reelTitle =
+                    document.createElement('div');
+
+                reelTitle.textContent =
+                    '🎬 Reel animado';
+
+                reelTitle.style.cssText = `
+                    font-weight: 800;
+                    font-size: 14px;
+                    color: #0f172a;
+                    margin-bottom: 8px;
+                `;
+
+                const reelHint =
+                    document.createElement('div');
+
+                reelHint.textContent =
+                    'A foto marcada como CAPA será a primeira cena.';
+
+                reelHint.style.cssText = `
+                    font-size: 12px;
+                    color: #64748b;
+                    margin-bottom: 10px;
+                `;
+
+                const reelGrid =
+                    document.createElement('div');
+
+                reelGrid.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(5, minmax(0, 1fr));
+                    gap: 8px;
+                    margin: 10px 0 12px;
+                `;
+
+
+                const reelSelectionStatus =
+                    document.createElement('div');
+
+                reelSelectionStatus.style.cssText = `
+                    margin-bottom: 10px;
+                    font-size: 12px;
+                    color: #64748b;
+                `;
+
+
+                function renderReelChoices() {
+                    reelGrid.innerHTML =
+                        '';
+
+                    reelSelectedImageUrls =
+                        [];
+
+                    if (
+                        !Array.isArray(galleryImageUrls) ||
+                        galleryImageUrls.length === 0
+                    ) {
+                        reelSelectionStatus.textContent =
+                            'As fotos ainda não foram carregadas.';
+
+                        reelButton.disabled =
+                            true;
+
+                        return;
+                    }
+
+                    galleryImageUrls.forEach(
+                        (imageUrl, index) => {
+                            const label =
+                                document.createElement('label');
+
+                            label.style.cssText = `
+                                position: relative;
+                                display: block;
+                                padding: 4px;
+                                border: 2px solid #16a34a;
+                                border-radius: 12px;
+                                background: white;
+                                cursor: pointer;
+                            `;
+
+                            const checkbox =
+                                document.createElement('input');
+
+                            checkbox.type =
+                                'checkbox';
+
+                            checkbox.checked =
+                                true;
+
+                            checkbox.dataset.imageUrl =
+                                imageUrl;
+
+                            checkbox.style.cssText = `
+                                position: absolute;
+                                top: 7px;
+                                right: 7px;
+                                width: 18px;
+                                height: 18px;
+                                z-index: 2;
+                            `;
+
+                            const image =
+                                document.createElement('img');
+
+                            image.src =
+                                imageUrl;
+
+                            image.alt =
+                                'Foto ' + (index + 1);
+
+                            image.style.cssText = `
+                                width: 100%;
+                                aspect-ratio: 1 / 1;
+                                object-fit: contain;
+                                display: block;
+                                border-radius: 8px;
+                                background: white;
+                            `;
+
+                            checkbox.addEventListener(
+                                'change',
+                                () => {
+                                    label.style.borderColor =
+                                        checkbox.checked
+                                            ? '#16a34a'
+                                            : '#cbd5e1';
+
+                                    reelSelectedImageUrls =
+                                        Array.from(
+                                            reelGrid.querySelectorAll(
+                                                'input[type="checkbox"]:checked'
+                                            )
+                                        )
+                                            .map(
+                                                input =>
+                                                    input.dataset.imageUrl
+                                            )
+                                            .filter(Boolean);
+
+                                    reelSelectionStatus.textContent =
+                                        reelSelectedImageUrls.length +
+                                        ' foto(s) serão usadas no Reel.';
+
+                                    reelButton.disabled =
+                                        reelSelectedImageUrls.length === 0;
+
+                                    reelButton.style.display =
+                                        'block';
+
+                                    reelButton.textContent =
+                                        'Processar Reel';
+
+                                    reelButton.style.background =
+                                        '#e1306c';
+
+                                    reelApproveButton.style.display =
+                                        'none';
+
+                                    reelReview.status.style.display =
+                                        'none';
+
+                                    reelReview.textarea.style.display =
+                                        'none';
+
+                                    reelVideo.style.display =
+                                        'none';
+                                }
+                            );
+
+                            label.appendChild(
+                                checkbox
+                            );
+
+                            label.appendChild(
+                                image
+                            );
+
+                            reelGrid.appendChild(
+                                label
+                            );
+                        }
+                    );
+
+                    reelSelectedImageUrls =
+                        [...galleryImageUrls];
+
+                    reelSelectionStatus.textContent =
+                        reelSelectedImageUrls.length +
+                        ' fotos serão usadas no Reel.';
+
+                    reelButton.disabled =
+                        false;
+                }
+
+
+                const reelButton =
+                    document.createElement('button');
+
+                reelButton.type =
+                    'button';
+
+                reelButton.textContent =
+                    'Processar Reel';
+
+                reelButton.disabled =
+                    true;
+
+                reelButton.style.cssText = `
+                    width: 100%;
+                    padding: 12px;
+                    border: 0;
+                    border-radius: 12px;
+                    background: #e1306c;
+                    color: white;
+                    font-weight: 800;
+                    cursor: pointer;
+                `;
+
+                const reelStatus =
+                    document.createElement('div');
+
+                reelStatus.style.cssText = `
+                    margin-top: 9px;
+                    font-size: 12px;
+                    color: #64748b;
+                `;
+
+                const reelVideo =
+                    document.createElement('video');
+
+                reelVideo.controls =
+                    true;
+
+                reelVideo.playsInline =
+                    true;
+
+                reelVideo.preload =
+                    'metadata';
+
+                reelVideo.style.cssText = `
+                    display: none;
+                    width: 100%;
+                    max-width: 270px;
+                    aspect-ratio: 9 / 16;
+                    object-fit: contain;
+                    margin: 6px auto 0;
+                    background: #000;
+                    border-radius: 14px;
+                `;
+
+                reelBox.appendChild(
+                    reelTitle
+                );
+
+                reelBox.appendChild(
+                    reelHint
+                );
+
+                reelBox.appendChild(
+                    reelGrid
+                );
+
+                reelBox.appendChild(
+                    reelSelectionStatus
+                );
+
+                reelBox.appendChild(
+                    reelButton
+                );
+
+                reelBox.appendChild(
+                    reelStatus
+                );
+
+                reelBox.appendChild(
+                    reelVideo
+                );
+
+                reelBox.appendChild(
+                    reelReview.status
+                );
+
+                reelBox.appendChild(
+                    reelReview.textarea
+                );
+
+                reelBox.appendChild(
+                    reelApproveButton
+                );
+
+
+                async function generateInstagramReel() {
+                    if (
+                        !Array.isArray(
+                            galleryImageUrls
+                        ) ||
+                        galleryImageUrls.length === 0
+                    ) {
+                        reelStatus.textContent =
+                            'As fotos ainda não estão disponíveis.';
+                        reelStatus.style.color =
+                            '#b91c1c';
+                        return;
+                    }
+
+                    const reelImages =
+                        Array.from(
+                            reelGrid.querySelectorAll(
+                                'input[type="checkbox"]:checked'
+                            )
+                        )
+                            .map(
+                                input =>
+                                    input.dataset.imageUrl
+                            )
+                            .filter(Boolean)
+                            .slice(0, 5);
+
+                    if (reelImages.length === 0) {
+                        reelStatus.textContent =
+                            'Selecione pelo menos uma foto para o Reel.';
+
+                        reelStatus.style.color =
+                            '#b91c1c';
+
+                        return;
+                    }
+
+                    reelSelectedImageUrls =
+                        reelImages;
+
+                    try {
+                        reelButton.disabled =
+                            true;
+
+                        reelButton.textContent =
+                            '⏳ Processando Reel...';
+
+                        reelButton.style.background =
+                            '#e1306c';
+
+                        reelStatus.textContent =
+                            'Montando vídeo vertical com FFmpeg...';
+
+                        reelStatus.style.color =
+                            '#64748b';
+
+                        const response =
+                            await fetch(
+                                '/admin/vitrine2/marketing/media/reel',
+                                {
+                                    method:
+                                        'POST',
+
+                                    headers: {
+                                        'Content-Type':
+                                            'application/json'
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+                                            imageUrls:
+                                                reelImages
+                                        })
+                                }
+                            );
+
+                        const payload =
+                            await response.json();
+
+                        if (
+                            !response.ok ||
+                            !payload.success ||
+                            !payload.videoUrl
+                        ) {
+                            throw new Error(
+                                payload?.error?.message ||
+                                'Não foi possível gerar o Reel.'
+                            );
+                        }
+
+                        reelVideo.src =
+                            payload.videoUrl +
+                            '?t=' +
+                            Date.now();
+
+                        reelVideo.style.display =
+                            'block';
+
+                        reelVideo.load();
+
+                        reelStatus.textContent =
+                            `✅ Reel pronto • ${payload.imageCount} fotos • ${payload.durationSeconds}s • 1080×1920`;
+
+                        reelStatus.style.color =
+                            '#166534';
+
+                        const reelApproved =
+                            await prepareInstagramFormatReview(
+                                reelReview
+                            );
+
+                        if (reelApproved) {
+                            reelButton.style.display =
+                                'none';
+
+                            reelApproveButton.style.display =
+                                'block';
+                        } else {
+                            reelButton.textContent =
+                                'Tentar processar Reel';
+
+                            reelButton.style.background =
+                                '#e1306c';
+                        }
+                    } catch (error) {
+                        console.error(
+                            '[INSTAGRAM REEL] Erro:',
+                            error
+                        );
+
+                        reelStatus.textContent =
+                            `❌ ${
+                                error?.message ||
+                                'Erro ao gerar Reel.'
+                            }`;
+
+                        reelStatus.style.color =
+                            '#b91c1c';
+
+                        reelButton.textContent =
+                            'Tentar processar Reel';
+
+                        reelButton.style.background =
+                            '#e1306c';
+                    } finally {
+                        reelButton.disabled =
+                            false;
+                    }
+                }
+
+
+                reelButton.addEventListener(
+                    'click',
+                    generateInstagramReel
+                );
+
+
                 const generateButton =
                     document.createElement('button');
 
@@ -1366,7 +2079,7 @@
                     'button';
 
                 generateButton.textContent =
-                    'Gerar rascunho';
+                    'Processar Foto';
 
                 generateButton.style.cssText = `
                     width: 100%;
@@ -1417,7 +2130,7 @@
                     'button';
 
                 publishButton.textContent =
-                    'Aprovar e publicar no Instagram';
+                    '✓ Aprovado para publicar';
 
                 publishButton.style.cssText = `
                     display: none;
@@ -1453,6 +2166,1232 @@
                     cursor: pointer;
                 `;
 
+                const formatTabs =
+                    document.createElement('div');
+
+                formatTabs.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 8px;
+                    margin-top: 16px;
+                    padding: 5px;
+                    border-radius: 14px;
+                    background: #f1f5f9;
+                `;
+
+
+                function createFormatTabButton(
+                    label,
+                    format
+                ) {
+                    const button =
+                        document.createElement('button');
+
+                    button.type =
+                        'button';
+
+                    button.textContent =
+                        label;
+
+                    button.dataset.format =
+                        format;
+
+                    button.style.cssText = `
+                        padding: 11px 8px;
+                        border: 0;
+                        border-radius: 10px;
+                        background: transparent;
+                        color: #475569;
+                        font-size: 13px;
+                        font-weight: 800;
+                        cursor: pointer;
+                    `;
+
+                    return button;
+                }
+
+
+                const photoTabButton =
+                    createFormatTabButton(
+                        '📷 Foto',
+                        'photo'
+                    );
+
+                const carouselTabButton =
+                    createFormatTabButton(
+                        '▣ Carrossel',
+                        'carousel'
+                    );
+
+                const reelTabButton =
+                    createFormatTabButton(
+                        '🎬 Reel',
+                        'reel'
+                    );
+
+                formatTabs.appendChild(
+                    photoTabButton
+                );
+
+                formatTabs.appendChild(
+                    carouselTabButton
+                );
+
+                formatTabs.appendChild(
+                    reelTabButton
+                );
+
+
+                const photoPanel =
+                    document.createElement('div');
+
+                const carouselPanel =
+                    document.createElement('div');
+
+                const reelPanel =
+                    document.createElement('div');
+
+
+                photoPanel.style.cssText = `
+                    display: block;
+                `;
+
+                carouselPanel.style.cssText = `
+                    display: none;
+                `;
+
+                reelPanel.style.cssText = `
+                    display: none;
+                `;
+
+
+                const carouselBox =
+                    document.createElement('div');
+
+                carouselBox.style.cssText = `
+                    margin-top: 16px;
+                    padding: 18px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 14px;
+                    background: #ffffff;
+                `;
+
+                const carouselTitle =
+                    document.createElement('div');
+
+                carouselTitle.textContent =
+                    '▣ Carrossel';
+
+                carouselTitle.style.cssText = `
+                    font-size: 15px;
+                    font-weight: 800;
+                    color: #0f172a;
+                    margin-bottom: 8px;
+                `;
+
+                const carouselDescription =
+                    document.createElement('div');
+
+                carouselDescription.textContent =
+                    'Seleção de várias fotos, capa e ordem serão montadas nesta aba.';
+
+                carouselDescription.style.cssText = `
+                    font-size: 13px;
+                    line-height: 1.5;
+                    color: #64748b;
+                `;
+
+                const carouselReserved =
+                    document.createElement('div');
+
+                carouselReserved.textContent =
+                    'Escolha de 2 a 5 fotos para montar o Carrossel.';
+
+                carouselReserved.style.cssText = `
+                    margin-top: 12px;
+                    padding: 12px;
+                    border-radius: 10px;
+                    background: #f8fafc;
+                    color: #334155;
+                    font-size: 13px;
+                    font-weight: 700;
+                `;
+
+
+                const carouselGrid =
+                    document.createElement('div');
+
+                carouselGrid.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(5, minmax(0, 1fr));
+                    gap: 8px;
+                    margin-top: 12px;
+                `;
+
+
+                const carouselStatus =
+                    document.createElement('div');
+
+                carouselStatus.textContent =
+                    'Aguardando as fotos da Shopee...';
+
+                carouselStatus.style.cssText = `
+                    margin-top: 10px;
+                    font-size: 12px;
+                    color: #64748b;
+                `;
+
+
+                const carouselPreview =
+                    document.createElement('div');
+
+                carouselPreview.style.cssText = `
+                    display: none;
+                    margin-top: 14px;
+                    padding: 12px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 14px;
+                    background: #f8fafc;
+                `;
+
+
+                const carouselPreviewTitle =
+                    document.createElement('div');
+
+                carouselPreviewTitle.textContent =
+                    'Prévia do Carrossel';
+
+                carouselPreviewTitle.style.cssText = `
+                    margin-bottom: 10px;
+                    font-size: 13px;
+                    font-weight: 800;
+                    color: #0f172a;
+                    text-align: center;
+                `;
+
+
+                const carouselPreviewImage =
+                    document.createElement('img');
+
+                carouselPreviewImage.style.cssText = `
+                    display: block;
+                    width: 100%;
+                    max-width: 360px;
+                    aspect-ratio: 1 / 1;
+                    object-fit: contain;
+                    margin: 0 auto;
+                    border-radius: 12px;
+                    background: white;
+                `;
+
+
+                const carouselPreviewNav =
+                    document.createElement('div');
+
+                carouselPreviewNav.style.cssText = `
+                    display: grid;
+                    grid-template-columns: 46px 1fr 46px;
+                    align-items: center;
+                    gap: 10px;
+                    max-width: 360px;
+                    margin: 10px auto 0;
+                `;
+
+
+                const carouselPrevButton =
+                    document.createElement('button');
+
+                carouselPrevButton.type =
+                    'button';
+
+                carouselPrevButton.textContent =
+                    '←';
+
+                carouselPrevButton.style.cssText = `
+                    padding: 8px;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 10px;
+                    background: white;
+                    font-weight: 900;
+                    cursor: pointer;
+                `;
+
+
+                const carouselPreviewIndicator =
+                    document.createElement('div');
+
+                carouselPreviewIndicator.style.cssText = `
+                    text-align: center;
+                    font-size: 13px;
+                    font-weight: 800;
+                    color: #334155;
+                `;
+
+
+                const carouselNextButton =
+                    document.createElement('button');
+
+                carouselNextButton.type =
+                    'button';
+
+                carouselNextButton.textContent =
+                    '→';
+
+                carouselNextButton.style.cssText = `
+                    padding: 8px;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 10px;
+                    background: white;
+                    font-weight: 900;
+                    cursor: pointer;
+                `;
+
+
+                carouselPreviewNav.appendChild(
+                    carouselPrevButton
+                );
+
+                carouselPreviewNav.appendChild(
+                    carouselPreviewIndicator
+                );
+
+                carouselPreviewNav.appendChild(
+                    carouselNextButton
+                );
+
+
+                carouselPreview.appendChild(
+                    carouselPreviewTitle
+                );
+
+                carouselPreview.appendChild(
+                    carouselPreviewImage
+                );
+
+                carouselPreview.appendChild(
+                    carouselPreviewNav
+                );
+
+
+                let carouselPreviewIndex =
+                    0;
+
+
+                function renderCarouselPreview() {
+                    const total =
+                        carouselSelectedImageUrls.length;
+
+                    if (total === 0) {
+                        carouselPreview.style.display =
+                            'none';
+
+                        return;
+                    }
+
+                    if (
+                        carouselPreviewIndex >=
+                        total
+                    ) {
+                        carouselPreviewIndex =
+                            0;
+                    }
+
+                    carouselPreviewImage.src =
+                        carouselSelectedImageUrls[
+                            carouselPreviewIndex
+                        ];
+
+                    carouselPreviewIndicator.textContent =
+                        (
+                            carouselPreviewIndex === 0
+                                ? 'CAPA • '
+                                : ''
+                        ) +
+                        (carouselPreviewIndex + 1) +
+                        ' / ' +
+                        total;
+
+                    carouselPreview.style.display =
+                        'block';
+                }
+
+
+                carouselPrevButton.addEventListener(
+                    'click',
+                    () => {
+                        const total =
+                            carouselSelectedImageUrls.length;
+
+                        if (total === 0) {
+                            return;
+                        }
+
+                        carouselPreviewIndex =
+                            (
+                                carouselPreviewIndex -
+                                1 +
+                                total
+                            ) %
+                            total;
+
+                        renderCarouselPreview();
+                    }
+                );
+
+
+                carouselNextButton.addEventListener(
+                    'click',
+                    () => {
+                        const total =
+                            carouselSelectedImageUrls.length;
+
+                        if (total === 0) {
+                            return;
+                        }
+
+                        carouselPreviewIndex =
+                            (
+                                carouselPreviewIndex +
+                                1
+                            ) %
+                            total;
+
+                        renderCarouselPreview();
+                    }
+                );
+
+
+                const carouselBuildButton =
+                    document.createElement('button');
+
+                carouselBuildButton.type =
+                    'button';
+
+                carouselBuildButton.textContent =
+                    'Processar Carrossel';
+
+                carouselBuildButton.disabled =
+                    true;
+
+                carouselBuildButton.style.cssText = `
+                    width: 100%;
+                    margin-top: 12px;
+                    padding: 12px;
+                    border: 0;
+                    border-radius: 12px;
+                    background: #e1306c;
+                    color: white;
+                    font-weight: 800;
+                    cursor: pointer;
+                `;
+
+
+                function renderCarouselChoices() {
+                    carouselGrid.innerHTML =
+                        '';
+
+                    if (
+                        !Array.isArray(galleryImageUrls) ||
+                        galleryImageUrls.length === 0
+                    ) {
+                        carouselStatus.textContent =
+                            'As fotos ainda não foram carregadas.';
+                        carouselBuildButton.disabled =
+                            true;
+                        return;
+                    }
+
+                    galleryImageUrls.forEach(
+                        (imageUrl, index) => {
+                            const label =
+                                document.createElement('label');
+
+                            label.style.cssText = `
+                                position: relative;
+                                display: block;
+                                padding: 4px;
+                                border: 2px solid #16a34a;
+                                border-radius: 12px;
+                                background: white;
+                                cursor: pointer;
+                            `;
+
+                            const checkbox =
+                                document.createElement('input');
+
+                            checkbox.type =
+                                'checkbox';
+
+                            checkbox.checked =
+                                true;
+
+                            checkbox.dataset.imageUrl =
+                                imageUrl;
+
+                            checkbox.style.cssText = `
+                                position: absolute;
+                                top: 7px;
+                                right: 7px;
+                                width: 18px;
+                                height: 18px;
+                                z-index: 2;
+                            `;
+
+                            const image =
+                                document.createElement('img');
+
+                            image.src =
+                                imageUrl;
+
+                            image.alt =
+                                'Foto ' + (index + 1);
+
+                            image.style.cssText = `
+                                width: 100%;
+                                aspect-ratio: 1 / 1;
+                                object-fit: contain;
+                                display: block;
+                                border-radius: 8px;
+                                background: white;
+                            `;
+
+                            checkbox.addEventListener(
+                                'change',
+                                () => {
+                                    label.style.borderColor =
+                                        checkbox.checked
+                                            ? '#16a34a'
+                                            : '#cbd5e1';
+
+                                    carouselSelectedImageUrls =
+                                        Array.from(
+                                            carouselGrid.querySelectorAll(
+                                                'input[type="checkbox"]:checked'
+                                            )
+                                        )
+                                            .map(
+                                                input =>
+                                                    input.dataset.imageUrl
+                                            )
+                                            .filter(Boolean);
+
+                                    const selected =
+                                        carouselSelectedImageUrls.length;
+
+                                    carouselStatus.textContent =
+                                        selected +
+                                        ' foto(s) selecionada(s).';
+
+                                    carouselStatus.style.color =
+                                        '#64748b';
+
+                                    carouselBuildButton.disabled =
+                                        selected < 2 ||
+                                        selected > 5;
+
+                                    carouselBuildButton.style.display =
+                                        'block';
+
+                                    carouselBuildButton.textContent =
+                                        'Processar Carrossel';
+
+                                    carouselBuildButton.style.background =
+                                        '#e1306c';
+
+                                    carouselApproveButton.style.display =
+                                        'none';
+
+                                    carouselReview.status.style.display =
+                                        'none';
+
+                                    carouselReview.textarea.style.display =
+                                        'none';
+
+                                    if (selected >= 2) {
+                                        if (
+                                            carouselPreviewIndex >=
+                                            selected
+                                        ) {
+                                            carouselPreviewIndex =
+                                                0;
+                                        }
+
+                                        renderCarouselPreview();
+                                    } else {
+                                        carouselPreview.style.display =
+                                            'none';
+                                    }
+                                }
+                            );
+
+                            label.appendChild(
+                                checkbox
+                            );
+
+                            label.appendChild(
+                                image
+                            );
+
+                            carouselGrid.appendChild(
+                                label
+                            );
+                        }
+                    );
+
+                    carouselStatus.textContent =
+                        galleryImageUrls.length +
+                        ' fotos selecionadas.';
+
+                    carouselBuildButton.disabled =
+                        galleryImageUrls.length < 2;
+                }
+
+
+                carouselBuildButton.addEventListener(
+                    'click',
+                    async () => {
+                        const selectedImages =
+                            Array.from(
+                                carouselGrid.querySelectorAll(
+                                    'input[type="checkbox"]:checked'
+                                )
+                            )
+                                .map(
+                                    input =>
+                                        input.dataset.imageUrl
+                                )
+                                .filter(Boolean);
+
+                        if (
+                            selectedImages.length < 2
+                        ) {
+                            carouselStatus.textContent =
+                                'Selecione pelo menos 2 fotos.';
+
+                            carouselStatus.style.color =
+                                '#b91c1c';
+
+                            return;
+                        }
+
+                        carouselBuildButton.disabled =
+                            true;
+
+                        carouselBuildButton.textContent =
+                            '⏳ Processando Carrossel...';
+
+                        carouselBuildButton.style.background =
+                            '#e1306c';
+
+                        carouselSelectedImageUrls =
+                            selectedImages;
+
+                        carouselPreviewIndex =
+                            0;
+
+                        renderCarouselPreview();
+
+                        carouselStatus.textContent =
+                            '✅ Carrossel pronto com ' +
+                            carouselSelectedImageUrls.length +
+                            ' fotos.';
+
+                        carouselStatus.style.color =
+                            '#166534';
+
+                        const carouselApproved =
+                            await prepareInstagramFormatReview(
+                                carouselReview
+                            );
+
+                        if (carouselApproved) {
+                            carouselBuildButton.style.display =
+                                'none';
+
+                            carouselApproveButton.style.display =
+                                'block';
+                        } else {
+                            carouselBuildButton.textContent =
+                                'Tentar processar Carrossel';
+
+                            carouselBuildButton.style.background =
+                                '#e1306c';
+                        }
+
+                        carouselBuildButton.disabled =
+                            false;
+                    }
+                );
+
+
+                const carouselReview =
+                    createInstagramReviewArea();
+
+
+                const carouselApproveButton =
+                    document.createElement('button');
+
+                carouselApproveButton.type =
+                    'button';
+
+                carouselApproveButton.textContent =
+                    '✓ Aprovado para publicar';
+
+                carouselApproveButton.style.cssText = `
+                    display: none;
+                    width: 100%;
+                    margin-top: 14px;
+                    padding: 13px;
+                    border: 0;
+                    border-radius: 12px;
+                    background: #16a34a;
+                    color: white;
+                    font-weight: 800;
+                    cursor: pointer;
+                `;
+
+
+                function setCarouselPublishedState(
+                    publication
+                ) {
+                    carouselApproveButton.disabled =
+                        true;
+
+                    carouselApproveButton.textContent =
+                        '✓ Publicado';
+
+                    carouselApproveButton.style.display =
+                        'block';
+
+                    carouselApproveButton.style.background =
+                        '#2563eb';
+
+                    carouselApproveButton.style.cursor =
+                        'default';
+
+                    carouselBuildButton.style.display =
+                        'none';
+
+                    carouselReview.textarea.disabled =
+                        true;
+
+                    const publishedAt =
+                        formatPublicationDate(
+                            publication?.publishedAt
+                        );
+
+                    carouselStatus.textContent =
+                        publishedAt
+                            ? `🔵 Carrossel publicado no Instagram em ${publishedAt}.`
+                            : '🔵 Carrossel já publicado no Instagram.';
+
+                    carouselStatus.style.color =
+                        '#1d4ed8';
+                }
+
+
+                async function loadCarouselPublicationState() {
+                    if (
+                        !/^\d+$/.test(
+                            publicationItemId
+                        )
+                    ) {
+                        return;
+                    }
+
+                    try {
+                        const params =
+                            new URLSearchParams({
+                                marketplace:
+                                    publicationMarketplace,
+
+                                itemId:
+                                    publicationItemId
+                            });
+
+                        const response =
+                            await fetch(
+                                '/admin/vitrine2/marketing/publication-history?' +
+                                params.toString(),
+                                {
+                                    cache:
+                                        'no-store'
+                                }
+                            );
+
+                        if (!response.ok) {
+                            return;
+                        }
+
+                        const payload =
+                            await response.json();
+
+                        const publication =
+                            Array.isArray(
+                                payload?.publications
+                            )
+                                ? payload.publications.find(
+                                    entry =>
+                                        entry?.channel ===
+                                            'instagram' &&
+                                        entry?.format ===
+                                            'carousel'
+                                )
+                                : null;
+
+
+                        if (
+                            publication?.status ===
+                            'PUBLISHED'
+                        ) {
+                            setCarouselPublishedState(
+                                publication
+                            );
+
+                            return;
+                        }
+
+
+                        if (
+                            publication?.status ===
+                            'PROCESSING'
+                        ) {
+                            carouselApproveButton.disabled =
+                                true;
+
+                            carouselApproveButton.style.display =
+                                'block';
+
+                            carouselApproveButton.textContent =
+                                '⏳ Publicação em processamento';
+
+                            carouselApproveButton.style.background =
+                                '#64748b';
+
+                            carouselStatus.textContent =
+                                '⏳ Este Carrossel já possui uma publicação em processamento.';
+
+                            carouselStatus.style.color =
+                                '#475569';
+                        }
+                    } catch (error) {
+                        console.warn(
+                            '[INSTAGRAM] Histórico do Carrossel indisponível:',
+                            error
+                        );
+                    }
+                }
+
+
+                carouselApproveButton.addEventListener(
+                    'click',
+                    async () => {
+                        const imageUrls =
+                            Array.isArray(
+                                carouselSelectedImageUrls
+                            )
+                                ? carouselSelectedImageUrls
+                                    .map(
+                                        value =>
+                                            String(
+                                                value ||
+                                                ''
+                                            ).trim()
+                                    )
+                                    .filter(Boolean)
+                                : [];
+
+
+                        const finalCaption =
+                            String(
+                                carouselReview
+                                    .textarea
+                                    .value ||
+                                ''
+                            ).trim();
+
+
+                        if (
+                            imageUrls.length < 2 ||
+                            imageUrls.length > 5
+                        ) {
+                            window.alert(
+                                'Selecione entre 2 e 5 fotos para publicar o Carrossel.'
+                            );
+
+                            return;
+                        }
+
+
+                        if (!finalCaption) {
+                            window.alert(
+                                'A legenda do Carrossel está vazia.'
+                            );
+
+                            return;
+                        }
+
+
+                        const confirmed =
+                            window.confirm(
+                                'Confirma a aprovação e publicação deste Carrossel no Instagram?'
+                            );
+
+
+                        if (!confirmed) {
+                            return;
+                        }
+
+
+                        try {
+                            carouselApproveButton.disabled =
+                                true;
+
+                            carouselApproveButton.textContent =
+                                '⏳ Publicando Carrossel...';
+
+                            carouselApproveButton.style.background =
+                                '#e1306c';
+
+                            carouselStatus.textContent =
+                                '⏳ Enviando Carrossel para o Instagram...';
+
+                            carouselStatus.style.color =
+                                '#475569';
+
+
+                            const publishResponse =
+                                await fetch(
+                                    '/admin/vitrine2/marketing/meta/publish',
+                                    {
+                                        method:
+                                            'POST',
+
+                                        headers: {
+                                            'Content-Type':
+                                                'application/json'
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+                                                marketplace:
+                                                    publicationMarketplace,
+
+                                                itemId:
+                                                    publicationItemId,
+
+                                                format:
+                                                    'carousel',
+
+                                                imageUrls,
+
+                                                caption:
+                                                    finalCaption,
+
+                                                channels: [
+                                                    'instagram'
+                                                ]
+                                            })
+                                    }
+                                );
+
+
+                            let publishPayload =
+                                {};
+
+
+                            try {
+                                publishPayload =
+                                    await publishResponse.json();
+                            } catch (_) {
+                                publishPayload =
+                                    {};
+                            }
+
+
+                            /*
+                             * Publicação já existente:
+                             * nunca chama a Meta novamente.
+                             */
+                            if (
+                                publishResponse.status ===
+                                    409 &&
+                                publishPayload
+                                    ?.error
+                                    ?.code ===
+                                    'PUBLICATION_ALREADY_EXISTS'
+                            ) {
+                                const existingPublication =
+                                    publishPayload
+                                        ?.publication;
+
+
+                                if (
+                                    existingPublication
+                                        ?.status ===
+                                        'PUBLISHED'
+                                ) {
+                                    setCarouselPublishedState(
+                                        existingPublication
+                                    );
+
+                                    return;
+                                }
+
+
+                                carouselApproveButton.disabled =
+                                    true;
+
+                                carouselApproveButton.textContent =
+                                    '⏳ Publicação em processamento';
+
+                                carouselApproveButton.style.background =
+                                    '#64748b';
+
+                                carouselStatus.textContent =
+                                    '⏳ Este Carrossel já possui uma publicação em processamento.';
+
+                                carouselStatus.style.color =
+                                    '#475569';
+
+                                return;
+                            }
+
+
+                            const channelResult =
+                                publishPayload
+                                    ?.channels
+                                    ?.instagram ||
+                                null;
+
+
+                            if (
+                                !publishResponse.ok ||
+                                publishPayload?.success ===
+                                    false ||
+                                channelResult?.success ===
+                                    false ||
+                                channelResult?.error
+                            ) {
+                                throw new Error(
+                                    channelResult
+                                        ?.error
+                                        ?.message ||
+                                    publishPayload
+                                        ?.error
+                                        ?.message ||
+                                    'A publicação do Carrossel não foi concluída.'
+                                );
+                            }
+
+
+                            const savedPublication =
+                                publishPayload
+                                    ?.publications
+                                    ?.instagram ||
+                                null;
+
+
+                            setCarouselPublishedState(
+                                savedPublication
+                            );
+
+
+                            carouselStatus.textContent =
+                                savedPublication?.publishedAt
+                                    ? `🔵 Carrossel publicado no Instagram em ${formatPublicationDate(savedPublication.publishedAt)}.`
+                                    : '🔵 Carrossel publicado no Instagram com sucesso.';
+
+                        } catch (error) {
+                            console.error(
+                                '[INSTAGRAM] Erro ao publicar Carrossel:',
+                                error
+                            );
+
+
+                            carouselStatus.textContent =
+                                `❌ ${
+                                    error?.message ||
+                                    'Erro na publicação do Carrossel.'
+                                }`;
+
+                            carouselStatus.style.color =
+                                '#b91c1c';
+
+
+                            carouselApproveButton.disabled =
+                                false;
+
+                            carouselApproveButton.textContent =
+                                '✓ Aprovado para publicar';
+
+                            carouselApproveButton.style.background =
+                                '#16a34a';
+                        }
+                    }
+                );
+
+
+                carouselBox.appendChild(
+                    carouselTitle
+                );
+
+                carouselBox.appendChild(
+                    carouselDescription
+                );
+
+                carouselBox.appendChild(
+                    carouselReserved
+                );
+
+                carouselBox.appendChild(
+                    carouselGrid
+                );
+
+                carouselBox.appendChild(
+                    carouselStatus
+                );
+
+                carouselBox.appendChild(
+                    carouselBuildButton
+                );
+
+                carouselBox.appendChild(
+                    carouselPreview
+                );
+
+                carouselBox.appendChild(
+                    carouselReview.status
+                );
+
+                carouselBox.appendChild(
+                    carouselReview.textarea
+                );
+
+                carouselBox.appendChild(
+                    carouselApproveButton
+                );
+
+                carouselPanel.appendChild(
+                    carouselBox
+                );
+
+
+                function setInstagramFormatTab(
+                    format
+                ) {
+                    const isPhoto =
+                        format === 'photo';
+
+                    const isCarousel =
+                        format === 'carousel';
+
+                    const isReel =
+                        format === 'reel';
+
+                    photoPanel.style.display =
+                        isPhoto
+                            ? 'block'
+                            : 'none';
+
+                    carouselPanel.style.display =
+                        isCarousel
+                            ? 'block'
+                            : 'none';
+
+                    reelPanel.style.display =
+                        isReel
+                            ? 'block'
+                            : 'none';
+
+                    const buttons = [
+                        photoTabButton,
+                        carouselTabButton,
+                        reelTabButton
+                    ];
+
+                    for (
+                        const button
+                        of buttons
+                    ) {
+                        const active =
+                            button.dataset.format ===
+                            format;
+
+                        button.style.background =
+                            active
+                                ? '#ffffff'
+                                : 'transparent';
+
+                        button.style.color =
+                            active
+                                ? '#0f172a'
+                                : '#64748b';
+
+                        button.style.boxShadow =
+                            active
+                                ? '0 1px 4px rgba(15, 23, 42, 0.12)'
+                                : 'none';
+                    }
+                }
+
+
+                photoTabButton.addEventListener(
+                    'click',
+                    () =>
+                        setInstagramFormatTab(
+                            'photo'
+                        )
+                );
+
+                carouselTabButton.addEventListener(
+                    'click',
+                    () =>
+                        setInstagramFormatTab(
+                            'carousel'
+                        )
+                );
+
+                reelTabButton.addEventListener(
+                    'click',
+                    () =>
+                        setInstagramFormatTab(
+                            'reel'
+                        )
+                );
+
+
+                photoPanel.appendChild(
+                    galleryBox
+                );
+
+                photoPanel.appendChild(
+                    generateButton
+                );
+
+                photoPanel.appendChild(
+                    statusBox
+                );
+
+                photoPanel.appendChild(
+                    textarea
+                );
+
+                photoPanel.appendChild(
+                    publishButton
+                );
+
+
+                reelPanel.appendChild(
+                    reelBox
+                );
+
+
+                setInstagramFormatTab(
+                    'photo'
+                );
+
+
                 generateButton.addEventListener(
                     'click',
                     async () => {
@@ -1461,7 +3400,10 @@
                                 true;
 
                             generateButton.textContent =
-                                'Gerando...';
+                                '⏳ Processando Foto...';
+
+                            generateButton.style.background =
+                                '#e1306c';
 
                             statusBox.textContent =
                                 'Preparando conteúdo...';
@@ -1580,17 +3522,26 @@
                                 '#166534';
 
                             generateButton.textContent =
-                                'Rascunho gerado';
+                                'Processamento concluído';
 
                             if (
                                 result.status === 'READY' &&
                                 auditStatus === 'APPROVED'
                             ) {
+                                generateButton.style.display =
+                                    'none';
+
                                 publishButton.style.display =
                                     'block';
 
                                 publishButton.disabled =
                                     false;
+
+                                publishButton.textContent =
+                                    '✓ Aprovado para publicar';
+
+                                publishButton.style.background =
+                                    '#16a34a';
                             }
                         } catch (error) {
                             console.error(
@@ -1611,10 +3562,187 @@
                                 false;
 
                             generateButton.textContent =
-                                'Tentar novamente';
+                                'Tentar processar novamente';
+
+                            generateButton.style.background =
+                                '#e1306c';
                         }
                     }
                 );
+
+                const publicationMarketplace =
+                    String(
+                        product?.marketplace ||
+                        'shopee'
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                const publicationItemId =
+                    String(
+                        product?.itemId ||
+                        ''
+                    ).trim();
+
+
+                function formatPublicationDate(
+                    value
+                ) {
+                    if (!value) {
+                        return '';
+                    }
+
+                    try {
+                        const normalized =
+                            String(value).includes('T')
+                                ? String(value)
+                                : String(value)
+                                    .replace(' ', 'T') +
+                                  'Z';
+
+                        const date =
+                            new Date(normalized);
+
+                        if (
+                            Number.isNaN(
+                                date.getTime()
+                            )
+                        ) {
+                            return String(value);
+                        }
+
+                        return date.toLocaleString(
+                            'pt-BR'
+                        );
+                    } catch (_) {
+                        return String(value);
+                    }
+                }
+
+
+                function setPhotoPublishedState(
+                    publication
+                ) {
+                    publishButton.disabled =
+                        true;
+
+                    publishButton.textContent =
+                        '✓ Publicado';
+
+                    publishButton.style.background =
+                        '#2563eb';
+
+                    publishButton.style.cursor =
+                        'default';
+
+                    textarea.disabled =
+                        true;
+
+                    generateButton.disabled =
+                        true;
+
+                    const publishedAt =
+                        formatPublicationDate(
+                            publication?.publishedAt
+                        );
+
+                    statusBox.textContent =
+                        publishedAt
+                            ? `🔵 Foto já publicada no Instagram em ${publishedAt}.`
+                            : '🔵 Foto já publicada no Instagram.';
+
+                    statusBox.style.color =
+                        '#1d4ed8';
+                }
+
+
+                async function loadPhotoPublicationState() {
+                    if (
+                        !/^\d+$/.test(
+                            publicationItemId
+                        )
+                    ) {
+                        return;
+                    }
+
+                    try {
+                        const params =
+                            new URLSearchParams({
+                                marketplace:
+                                    publicationMarketplace,
+
+                                itemId:
+                                    publicationItemId
+                            });
+
+                        const response =
+                            await fetch(
+                                '/admin/vitrine2/marketing/publication-history?' +
+                                params.toString(),
+                                {
+                                    cache:
+                                        'no-store'
+                                }
+                            );
+
+                        if (!response.ok) {
+                            return;
+                        }
+
+                        const payload =
+                            await response.json();
+
+                        const publication =
+                            Array.isArray(
+                                payload?.publications
+                            )
+                                ? payload.publications.find(
+                                    entry =>
+                                        entry?.channel ===
+                                            'instagram' &&
+                                        entry?.format ===
+                                            'photo'
+                                )
+                                : null;
+
+                        if (
+                            publication?.status ===
+                            'PUBLISHED'
+                        ) {
+                            setPhotoPublishedState(
+                                publication
+                            );
+
+                            return;
+                        }
+
+                        if (
+                            publication?.status ===
+                            'PROCESSING'
+                        ) {
+                            publishButton.disabled =
+                                true;
+
+                            publishButton.textContent =
+                                '⏳ Publicação em processamento';
+
+                            publishButton.style.background =
+                                '#64748b';
+
+                            statusBox.textContent =
+                                '⏳ Esta Foto já possui uma publicação em processamento.';
+
+                            statusBox.style.color =
+                                '#475569';
+                        }
+                    } catch (error) {
+                        console.warn(
+                            '[INSTAGRAM] Histórico da Foto indisponível:',
+                            error
+                        );
+                    }
+                }
+
 
                 publishButton.addEventListener(
                     'click',
@@ -1662,7 +3790,10 @@
                                 true;
 
                             publishButton.textContent =
-                                'Publicando...';
+                                '⏳ Publicando...';
+
+                            publishButton.style.background =
+                                '#e1306c';
 
                             statusBox.textContent =
                                 '⏳ Enviando publicação para o Instagram...';
@@ -1683,9 +3814,20 @@
 
                                         body:
                                             JSON.stringify({
+                                                marketplace:
+                                                    publicationMarketplace,
+
+                                                itemId:
+                                                    publicationItemId,
+
+                                                format:
+                                                    'photo',
+
                                                 imageUrl,
+
                                                 caption:
                                                     finalCaption,
+
                                                 channels: [
                                                     'instagram'
                                                 ]
@@ -1713,6 +3855,49 @@
                                     ?.instagram ||
                                 null;
 
+
+                            if (
+                                publishResponse.status === 409 &&
+                                publishPayload
+                                    ?.error
+                                    ?.code ===
+                                    'PUBLICATION_ALREADY_EXISTS'
+                            ) {
+                                const existingPublication =
+                                    publishPayload
+                                        ?.publication;
+
+                                if (
+                                    existingPublication
+                                        ?.status ===
+                                        'PUBLISHED'
+                                ) {
+                                    setPhotoPublishedState(
+                                        existingPublication
+                                    );
+
+                                    return;
+                                }
+
+                                publishButton.disabled =
+                                    true;
+
+                                publishButton.textContent =
+                                    '⏳ Publicação em processamento';
+
+                                publishButton.style.background =
+                                    '#64748b';
+
+                                statusBox.textContent =
+                                    '⏳ Esta Foto já possui uma publicação em processamento.';
+
+                                statusBox.style.color =
+                                    '#475569';
+
+                                return;
+                            }
+
+
                             if (
                                 !publishResponse.ok ||
                                 publishPayload?.success === false ||
@@ -1731,23 +3916,20 @@
                                 );
                             }
 
+                            const savedPublication =
+                                publishPayload
+                                    ?.publications
+                                    ?.instagram ||
+                                null;
+
+                            setPhotoPublishedState(
+                                savedPublication
+                            );
+
                             statusBox.textContent =
-                                '✅ Publicado no Instagram com sucesso.';
-
-                            statusBox.style.color =
-                                '#166534';
-
-                            publishButton.textContent =
-                                'Publicado';
-
-                            publishButton.style.background =
-                                '#15803d';
-
-                            textarea.disabled =
-                                true;
-
-                            generateButton.disabled =
-                                true;
+                                savedPublication?.publishedAt
+                                    ? `🔵 Foto publicada no Instagram em ${formatPublicationDate(savedPublication.publishedAt)}.`
+                                    : '🔵 Foto publicada no Instagram com sucesso.';
                         } catch (error) {
                             console.error(
                                 '[INSTAGRAM] Erro ao publicar:',
@@ -1767,7 +3949,10 @@
                                 false;
 
                             publishButton.textContent =
-                                'Tentar publicar novamente';
+                                '✓ Aprovado para publicar';
+
+                            publishButton.style.background =
+                                '#16a34a';
                         }
                     }
                 );
@@ -1794,11 +3979,10 @@
                 modal.appendChild(heading);
                 modal.appendChild(productBox);
                 modal.appendChild(policyBox);
-                modal.appendChild(galleryBox);
-                modal.appendChild(generateButton);
-                modal.appendChild(statusBox);
-                modal.appendChild(textarea);
-                modal.appendChild(publishButton);
+                modal.appendChild(formatTabs);
+                modal.appendChild(photoPanel);
+                modal.appendChild(carouselPanel);
+                modal.appendChild(reelPanel);
                 modal.appendChild(closeButton);
 
                 overlay.appendChild(modal);
@@ -1807,6 +3991,8 @@
                     overlay
                 );
 
+                loadPhotoPublicationState();
+                loadCarouselPublicationState();
                 loadInstagramGallery();
 
                 console.log(

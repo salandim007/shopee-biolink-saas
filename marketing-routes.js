@@ -1,11 +1,21 @@
 'use strict';
 
+const fs =
+    require('node:fs');
+
+const path =
+    require('node:path');
+
 const express =
     require('express');
 
 const {
     captureShopeeMedia
 } = require('./shopee-browser-media-capture');
+
+const {
+    generateReel
+} = require('./marketing/reel-generator');
 
 const {
     createMetaPublisher
@@ -26,6 +36,10 @@ const {
 const {
     createEvidenceAuditor
 } = require('./marketing/evidence-auditor');
+
+const publicationHistoryStore =
+    require('./marketing/publication-history-store');
+
 
 const router =
     express.Router();
@@ -535,6 +549,187 @@ router.post(
 
 
 router.post(
+    '/media/reel',
+    async (req, res) => {
+        const body =
+            req.body || {};
+
+        const imageUrls =
+            Array.isArray(body.imageUrls)
+                ? body.imageUrls
+                : [];
+
+        if (imageUrls.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code:
+                        'REEL_IMAGES_REQUIRED',
+
+                    message:
+                        'Informe pelo menos uma imagem para gerar o Reel.'
+                }
+            });
+        }
+
+        if (imageUrls.length > 5) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code:
+                        'REEL_TOO_MANY_IMAGES',
+
+                    message:
+                        'O Reel aceita no máximo 5 imagens nesta etapa.'
+                }
+            });
+        }
+
+        try {
+            const result =
+                await generateReel({
+                    imageUrls
+                });
+
+            const videoUrl =
+                '/admin/vitrine2/marketing/media/reel/' +
+                encodeURIComponent(
+                    result.jobId
+                );
+
+            return res.json({
+                success: true,
+
+                jobId:
+                    result.jobId,
+
+                videoUrl,
+
+                imageCount:
+                    result.imageCount,
+
+                width:
+                    result.width,
+
+                height:
+                    result.height,
+
+                fps:
+                    result.fps,
+
+                durationSeconds:
+                    result.durationSeconds
+            });
+        } catch (error) {
+            console.error(
+                '[MARKETING REEL] Falha ao gerar Reel:',
+                error?.code || '',
+                error?.message || error
+            );
+
+            const validationCodes =
+                new Set([
+                    'REEL_IMAGES_REQUIRED',
+                    'REEL_INVALID_IMAGE_URL'
+                ]);
+
+            const status =
+                validationCodes.has(
+                    error?.code
+                )
+                    ? 400
+                    : 500;
+
+            return res.status(status).json({
+                success: false,
+
+                error: {
+                    code:
+                        error?.code ||
+                        'REEL_GENERATION_FAILED',
+
+                    message:
+                        status === 400
+                            ? error.message
+                            : 'Não foi possível gerar o Reel.'
+                }
+            });
+        }
+    }
+);
+
+
+router.get(
+    '/media/reel/:jobId',
+    (req, res) => {
+        const jobId =
+            String(
+                req.params.jobId ||
+                ''
+            ).trim();
+
+        if (
+            !/^[a-zA-Z0-9_-]+$/.test(
+                jobId
+            )
+        ) {
+            return res.status(400).json({
+                success: false,
+
+                error: {
+                    code:
+                        'INVALID_REEL_JOB_ID',
+
+                    message:
+                        'Identificador do Reel inválido.'
+                }
+            });
+        }
+
+        const reelPath =
+            path.join(
+                process.cwd(),
+                'tmp',
+                'reels',
+                jobId,
+                'reel.mp4'
+            );
+
+        if (
+            !fs.existsSync(
+                reelPath
+            )
+        ) {
+            return res.status(404).json({
+                success: false,
+
+                error: {
+                    code:
+                        'REEL_NOT_FOUND',
+
+                    message:
+                        'Reel não encontrado.'
+                }
+            });
+        }
+
+        res.set(
+            'Cache-Control',
+            'no-store'
+        );
+
+        res.type(
+            'video/mp4'
+        );
+
+        return res.sendFile(
+            reelPath
+        );
+    }
+);
+
+
+router.post(
     '/prepare',
     async (req, res) => {
         const body = req.body || {};
@@ -724,6 +919,71 @@ router.post(
 );
 
 
+router.get(
+    '/publication-history',
+    async (req, res) => {
+        const marketplace =
+            String(
+                req.query.marketplace ||
+                'shopee'
+            )
+                .trim()
+                .toLowerCase();
+
+        const itemId =
+            String(
+                req.query.itemId ||
+                ''
+            ).trim();
+
+        if (!/^\d+$/.test(itemId)) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code:
+                        'INVALID_ITEM_ID',
+
+                    message:
+                        'itemId inválido.'
+                }
+            });
+        }
+
+        try {
+            const publications =
+                await publicationHistoryStore
+                    .listProductPublications({
+                        marketplace,
+                        itemId
+                    });
+
+            return res.json({
+                success: true,
+                marketplace,
+                itemId,
+                publications
+            });
+        } catch (error) {
+            console.error(
+                '[MARKETING HISTORY] Falha:',
+                error?.message || error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error: {
+                    code:
+                        'PUBLICATION_HISTORY_ERROR',
+
+                    message:
+                        'Não foi possível consultar o histórico.'
+                }
+            });
+        }
+    }
+);
+
+
 router.post(
     '/meta/publish',
     async (req, res) => {
@@ -735,29 +995,62 @@ router.post(
                 success: false,
                 error: {
                     code: 'NOT_FOUND',
-                    message: 'Rota não encontrada.'
+                    message:
+                        'Rota não encontrada.'
                 }
             });
         }
 
-        const body = req.body || {};
-        const imageUrl = body.imageUrl;
-        const caption = body.caption;
-        const channels = body.channels;
+        const body =
+            req.body || {};
+
+        const caption =
+            body.caption;
+
+        const channels =
+            body.channels;
+
+        const marketplace =
+            String(
+                body.marketplace ||
+                'shopee'
+            )
+                .trim()
+                .toLowerCase();
+
+        const itemId =
+            String(
+                body.itemId ||
+                ''
+            ).trim();
+
+        const format =
+            String(
+                body.format ||
+                'photo'
+            )
+                .trim()
+                .toLowerCase();
+
 
         if (
-            typeof imageUrl !==
-                'string' ||
-            !imageUrl.trim()
+            ![
+                'photo',
+                'carousel'
+            ].includes(format)
         ) {
             return res.status(400).json({
                 success: false,
                 error: {
-                    code: 'IMAGE_URL_REQUIRED',
-                    message: 'imageUrl é obrigatória.'
+                    code:
+                        'FORMAT_NOT_SUPPORTED',
+
+                    message:
+                        'Formato de publicação inválido.'
                 }
             });
         }
+
 
         if (
             typeof caption !==
@@ -766,11 +1059,29 @@ router.post(
             return res.status(400).json({
                 success: false,
                 error: {
-                    code: 'INVALID_CAPTION',
-                    message: 'caption deve ser uma string.'
+                    code:
+                        'INVALID_CAPTION',
+
+                    message:
+                        'caption deve ser uma string.'
                 }
             });
         }
+
+
+        if (!/^\d+$/.test(itemId)) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code:
+                        'INVALID_ITEM_ID',
+
+                    message:
+                        'itemId inválido.'
+                }
+            });
+        }
+
 
         if (
             !Array.isArray(channels) ||
@@ -779,14 +1090,26 @@ router.post(
             return res.status(400).json({
                 success: false,
                 error: {
-                    code: 'CHANNELS_REQUIRED',
-                    message: 'Informe pelo menos um canal.'
+                    code:
+                        'CHANNELS_REQUIRED',
+
+                    message:
+                        'Informe pelo menos um canal.'
                 }
             });
         }
 
+
+        const uniqueChannels =
+            [
+                ...new Set(
+                    channels
+                )
+            ];
+
+
         if (
-            channels.some(
+            uniqueChannels.some(
                 channel =>
                     ![
                         'instagram',
@@ -797,45 +1120,322 @@ router.post(
             return res.status(400).json({
                 success: false,
                 error: {
-                    code: 'INVALID_CHANNEL',
-                    message: 'Canal de publicação inválido.'
+                    code:
+                        'INVALID_CHANNEL',
+
+                    message:
+                        'Canal de publicação inválido.'
                 }
             });
         }
 
+
+        /*
+         * FOTO
+         */
+        let normalizedImageUrl =
+            null;
+
+
+        if (format === 'photo') {
+            normalizedImageUrl =
+                String(
+                    body.imageUrl ||
+                    ''
+                ).trim();
+
+            if (!normalizedImageUrl) {
+                return res.status(400).json({
+                    success: false,
+                    error: {
+                        code:
+                            'IMAGE_URL_REQUIRED',
+
+                        message:
+                            'imageUrl é obrigatória.'
+                    }
+                });
+            }
+        }
+
+
+        /*
+         * CARROSSEL
+         */
+        let normalizedImageUrls =
+            [];
+
+
+        if (format === 'carousel') {
+            normalizedImageUrls =
+                Array.isArray(
+                    body.imageUrls
+                )
+                    ? [
+                        ...new Set(
+                            body.imageUrls
+                                .map(
+                                    value =>
+                                        String(
+                                            value ||
+                                            ''
+                                        ).trim()
+                                )
+                                .filter(Boolean)
+                        )
+                    ]
+                    : [];
+
+
+            if (
+                normalizedImageUrls.length < 2 ||
+                normalizedImageUrls.length > 5
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    error: {
+                        code:
+                            'CAROUSEL_IMAGES_INVALID',
+
+                        message:
+                            'O Carrossel precisa ter entre 2 e 5 imagens.'
+                    }
+                });
+            }
+
+
+            if (
+                uniqueChannels.length !== 1 ||
+                uniqueChannels[0] !==
+                    'instagram'
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    error: {
+                        code:
+                            'CAROUSEL_CHANNEL_NOT_SUPPORTED',
+
+                        message:
+                            'Nesta etapa o Carrossel está disponível apenas para Instagram.'
+                    }
+                });
+            }
+        }
+
+
+        const reservedChannels =
+            [];
+
+
         try {
-            const result =
-                await metaPublisher
-                    .publishToChannels({
-                        imageUrl:
-                            imageUrl.trim(),
+            /*
+             * Reserva Produto + Canal + Formato.
+             */
+            for (
+                const channel
+                of uniqueChannels
+            ) {
+                const reservation =
+                    await publicationHistoryStore
+                        .beginPublication({
+                            marketplace,
+                            itemId,
+                            channel,
+                            format
+                        });
 
-                        caption,
 
-                        channels
+                if (
+                    !reservation.allowed
+                ) {
+                    for (
+                        const reservedChannel
+                        of reservedChannels
+                    ) {
+                        await publicationHistoryStore
+                            .markFailed({
+                                marketplace,
+                                itemId,
+                                channel:
+                                    reservedChannel,
+                                format
+                            });
+                    }
+
+
+                    return res.status(409).json({
+                        success: false,
+
+                        error: {
+                            code:
+                                'PUBLICATION_ALREADY_EXISTS',
+
+                            message:
+                                'Este formato já foi publicado ou está em processamento.'
+                        },
+
+                        publication:
+                            reservation.publication
                     });
+                }
 
-            return res.json(
-                result
-            );
+
+                reservedChannels.push(
+                    channel
+                );
+            }
+
+
+            let result;
+
+
+            /*
+             * PUBLICAÇÃO DA FOTO
+             */
+            if (format === 'photo') {
+                result =
+                    await metaPublisher
+                        .publishToChannels({
+                            imageUrl:
+                                normalizedImageUrl,
+
+                            caption,
+
+                            channels:
+                                uniqueChannels
+                        });
+            }
+
+
+            /*
+             * PUBLICAÇÃO DO CARROSSEL
+             */
+            if (format === 'carousel') {
+                const instagramResult =
+                    await metaPublisher
+                        .publishInstagramCarousel({
+                            imageUrls:
+                                normalizedImageUrls,
+
+                            caption
+                        });
+
+
+                result = {
+                    success:
+                        true,
+
+                    channels: {
+                        instagram:
+                            instagramResult
+                    }
+                };
+            }
+
+
+            /*
+             * Grava o resultado no histórico.
+             */
+            const savedPublications =
+                {};
+
+
+            for (
+                const channel
+                of uniqueChannels
+            ) {
+                const channelResult =
+                    result
+                        ?.channels
+                        ?.[channel];
+
+
+                if (
+                    channelResult
+                        ?.success
+                ) {
+                    const mediaId =
+                        channelResult.mediaId ||
+                        channelResult.photoId ||
+                        channelResult.postId ||
+                        null;
+
+
+                    savedPublications[
+                        channel
+                    ] =
+                        await publicationHistoryStore
+                            .markPublished({
+                                marketplace,
+                                itemId,
+                                channel,
+                                format,
+                                mediaId
+                            });
+                } else {
+                    await publicationHistoryStore
+                        .markFailed({
+                            marketplace,
+                            itemId,
+                            channel,
+                            format
+                        });
+                }
+            }
+
+
+            return res.json({
+                ...result,
+
+                format,
+
+                publications:
+                    savedPublications
+            });
+
         } catch (error) {
+
+            for (
+                const channel
+                of reservedChannels
+            ) {
+                try {
+                    await publicationHistoryStore
+                        .markFailed({
+                            marketplace,
+                            itemId,
+                            channel,
+                            format
+                        });
+                } catch (_) {
+                    // Não mascara o erro original.
+                }
+            }
+
+
+            console.error(
+                '[MARKETING PUBLISH] Falha:',
+                error?.code || '',
+                error?.message || error
+            );
+
+
             return res.status(500).json({
                 success: false,
+
                 error: {
                     code:
-                        error &&
-                        error.code
-                            ? error.code
-                            : 'META_PUBLICATION_ERROR',
+                        error?.code ||
+                        'META_PUBLICATION_ERROR',
 
                     message:
+                        error?.message ||
                         'Não foi possível processar a publicação.'
                 }
             });
         }
     }
 );
-
 
 module.exports =
     router;

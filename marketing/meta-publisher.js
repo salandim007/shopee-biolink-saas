@@ -254,6 +254,276 @@ function createMetaPublisher(options = {}) {
         };
     }
 
+    async function publishInstagramCarousel({
+        imageUrls,
+        caption = ''
+    }) {
+        const accessToken =
+            env.INSTAGRAM_ACCESS_TOKEN;
+
+        if (!accessToken) {
+            throw new MetaPublisherError(
+                'Credencial do Instagram não configurada.',
+                'INSTAGRAM_CREDENTIAL_MISSING'
+            );
+        }
+
+
+        const normalizedImageUrls =
+            Array.isArray(imageUrls)
+                ? [
+                    ...new Set(
+                        imageUrls
+                            .map(
+                                value =>
+                                    String(
+                                        value || ''
+                                    ).trim()
+                            )
+                            .filter(Boolean)
+                    )
+                ]
+                : [];
+
+
+        if (
+            normalizedImageUrls.length < 2 ||
+            normalizedImageUrls.length > 10
+        ) {
+            throw new MetaPublisherError(
+                'O Carrossel precisa ter entre 2 e 10 imagens.',
+                'INSTAGRAM_CAROUSEL_IMAGES_INVALID'
+            );
+        }
+
+
+        async function waitForInstagramContainer(
+            containerId
+        ) {
+            for (
+                let attempt = 1;
+                attempt <= INSTAGRAM_STATUS_MAX_ATTEMPTS;
+                attempt += 1
+            ) {
+                const statusUrl =
+                    new URL(
+                        `https://graph.instagram.com/v24.0/${encodeURIComponent(containerId)}`
+                    );
+
+                statusUrl.searchParams.set(
+                    'fields',
+                    'status_code,status'
+                );
+
+                statusUrl.searchParams.set(
+                    'access_token',
+                    accessToken
+                );
+
+
+                const containerStatus =
+                    await getJson(
+                        statusUrl.toString(),
+                        'Instagram'
+                    );
+
+
+                const statusCode =
+                    containerStatus &&
+                    containerStatus.status_code;
+
+
+                if (
+                    statusCode ===
+                    'FINISHED'
+                ) {
+                    return;
+                }
+
+
+                if (
+                    statusCode ===
+                        'ERROR' ||
+                    statusCode ===
+                        'EXPIRED' ||
+                    statusCode ===
+                        'PUBLISHED'
+                ) {
+                    throw new MetaPublisherError(
+                        'Um container do Carrossel não pode ser publicado.',
+                        'INSTAGRAM_CAROUSEL_CONTAINER_FAILED'
+                    );
+                }
+
+
+                if (
+                    attempt <
+                    INSTAGRAM_STATUS_MAX_ATTEMPTS
+                ) {
+                    await sleepImpl(
+                        INSTAGRAM_STATUS_POLL_INTERVAL_MS
+                    );
+                }
+            }
+
+
+            throw new MetaPublisherError(
+                'O container do Carrossel não ficou pronto no tempo esperado.',
+                'INSTAGRAM_CAROUSEL_STATUS_TIMEOUT'
+            );
+        }
+
+
+        /*
+         * 1. Cada imagem vira um container filho.
+         */
+        const childContainerIds =
+            [];
+
+
+        for (
+            const imageUrl
+            of normalizedImageUrls
+        ) {
+            const child =
+                await postForm(
+                    'https://graph.instagram.com/v24.0/me/media',
+                    {
+                        image_url:
+                            imageUrl,
+
+                        is_carousel_item:
+                            'true',
+
+                        access_token:
+                            accessToken
+                    },
+                    'Instagram'
+                );
+
+
+            if (
+                !child ||
+                !child.id
+            ) {
+                throw new MetaPublisherError(
+                    'Instagram não retornou o container de uma imagem do Carrossel.',
+                    'INSTAGRAM_CAROUSEL_CHILD_ID_MISSING'
+                );
+            }
+
+
+            const childId =
+                String(
+                    child.id
+                );
+
+
+            await waitForInstagramContainer(
+                childId
+            );
+
+
+            childContainerIds.push(
+                childId
+            );
+        }
+
+
+        /*
+         * 2. Cria o container principal.
+         * A ordem dos IDs é a ordem escolhida no editor.
+         */
+        const carousel =
+            await postForm(
+                'https://graph.instagram.com/v24.0/me/media',
+                {
+                    media_type:
+                        'CAROUSEL',
+
+                    children:
+                        childContainerIds.join(
+                            ','
+                        ),
+
+                    caption,
+
+                    access_token:
+                        accessToken
+                },
+                'Instagram'
+            );
+
+
+        if (
+            !carousel ||
+            !carousel.id
+        ) {
+            throw new MetaPublisherError(
+                'Instagram não retornou o container principal do Carrossel.',
+                'INSTAGRAM_CAROUSEL_ID_MISSING'
+            );
+        }
+
+
+        const carouselContainerId =
+            String(
+                carousel.id
+            );
+
+
+        await waitForInstagramContainer(
+            carouselContainerId
+        );
+
+
+        /*
+         * 3. Publicação real.
+         */
+        const published =
+            await postForm(
+                'https://graph.instagram.com/v24.0/me/media_publish',
+                {
+                    creation_id:
+                        carouselContainerId,
+
+                    access_token:
+                        accessToken
+                },
+                'Instagram'
+            );
+
+
+        if (
+            !published ||
+            !published.id
+        ) {
+            throw new MetaPublisherError(
+                'Instagram não retornou o identificador do Carrossel publicado.',
+                'INSTAGRAM_CAROUSEL_MEDIA_ID_MISSING'
+            );
+        }
+
+
+        return {
+            success:
+                true,
+
+            mediaId:
+                String(
+                    published.id
+                ),
+
+            carouselContainerId,
+
+            childContainerIds,
+
+            imageCount:
+                normalizedImageUrls.length
+        };
+    }
+
+
     async function publishFacebook({ imageUrl, caption = '' }) {
         const accessToken = env.FACEBOOK_PAGE_ACCESS_TOKEN;
         const pageId = env.FACEBOOK_PAGE_ID;
@@ -362,6 +632,7 @@ function createMetaPublisher(options = {}) {
 
     return {
         publishInstagram,
+        publishInstagramCarousel,
         publishFacebook,
         publishToChannels
     };
