@@ -156,6 +156,10 @@ function buildFilterGraph({
             fps
         );
 
+
+    /*
+     * Fotos do produto.
+     */
     for (
         let index = 0;
         index < imageCount;
@@ -177,14 +181,47 @@ function buildFilterGraph({
         );
     }
 
-    if (imageCount === 1) {
-        filters.push(
-            '[v0]null[vout]'
-        );
 
-        return filters.join(';');
-    }
+    /*
+     * Avatar horizontal adaptado para Reel vertical.
+     *
+     * Fundo:
+     * amplia e desfoca o próprio vídeo.
+     *
+     * Frente:
+     * mantém o avatar inteiro e centralizado.
+     */
+    filters.push(
+        `[${imageCount}:v]split=2[avatarbg][avatarfg]`
+    );
 
+    filters.push(
+        `[avatarbg]` +
+        `scale=${width}:${height}:force_original_aspect_ratio=increase,` +
+        `crop=${width}:${height},` +
+        `boxblur=20:1` +
+        `[avatarbg2]`
+    );
+
+    filters.push(
+        `[avatarfg]` +
+        `scale=${width}:${height}:force_original_aspect_ratio=decrease` +
+        `[avatarfg2]`
+    );
+
+    filters.push(
+        `[avatarbg2][avatarfg2]` +
+        `overlay=(W-w)/2:(H-h)/2,` +
+        `fps=${fps},` +
+        `setsar=1,` +
+        `setpts=PTS-STARTPTS` +
+        `[vclose]`
+    );
+
+
+    /*
+     * Transições entre as fotos.
+     */
     const transitions = [
         'fade',
         'smoothleft',
@@ -199,15 +236,14 @@ function buildFilterGraph({
         secondsPerImage -
         transitionDuration;
 
+
     for (
         let index = 1;
         index < imageCount;
         index += 1
     ) {
         const output =
-            index === imageCount - 1
-                ? 'vout'
-                : `x${index}`;
+            `x${index}`;
 
         const transition =
             transitions[
@@ -234,9 +270,64 @@ function buildFilterGraph({
             output;
     }
 
+
+    /*
+     * Momento em que o avatar começa.
+     */
+    const productDuration =
+        (
+            imageCount *
+            secondsPerImage
+        ) -
+        (
+            Math.max(
+                0,
+                imageCount - 1
+            ) *
+            transitionDuration
+        );
+
+    const avatarOffset =
+        Math.max(
+            0,
+            productDuration -
+            transitionDuration
+        );
+
+
+    /*
+     * Transição suave da última foto para o avatar.
+     */
+    filters.push(
+        `[${previous}][vclose]` +
+        `xfade=` +
+        `transition=fade:` +
+        `duration=${transitionDuration}:` +
+        `offset=${avatarOffset.toFixed(2)}` +
+        `[vout]`
+    );
+
+
+    /*
+     * O áudio do avatar começa somente quando
+     * ele aparece no final do Reel.
+     */
+    const audioDelayMs =
+        Math.round(
+            avatarOffset *
+            1000
+        );
+
+    filters.push(
+        `[${imageCount}:a]` +
+        `asetpts=PTS-STARTPTS,` +
+        `adelay=${audioDelayMs}:all=1` +
+        `[aout]`
+    );
+
+
     return filters.join(';');
 }
-
 
 function executeFfmpeg(
     ffmpegPath,
@@ -367,6 +458,50 @@ async function generateReel(options = {}) {
         options.transitionDuration ||
         0.45;
 
+    const closingDuration =
+        options.closingDuration ||
+        10.08;
+
+    const fontFile =
+        options.fontFile ||
+        (
+            process.platform === 'win32'
+                ? 'C\\:/Windows/Fonts/arial.ttf'
+                : '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+        );
+
+    const boldFontFile =
+        options.boldFontFile ||
+        (
+            process.platform === 'win32'
+                ? 'C\\:/Windows/Fonts/arialbd.ttf'
+                : '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+        );
+
+    const avatarPath =
+        options.avatarPath ||
+        path.join(
+            process.cwd(),
+            'assets',
+            'video',
+            'avatar.mp4'
+        );
+
+    try {
+        await fs.access(
+            avatarPath
+        );
+    } catch {
+        throw new ReelGeneratorError(
+            'O vídeo do avatar não foi encontrado.',
+            'REEL_AVATAR_NOT_FOUND',
+            {
+                avatarPath
+            }
+        );
+    }
+
+
     const rootDirectory =
         options.outputDirectory ||
         path.join(
@@ -431,7 +566,10 @@ async function generateReel(options = {}) {
             height,
             fps,
             secondsPerImage,
-            transitionDuration
+            transitionDuration,
+            closingDuration,
+            fontFile,
+            boldFontFile
         });
 
     const args = [
@@ -448,6 +586,16 @@ async function generateReel(options = {}) {
         );
     }
 
+
+    /*
+     * Avatar com vídeo + áudio.
+     */
+    args.push(
+        '-i',
+        avatarPath
+    );
+
+
     args.push(
         '-filter_complex',
         filterGraph,
@@ -455,8 +603,17 @@ async function generateReel(options = {}) {
         '-map',
         '[vout]',
 
+        '-map',
+        '[aout]',
+
         '-c:v',
         'libx264',
+
+        '-c:a',
+        'aac',
+
+        '-b:a',
+        '192k',
 
         '-preset',
         'medium',
@@ -481,7 +638,7 @@ async function generateReel(options = {}) {
         args
     );
 
-    const durationSeconds =
+    const productDuration =
         (
             imageUrls.length *
             secondsPerImage
@@ -493,6 +650,11 @@ async function generateReel(options = {}) {
             ) *
             transitionDuration
         );
+
+    const durationSeconds =
+        productDuration +
+        closingDuration -
+        transitionDuration;
 
     return {
         success:

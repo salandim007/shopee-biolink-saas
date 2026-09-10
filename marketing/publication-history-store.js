@@ -342,9 +342,64 @@ async function markFailed({
 }
 
 
+async function getPublicationByMediaId({
+    channel = 'instagram',
+    mediaId
+}) {
+    await ready;
+
+    const normalizedChannel =
+        String(
+            channel || ''
+        )
+            .trim()
+            .toLowerCase();
+
+    const normalizedMediaId =
+        String(
+            mediaId || ''
+        ).trim();
+
+
+    if (
+        !normalizedChannel ||
+        !normalizedMediaId
+    ) {
+        return null;
+    }
+
+
+    return get(
+        `
+            SELECT
+                marketplace,
+                item_id AS itemId,
+                channel,
+                format,
+                status,
+                media_id AS mediaId,
+                published_at AS publishedAt,
+                created_at AS createdAt,
+                updated_at AS updatedAt
+            FROM marketing_publications
+            WHERE channel = ?
+              AND media_id = ?
+              AND status = 'PUBLISHED'
+            ORDER BY published_at DESC
+            LIMIT 1
+        `,
+        [
+            normalizedChannel,
+            normalizedMediaId
+        ]
+    );
+}
+
+
 module.exports = {
     ready,
     getPublication,
+    getPublicationByMediaId,
     listProductPublications,
     beginPublication,
     markPublished,

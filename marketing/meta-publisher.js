@@ -128,9 +128,34 @@ function createMetaPublisher(options = {}) {
         }
 
         if (!response || !response.ok) {
-            const status = response && Number.isInteger(response.status)
-                ? response.status
-                : null;
+            const status =
+                response &&
+                Number.isInteger(response.status)
+                    ? response.status
+                    : null;
+
+            let metaPayload = null;
+
+            if (
+                response &&
+                typeof response.json === 'function'
+            ) {
+                try {
+                    metaPayload =
+                        await response.json();
+                } catch (_) {
+                    metaPayload = null;
+                }
+            }
+
+            console.error(
+                `[META ${channel}] RESPOSTA DE ERRO`,
+                {
+                    status,
+                    error:
+                        metaPayload?.error || null
+                }
+            );
 
             throw new MetaPublisherError(
                 status
@@ -524,6 +549,222 @@ function createMetaPublisher(options = {}) {
     }
 
 
+    async function publishInstagramReel({
+        videoUrl,
+        caption = ''
+    }) {
+        const accessToken =
+            env.INSTAGRAM_ACCESS_TOKEN;
+
+        /*
+         * Reel demora mais para processar que fotos.
+         * Até ~3 minutos, consultando a cada 3 segundos.
+         */
+        const REEL_STATUS_MAX_ATTEMPTS =
+            60;
+
+        const REEL_STATUS_POLL_INTERVAL_MS =
+            3000;
+
+        if (!accessToken) {
+            throw new MetaPublisherError(
+                'Credencial do Instagram não configurada.',
+                'INSTAGRAM_CREDENTIAL_MISSING'
+            );
+        }
+
+
+        const normalizedVideoUrl =
+            String(
+                videoUrl ||
+                ''
+            ).trim();
+
+
+        if (
+            !normalizedVideoUrl ||
+            !/^https:\/\//i.test(
+                normalizedVideoUrl
+            )
+        ) {
+            throw new MetaPublisherError(
+                'URL pública do Reel inválida.',
+                'INSTAGRAM_REEL_VIDEO_URL_INVALID'
+            );
+        }
+
+
+        /*
+         * 1. Cria container REELS.
+         */
+        const container =
+            await postForm(
+                'https://graph.instagram.com/v24.0/me/media',
+                {
+                    media_type:
+                        'REELS',
+
+                    video_url:
+                        normalizedVideoUrl,
+
+                    caption,
+
+                    access_token:
+                        accessToken
+                },
+                'Instagram'
+            );
+
+
+        if (
+            !container ||
+            !container.id
+        ) {
+            throw new MetaPublisherError(
+                'Instagram não retornou o container do Reel.',
+                'INSTAGRAM_REEL_CONTAINER_ID_MISSING'
+            );
+        }
+
+
+        const reelContainerId =
+            String(
+                container.id
+            );
+
+
+        /*
+         * 2. Aguarda a Meta processar o vídeo.
+         */
+        async function waitForInstagramReelContainer(
+            containerId
+        ) {
+            for (
+                let attempt = 1;
+                attempt <= REEL_STATUS_MAX_ATTEMPTS;
+                attempt += 1
+            ) {
+                const statusUrl =
+                    new URL(
+                        `https://graph.instagram.com/v24.0/${encodeURIComponent(containerId)}`
+                    );
+
+                statusUrl.searchParams.set(
+                    'fields',
+                    'status_code,status'
+                );
+
+                statusUrl.searchParams.set(
+                    'access_token',
+                    accessToken
+                );
+
+
+                const containerStatus =
+                    await getJson(
+                        statusUrl.toString(),
+                        'Instagram'
+                    );
+
+
+                const statusCode =
+                    containerStatus &&
+                    containerStatus.status_code;
+
+
+                console.log(
+                    '[INSTAGRAM REEL] Status:',
+                    statusCode || 'PROCESSANDO',
+                    `tentativa ${attempt}/${REEL_STATUS_MAX_ATTEMPTS}`
+                );
+
+
+                if (
+                    statusCode ===
+                    'FINISHED'
+                ) {
+                    return;
+                }
+
+
+                if (
+                    statusCode === 'ERROR' ||
+                    statusCode === 'EXPIRED'
+                ) {
+                    throw new MetaPublisherError(
+                        'O Reel não pôde ser processado pelo Instagram.',
+                        'INSTAGRAM_REEL_CONTAINER_FAILED'
+                    );
+                }
+
+
+                if (
+                    attempt <
+                    REEL_STATUS_MAX_ATTEMPTS
+                ) {
+                    await sleepImpl(
+                        REEL_STATUS_POLL_INTERVAL_MS
+                    );
+                }
+            }
+
+
+            throw new MetaPublisherError(
+                'O Reel não ficou pronto no tempo esperado.',
+                'INSTAGRAM_REEL_STATUS_TIMEOUT'
+            );
+        }
+
+
+        await waitForInstagramReelContainer(
+            reelContainerId
+        );
+
+
+        /*
+         * 3. Publica o Reel.
+         */
+        const published =
+            await postForm(
+                'https://graph.instagram.com/v24.0/me/media_publish',
+                {
+                    creation_id:
+                        reelContainerId,
+
+                    access_token:
+                        accessToken
+                },
+                'Instagram'
+            );
+
+
+        if (
+            !published ||
+            !published.id
+        ) {
+            throw new MetaPublisherError(
+                'Instagram não retornou o identificador do Reel publicado.',
+                'INSTAGRAM_REEL_MEDIA_ID_MISSING'
+            );
+        }
+
+
+        return {
+            success:
+                true,
+
+            mediaId:
+                String(
+                    published.id
+                ),
+
+            reelContainerId,
+
+            videoUrl:
+                normalizedVideoUrl
+        };
+    }
+
     async function publishFacebook({ imageUrl, caption = '' }) {
         const accessToken = env.FACEBOOK_PAGE_ACCESS_TOKEN;
         const pageId = env.FACEBOOK_PAGE_ID;
@@ -633,6 +874,7 @@ function createMetaPublisher(options = {}) {
     return {
         publishInstagram,
         publishInstagramCarousel,
+        publishInstagramReel,
         publishFacebook,
         publishToChannels
     };

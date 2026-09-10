@@ -44,6 +44,310 @@ const publicationHistoryStore =
 const router =
     express.Router();
 
+
+const MARKETING_PUBLIC_BASE_URL =
+    String(
+        process.env.MARKETING_PUBLIC_BASE_URL ||
+        'https://webhook.mixdeproduto.com'
+    )
+        .trim()
+        .replace(/\/+$/, '');
+
+
+function isAllowedShopeeImageUrl(
+    value
+) {
+    try {
+        const parsed =
+            new URL(
+                String(value || '').trim()
+            );
+
+        if (parsed.protocol !== 'https:') {
+            return false;
+        }
+
+        const hostname =
+            parsed.hostname.toLowerCase();
+
+        return (
+            hostname ===
+                'cf.shopee.com.br' ||
+            hostname.endsWith(
+                '.cf.shopee.com.br'
+            ) ||
+            hostname ===
+                'img.susercontent.com' ||
+            hostname.endsWith(
+                '.img.susercontent.com'
+            )
+        );
+    } catch (_) {
+        return false;
+    }
+}
+
+
+function toMetaImageUrl(
+    value
+) {
+    const imageUrl =
+        String(value || '').trim();
+
+    if (
+        !imageUrl ||
+        !isAllowedShopeeImageUrl(
+            imageUrl
+        )
+    ) {
+        return imageUrl;
+    }
+
+    return (
+        MARKETING_PUBLIC_BASE_URL +
+        '/admin/vitrine2/marketing/media/image?url=' +
+        encodeURIComponent(
+            imageUrl
+        )
+    );
+}
+
+
+/*
+ * Proxy público de imagens Shopee.
+ *
+ * A Meta baixa a imagem através do nosso
+ * servidor em vez de acessar diretamente
+ * o CDN da Shopee.
+ */
+router.get(
+    '/media/image',
+    async (req, res) => {
+        const sourceUrl =
+            String(
+                req.query?.url ||
+                ''
+            ).trim();
+
+        if (!sourceUrl) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code:
+                        'IMAGE_PROXY_URL_REQUIRED',
+
+                    message:
+                        'A URL da imagem é obrigatória.'
+                }
+            });
+        }
+
+        if (
+            !isAllowedShopeeImageUrl(
+                sourceUrl
+            )
+        ) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code:
+                        'IMAGE_PROXY_URL_NOT_ALLOWED',
+
+                    message:
+                        'A URL informada não pertence a um domínio de imagem permitido da Shopee.'
+                }
+            });
+        }
+
+        try {
+            const upstream =
+                await fetch(
+                    sourceUrl,
+                    {
+                        method:
+                            'GET',
+
+                        redirect:
+                            'follow',
+
+                        headers: {
+                            'User-Agent':
+                                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/152 Safari/537.36',
+
+                            Accept:
+                                'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+
+                            Referer:
+                                'https://shopee.com.br/'
+                        }
+                    }
+                );
+
+            if (!upstream.ok) {
+                return res.status(502).json({
+                    success: false,
+                    error: {
+                        code:
+                            'IMAGE_PROXY_UPSTREAM_ERROR',
+
+                        message:
+                            `A Shopee respondeu HTTP ${upstream.status}.`
+                    }
+                });
+            }
+
+            const finalUrl =
+                String(
+                    upstream.url ||
+                    sourceUrl
+                );
+
+            if (
+                !isAllowedShopeeImageUrl(
+                    finalUrl
+                )
+            ) {
+                return res.status(502).json({
+                    success: false,
+                    error: {
+                        code:
+                            'IMAGE_PROXY_REDIRECT_NOT_ALLOWED',
+
+                        message:
+                            'A imagem foi redirecionada para um domínio não permitido.'
+                    }
+                });
+            }
+
+            const contentType =
+                String(
+                    upstream.headers.get(
+                        'content-type'
+                    ) ||
+                    ''
+                )
+                    .split(';')[0]
+                    .trim()
+                    .toLowerCase();
+
+            if (
+                !contentType.startsWith(
+                    'image/'
+                )
+            ) {
+                return res.status(502).json({
+                    success: false,
+                    error: {
+                        code:
+                            'IMAGE_PROXY_INVALID_CONTENT',
+
+                        message:
+                            'A Shopee não retornou um arquivo de imagem válido.'
+                    }
+                });
+            }
+
+            const declaredLength =
+                Number(
+                    upstream.headers.get(
+                        'content-length'
+                    ) ||
+                    0
+                );
+
+            const maxBytes =
+                15 * 1024 * 1024;
+
+            if (
+                declaredLength >
+                maxBytes
+            ) {
+                return res.status(413).json({
+                    success: false,
+                    error: {
+                        code:
+                            'IMAGE_PROXY_TOO_LARGE',
+
+                        message:
+                            'A imagem excede o limite permitido.'
+                    }
+                });
+            }
+
+            const arrayBuffer =
+                await upstream.arrayBuffer();
+
+            const buffer =
+                Buffer.from(
+                    arrayBuffer
+                );
+
+            if (
+                !buffer.length ||
+                buffer.length >
+                    maxBytes
+            ) {
+                return res.status(502).json({
+                    success: false,
+                    error: {
+                        code:
+                            'IMAGE_PROXY_INVALID_SIZE',
+
+                        message:
+                            'O tamanho da imagem recebida é inválido.'
+                    }
+                });
+            }
+
+            res.setHeader(
+                'Content-Type',
+                contentType
+            );
+
+            res.setHeader(
+                'Content-Length',
+                String(buffer.length)
+            );
+
+            res.setHeader(
+                'Cache-Control',
+                'public, max-age=3600'
+            );
+
+            console.log(
+                '[MARKETING MEDIA] Imagem entregue pelo proxy',
+                {
+                    contentType,
+                    bytes:
+                        buffer.length
+                }
+            );
+
+            return res
+                .status(200)
+                .send(buffer);
+
+        } catch (error) {
+            console.error(
+                '[MARKETING MEDIA] Falha no proxy de imagem:',
+                error
+            );
+
+            return res.status(502).json({
+                success: false,
+                error: {
+                    code:
+                        'IMAGE_PROXY_ERROR',
+
+                    message:
+                        'Não foi possível obter a imagem da Shopee.'
+                }
+            });
+        }
+    }
+);
+
+
 const metaPublisher =
     createMetaPublisher();
 
@@ -1036,7 +1340,8 @@ router.post(
         if (
             ![
                 'photo',
-                'carousel'
+                'carousel',
+                'reel'
             ].includes(format)
         ) {
             return res.status(400).json({
@@ -1223,6 +1528,60 @@ router.post(
         }
 
 
+        /*
+         * REEL
+         */
+        let normalizedVideoUrl =
+            null;
+
+
+        if (format === 'reel') {
+            normalizedVideoUrl =
+                String(
+                    body.videoUrl ||
+                    ''
+                ).trim();
+
+
+            if (
+                !normalizedVideoUrl ||
+                !/^https:\/\//i.test(
+                    normalizedVideoUrl
+                )
+            ) {
+                return res.status(400).json({
+                    success: false,
+
+                    error: {
+                        code:
+                            'REEL_VIDEO_URL_REQUIRED',
+
+                        message:
+                            'O Reel precisa de uma URL pública HTTPS.'
+                    }
+                });
+            }
+
+
+            if (
+                uniqueChannels.length !== 1 ||
+                uniqueChannels[0] !==
+                    'instagram'
+            ) {
+                return res.status(400).json({
+                    success: false,
+
+                    error: {
+                        code:
+                            'REEL_CHANNEL_NOT_SUPPORTED',
+
+                        message:
+                            'Nesta etapa o Reel está disponível apenas para Instagram.'
+                    }
+                });
+            }
+        }
+
         const reservedChannels =
             [];
 
@@ -1297,7 +1656,7 @@ router.post(
                     await metaPublisher
                         .publishToChannels({
                             imageUrl:
-                                normalizedImageUrl,
+                                toMetaImageUrl(normalizedImageUrl),
 
                             caption,
 
@@ -1315,7 +1674,7 @@ router.post(
                     await metaPublisher
                         .publishInstagramCarousel({
                             imageUrls:
-                                normalizedImageUrls,
+                                normalizedImageUrls.map(value => toMetaImageUrl(value)),
 
                             caption
                         });
@@ -1332,6 +1691,31 @@ router.post(
                 };
             }
 
+
+            /*
+             * PUBLICAÇÃO DO REEL
+             */
+            if (format === 'reel') {
+                const instagramResult =
+                    await metaPublisher
+                        .publishInstagramReel({
+                            videoUrl:
+                                normalizedVideoUrl,
+
+                            caption
+                        });
+
+
+                result = {
+                    success:
+                        true,
+
+                    channels: {
+                        instagram:
+                            instagramResult
+                    }
+                };
+            }
 
             /*
              * Grava o resultado no histórico.

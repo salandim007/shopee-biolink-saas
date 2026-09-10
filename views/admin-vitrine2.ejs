@@ -383,6 +383,100 @@
             </div>
 
 
+            <!-- IMPORTAR PRODUTO SHOPEE -->
+
+            <div
+                class="
+                    bg-white
+                    rounded-2xl
+                    border
+                    border-sky-200
+                    p-4
+                    mb-6
+                "
+            >
+                <div class="flex items-start gap-3">
+                    <div
+                        class="
+                            w-10
+                            h-10
+                            rounded-xl
+                            bg-sky-100
+                            text-sky-700
+                            flex
+                            items-center
+                            justify-center
+                            shrink-0
+                        "
+                    >
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+
+                    <div>
+                        <h2 class="font-extrabold text-slate-800">
+                            Adicionar produto da Shopee
+                        </h2>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Cole o link de um produto encontrado na Shopee ou no painel de Afiliados.
+                        </p>
+                    </div>
+                </div>
+
+                <form
+                    class="
+                        mt-4
+                        flex
+                        flex-col
+                        sm:flex-row
+                        gap-3
+                    "
+                    onsubmit="event.preventDefault(); importShopeeProduct();"
+                >
+                    <input
+                        id="shopeeImportUrl"
+                        type="url"
+                        placeholder="https://shopee.com.br/..."
+                        autocomplete="off"
+                        class="
+                            flex-1
+                            rounded-xl
+                            border
+                            border-slate-200
+                            px-4
+                            py-3
+                            text-sm
+                            outline-none
+                            focus:border-sky-400
+                        "
+                    >
+
+                    <button
+                        id="shopeeImportButton"
+                        type="submit"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            gap-2
+                            rounded-xl
+                            bg-sky-600
+                            hover:bg-sky-700
+                            text-white
+                            px-5
+                            py-3
+                            text-sm
+                            font-bold
+                            transition
+                            whitespace-nowrap
+                        "
+                    >
+                        <i class="fa-solid fa-download"></i>
+                        Buscar e adicionar
+                    </button>
+                </form>
+            </div>
+
             <!-- FILTROS -->
 
             <div
@@ -2633,6 +2727,100 @@
             }
         }
 
+
+        async function importShopeeProduct() {
+            const input =
+                document.getElementById(
+                    'shopeeImportUrl'
+                );
+
+            const button =
+                document.getElementById(
+                    'shopeeImportButton'
+                );
+
+            const url =
+                input.value.trim();
+
+            if (!url) {
+                showMessage(
+                    'Cole o link de um produto da Shopee.',
+                    'error'
+                );
+
+                input.focus();
+                return;
+            }
+
+            const originalHtml =
+                button.innerHTML;
+
+            button.disabled =
+                true;
+
+            button.innerHTML =
+                `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Buscando produto...
+                `;
+
+            try {
+                const response =
+                    await fetch(
+                        '/api/vitrine2/import/api',
+                        {
+                            method:
+                                'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    url,
+                                    published: false,
+                                    featured: false,
+                                    collections: []
+                                })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        'Não foi possível importar o produto.'
+                    );
+                }
+
+                input.value =
+                    '';
+
+                showMessage(
+                    'Produto importado da Shopee com sucesso.'
+                );
+
+                await loadProducts();
+            } catch (error) {
+                showMessage(
+                    error.message,
+                    'error'
+                );
+            } finally {
+                button.disabled =
+                    false;
+
+                button.innerHTML =
+                    originalHtml;
+            }
+        }
 
         async function syncProducts() {
             const button =

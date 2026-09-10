@@ -1156,6 +1156,134 @@
                 let reelSelectedImageUrls =
                     [];
 
+                let reelGeneratedVideoUrl =
+                    '';
+
+                let reelAlreadyPublished =
+                    false;
+
+                let reelPublicationStatePromise =
+                    null;
+
+
+                function setReelPublishedState(
+                    publication
+                ) {
+                    reelAlreadyPublished =
+                        true;
+
+                    reelButton.disabled =
+                        true;
+
+                    reelButton.style.display =
+                        'none';
+
+                    reelApproveButton.disabled =
+                        false;
+
+                    reelApproveButton.style.display =
+                        'block';
+
+                    reelApproveButton.textContent =
+                        '✓ Publicado';
+
+                    reelApproveButton.style.background =
+                        ACTION_BLUE;
+
+                    reelApproveButton.style.cursor =
+                        'pointer';
+
+                    reelReview.textarea.disabled =
+                        true;
+
+                    const publishedAt =
+                        formatPublicationDate(
+                            publication?.publishedAt
+                        );
+
+                    reelStatus.textContent =
+                        publishedAt
+                            ? `🔵 Reel já publicado no Instagram em ${publishedAt}.`
+                            : '🔵 Reel já publicado no Instagram.';
+
+                    reelStatus.style.color =
+                        '#1d4ed8';
+                }
+
+
+                async function loadReelPublicationState() {
+                    if (
+                        !/^\d+$/.test(
+                            publicationItemId
+                        )
+                    ) {
+                        return false;
+                    }
+
+                    try {
+                        const params =
+                            new URLSearchParams({
+                                marketplace:
+                                    publicationMarketplace,
+
+                                itemId:
+                                    publicationItemId
+                            });
+
+                        const response =
+                            await fetch(
+                                '/admin/vitrine2/marketing/publication-history?' +
+                                params.toString(),
+                                {
+                                    cache:
+                                        'no-store'
+                                }
+                            );
+
+                        if (!response.ok) {
+                            return false;
+                        }
+
+                        const payload =
+                            await response.json();
+
+                        const publication =
+                            Array.isArray(
+                                payload?.publications
+                            )
+                                ? payload.publications.find(
+                                    entry =>
+                                        entry?.channel ===
+                                            'instagram' &&
+                                        entry?.format ===
+                                            'reel'
+                                )
+                                : null;
+
+                        if (
+                            publication?.status ===
+                            'PUBLISHED'
+                        ) {
+                            setReelPublishedState(
+                                publication
+                            );
+
+                            return true;
+                        }
+
+                        return false;
+
+                    } catch (error) {
+                        console.warn(
+                            '[INSTAGRAM] Histórico do Reel indisponível:',
+                            error
+                        );
+
+                        return false;
+                    }
+                }
+
+
                 const galleryBox =
                     document.createElement('div');
 
@@ -1219,38 +1347,135 @@
                     }
 
                     try {
-                        const response =
-                            await fetch(
-                                '/admin/vitrine2/marketing/media/gallery',
-                                {
-                                    method: 'POST',
+                        const galleryCacheKey =
+                            'instagram-gallery:' +
+                            shopId +
+                            ':' +
+                            String(itemId);
 
-                                    headers: {
-                                        'Content-Type':
-                                            'application/json'
-                                    },
+                        let payload =
+                            null;
 
-                                    body:
-                                        JSON.stringify({
-                                            shopId,
-                                            itemId
-                                        })
+                        let loadedFromCache =
+                            false;
+
+
+                        try {
+                            const cachedValue =
+                                sessionStorage.getItem(
+                                    galleryCacheKey
+                                );
+
+                            if (cachedValue) {
+                                const cachedImages =
+                                    JSON.parse(
+                                        cachedValue
+                                    );
+
+                                if (
+                                    Array.isArray(
+                                        cachedImages
+                                    ) &&
+                                    cachedImages.length >
+                                        0
+                                ) {
+                                    payload = {
+                                        success:
+                                            true,
+
+                                        images:
+                                            cachedImages
+                                    };
+
+                                    loadedFromCache =
+                                        true;
+
+                                    console.log(
+                                        '[INSTAGRAM] Galeria carregada do cache',
+                                        {
+                                            itemId,
+                                            imageCount:
+                                                cachedImages.length
+                                        }
+                                    );
                                 }
+                            }
+                        } catch (cacheError) {
+                            console.warn(
+                                '[INSTAGRAM] Cache da galeria indisponível:',
+                                cacheError
                             );
+                        }
 
-                        const payload =
-                            await response.json();
 
-                        if (
-                            !response.ok ||
-                            !payload.success ||
-                            !Array.isArray(payload.images) ||
-                            payload.images.length === 0
-                        ) {
-                            throw new Error(
-                                payload?.error?.message ||
-                                'Galeria indisponível.'
-                            );
+                        if (!payload) {
+                            const response =
+                                await fetch(
+                                    '/admin/vitrine2/marketing/media/gallery',
+                                    {
+                                        method:
+                                            'POST',
+
+                                        headers: {
+                                            'Content-Type':
+                                                'application/json'
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+                                                shopId,
+                                                itemId
+                                            })
+                                    }
+                                );
+
+                            payload =
+                                await response.json();
+
+                            if (
+                                !response.ok ||
+                                !payload.success ||
+                                !Array.isArray(
+                                    payload.images
+                                ) ||
+                                payload.images.length ===
+                                    0
+                            ) {
+                                throw new Error(
+                                    payload?.error?.message ||
+                                    'Galeria indisponível.'
+                                );
+                            }
+
+
+                            try {
+                                sessionStorage.setItem(
+                                    galleryCacheKey,
+                                    JSON.stringify(
+                                        payload.images
+                                    )
+                                );
+
+                                console.log(
+                                    '[INSTAGRAM] Galeria salva no cache',
+                                    {
+                                        itemId,
+                                        imageCount:
+                                            payload.images.length
+                                    }
+                                );
+                            } catch (cacheError) {
+                                console.warn(
+                                    '[INSTAGRAM] Não foi possível salvar o cache da galeria:',
+                                    cacheError
+                                );
+                            }
+                        }
+
+
+                        if (loadedFromCache) {
+                            galleryStatus.textContent =
+                                'Fotos recuperadas instantaneamente.';
                         }
 
                         galleryImageUrls =
@@ -1522,7 +1747,7 @@
                                 : '';
 
                         const constructionNotice =
-                            '🔧 Nossa página de ofertas está em preparação. Em breve os links dos produtos estarão disponíveis na bio.';
+                            '🔗 Acesse o link da bio para ver esta oferta e outras oportunidades.';
 
                         review.textarea.value =
                             [
@@ -1917,6 +2142,20 @@
 
                 async function generateInstagramReel() {
                     if (
+                        reelPublicationStatePromise
+                    ) {
+                        await reelPublicationStatePromise;
+                    }
+
+                    if (reelAlreadyPublished) {
+                        window.alert(
+                            'Este Reel já foi publicado no Instagram.'
+                        );
+
+                        return;
+                    }
+
+                    if (
                         !Array.isArray(
                             galleryImageUrls
                         ) ||
@@ -2005,6 +2244,9 @@
                             );
                         }
 
+                        reelGeneratedVideoUrl =
+                            payload.videoUrl;
+
                         reelVideo.src =
                             payload.videoUrl +
                             '?t=' +
@@ -2069,6 +2311,269 @@
                 reelButton.addEventListener(
                     'click',
                     generateInstagramReel
+                );
+
+                reelApproveButton.addEventListener(
+                    'click',
+                    async () => {
+
+                        if (reelAlreadyPublished) {
+                            window.alert(
+                                'Este Reel já foi publicado no Instagram.'
+                            );
+
+                            return;
+                        }
+
+
+                        const localVideoUrl =
+                            String(
+                                reelGeneratedVideoUrl ||
+                                ''
+                            ).trim();
+
+
+                        const finalCaption =
+                            String(
+                                reelReview
+                                    .textarea
+                                    .value ||
+                                ''
+                            ).trim();
+
+
+                        if (!localVideoUrl) {
+                            window.alert(
+                                'O Reel ainda não possui um vídeo gerado.'
+                            );
+
+                            return;
+                        }
+
+
+                        if (!finalCaption) {
+                            window.alert(
+                                'A legenda do Reel está vazia.'
+                            );
+
+                            return;
+                        }
+
+
+                        const confirmed =
+                            window.confirm(
+                                'Confirma a aprovação e publicação deste Reel no Instagram?'
+                            );
+
+
+                        if (!confirmed) {
+                            return;
+                        }
+
+
+                        /*
+                         * O navegador usa a rota local para a prévia.
+                         * A Meta precisa da mesma rota via HTTPS público.
+                         */
+                        const publicVideoUrl =
+                            new URL(
+                                localVideoUrl,
+                                'https://webhook.mixdeproduto.com'
+                            ).toString();
+
+
+                        try {
+                            reelApproveButton.disabled =
+                                true;
+
+                            reelApproveButton.textContent =
+                                '⏳ Publicando Reel...';
+
+                            reelApproveButton.style.background =
+                                '#e1306c';
+
+                            reelStatus.textContent =
+                                '⏳ Enviando Reel para o Instagram...';
+
+                            reelStatus.style.color =
+                                '#475569';
+
+
+                            const publishResponse =
+                                await fetch(
+                                    '/admin/vitrine2/marketing/meta/publish',
+                                    {
+                                        method:
+                                            'POST',
+
+                                        headers: {
+                                            'Content-Type':
+                                                'application/json'
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+                                                marketplace:
+                                                    publicationMarketplace,
+
+                                                itemId:
+                                                    publicationItemId,
+
+                                                format:
+                                                    'reel',
+
+                                                videoUrl:
+                                                    publicVideoUrl,
+
+                                                caption:
+                                                    finalCaption,
+
+                                                channels: [
+                                                    'instagram'
+                                                ]
+                                            })
+                                    }
+                                );
+
+
+                            const publishPayload =
+                                await publishResponse.json();
+
+
+                            /*
+                             * Evita publicação duplicada do Reel.
+                             */
+                            if (
+                                publishResponse.status === 409 &&
+                                publishPayload
+                                    ?.error
+                                    ?.code ===
+                                    'PUBLICATION_ALREADY_EXISTS'
+                            ) {
+                                const existingPublication =
+                                    publishPayload
+                                        ?.publication;
+
+
+                                if (
+                                    existingPublication
+                                        ?.status ===
+                                        'PUBLISHED'
+                                ) {
+                                    reelAlreadyPublished =
+                                        true;
+
+                                    reelApproveButton.disabled =
+                                        false;
+
+                                    reelApproveButton.textContent =
+                                        '✓ Já publicado';
+
+                                    reelApproveButton.style.background =
+                                        '#2563eb';
+
+                                    reelStatus.textContent =
+                                        '✅ Este Reel já foi publicado no Instagram.';
+
+                                    reelStatus.style.color =
+                                        '#166534';
+
+                                    window.alert(
+                                        'Este Reel já foi publicado no Instagram.'
+                                    );
+
+                                    return;
+                                }
+
+
+                                reelApproveButton.disabled =
+                                    true;
+
+                                reelApproveButton.textContent =
+                                    '⏳ Publicação em processamento';
+
+                                reelApproveButton.style.background =
+                                    '#64748b';
+
+                                reelStatus.textContent =
+                                    '⏳ Este Reel já está sendo processado pelo Instagram.';
+
+                                reelStatus.style.color =
+                                    '#475569';
+
+                                return;
+                            }
+
+
+                            if (
+                                !publishResponse.ok ||
+                                !publishPayload.success
+                            ) {
+                                throw new Error(
+                                    publishPayload
+                                        ?.error
+                                        ?.message ||
+                                    publishPayload
+                                        ?.channels
+                                        ?.instagram
+                                        ?.error
+                                        ?.message ||
+                                    'Não foi possível publicar o Reel.'
+                                );
+                            }
+
+
+                            reelAlreadyPublished =
+                                true;
+
+                            reelApproveButton.disabled =
+                                false;
+
+                            reelApproveButton.textContent =
+                                '✓ Publicado';
+
+                            reelApproveButton.style.background =
+                                '#2563eb';
+
+                            reelStatus.textContent =
+                                '✅ Reel publicado no Instagram.';
+
+                            reelStatus.style.color =
+                                '#166534';
+
+
+                            console.log(
+                                '[INSTAGRAM REEL] Publicado:',
+                                publishPayload
+                            );
+
+                        } catch (error) {
+
+                            console.error(
+                                '[INSTAGRAM REEL PUBLISH] Erro:',
+                                error
+                            );
+
+
+                            reelStatus.textContent =
+                                `❌ ${
+                                    error?.message ||
+                                    'Erro ao publicar o Reel.'
+                                }`;
+
+                            reelStatus.style.color =
+                                '#b91c1c';
+
+                            reelApproveButton.textContent =
+                                '✓ Aprovado para publicar';
+
+                            reelApproveButton.style.background =
+                                '#16a34a';
+
+                            reelApproveButton.disabled =
+                                false;
+                        }
+                    }
                 );
 
 
@@ -2165,6 +2670,60 @@
                     font-weight: 800;
                     cursor: pointer;
                 `;
+
+                /*
+                 * Rodapé fixo de ações.
+                 * O conteúdo do modal pode rolar,
+                 * mas o botão de ação e Fechar ficam parados.
+                 */
+                const actionFooter =
+                    document.createElement('div');
+
+                actionFooter.style.cssText = `
+                    position: sticky;
+                    bottom: 0;
+                    z-index: 50;
+                    margin: 20px -8px -8px;
+                    padding: 14px 8px 8px;
+                    background: rgba(255,255,255,.97);
+                    backdrop-filter: blur(8px);
+                    border-top: 1px solid #e2e8f0;
+                    box-shadow: 0 -10px 24px rgba(15,23,42,.06);
+                `;
+
+
+                const actionHost =
+                    document.createElement('div');
+
+                actionHost.style.cssText = `
+                    width: 100%;
+                `;
+
+
+                const actionClock =
+                    document.createElement('div');
+
+                actionClock.style.cssText = `
+                    display: none;
+                    margin: 0 0 8px;
+                    text-align: center;
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #64748b;
+                `;
+
+
+                actionFooter.appendChild(
+                    actionHost
+                );
+
+                actionFooter.appendChild(
+                    actionClock
+                );
+
+                actionFooter.appendChild(
+                    closeButton
+                );
 
                 const formatTabs =
                     document.createElement('div');
@@ -2805,17 +3364,45 @@
                             );
 
                         if (carouselApproved) {
+
+                            carouselBuildButton.textContent =
+                                'Finalizando processamento...';
+
+                            await finishProcessingCurtain(
+                                carouselBuildButton
+                            );
+
+
                             carouselBuildButton.style.display =
                                 'none';
 
                             carouselApproveButton.style.display =
                                 'block';
+
+                            carouselApproveButton.textContent =
+                                '✓ Processado — pronto para publicar';
+
+                            carouselApproveButton.style.background =
+                                ACTION_GREEN;
                         } else {
+
+                            /*
+                             * O processamento terminou com erro.
+                             * Para imediatamente relógio e cortina.
+                             */
+                            stopActionAnimation();
+
                             carouselBuildButton.textContent =
-                                'Tentar processar Carrossel';
+                                '❌ Falha no processamento — tentar novamente';
 
                             carouselBuildButton.style.background =
-                                '#e1306c';
+                                ACTION_RED;
+
+                            carouselStatus.textContent =
+                                '❌ O processamento não foi concluído. Clique para tentar novamente.';
+
+                            carouselStatus.style.color =
+                                '#b91c1c';
                         }
 
                         carouselBuildButton.disabled =
@@ -2835,7 +3422,7 @@
                     'button';
 
                 carouselApproveButton.textContent =
-                    '✓ Aprovado para publicar';
+                    '✓ Processado — pronto para publicar';
 
                 carouselApproveButton.style.cssText = `
                     display: none;
@@ -2851,11 +3438,22 @@
                 `;
 
 
+                let carouselAlreadyPublished =
+                    false;
+
+
+                let photoAlreadyPublished =
+                    false;
+
+
                 function setCarouselPublishedState(
                     publication
                 ) {
-                    carouselApproveButton.disabled =
+
+                    carouselAlreadyPublished =
                         true;
+                    carouselApproveButton.disabled =
+                        false;
 
                     carouselApproveButton.textContent =
                         '✓ Publicado';
@@ -2867,7 +3465,7 @@
                         '#2563eb';
 
                     carouselApproveButton.style.cursor =
-                        'default';
+                        'pointer';
 
                     carouselBuildButton.style.display =
                         'none';
@@ -2986,6 +3584,18 @@
                 carouselApproveButton.addEventListener(
                     'click',
                     async () => {
+
+                        if (
+                            carouselAlreadyPublished
+                        ) {
+                            window.alert(
+                                'Este Carrossel já foi publicado no Instagram.'
+                            );
+
+                            return;
+                        }
+
+
                         const imageUrls =
                             Array.isArray(
                                 carouselSelectedImageUrls
@@ -3051,7 +3661,7 @@
                                 '⏳ Publicando Carrossel...';
 
                             carouselApproveButton.style.background =
-                                '#e1306c';
+                                ACTION_GREEN;
 
                             carouselStatus.textContent =
                                 '⏳ Enviando Carrossel para o Instagram...';
@@ -3277,6 +3887,888 @@
                 );
 
 
+                /*
+                 * ==========================================================
+                 * CONTROLE DO RODAPÉ FIXO
+                 * ==========================================================
+                 */
+
+                let actionProgressTimer =
+                    null;
+
+                let actionSweepFrame =
+                    null;
+
+                let actionStartedAt =
+                    0;
+
+                let actionCurrentMode =
+                    '';
+
+                let processingCurtainStartedAt =
+                    0;
+
+                let processingCurtainProgress =
+                    0;
+
+
+                let publishingCurtainStartedAt =
+                    0;
+
+                let publishingCurtainProgress =
+                    0;
+
+
+                const ACTION_RED =
+                    '#dc2626';
+
+                const ACTION_GREEN =
+                    '#16a34a';
+
+                const ACTION_BLUE =
+                    '#2563eb';
+
+
+                function formatActionTime(
+                    milliseconds
+                ) {
+                    const totalSeconds =
+                        Math.max(
+                            0,
+                            Math.floor(
+                                milliseconds /
+                                1000
+                            )
+                        );
+
+                    const minutes =
+                        String(
+                            Math.floor(
+                                totalSeconds /
+                                60
+                            )
+                        ).padStart(
+                            2,
+                            '0'
+                        );
+
+                    const seconds =
+                        String(
+                            totalSeconds %
+                            60
+                        ).padStart(
+                            2,
+                            '0'
+                        );
+
+                    return (
+                        minutes +
+                        ':' +
+                        seconds
+                    );
+                }
+
+
+                function stopActionClock() {
+                    if (actionProgressTimer) {
+                        clearInterval(
+                            actionProgressTimer
+                        );
+
+                        actionProgressTimer =
+                            null;
+                    }
+
+                    actionClock.style.display =
+                        'none';
+
+                    actionClock.textContent =
+                        '';
+                }
+
+
+                function startActionClock(
+                    title
+                ) {
+                    if (actionProgressTimer) {
+                        return;
+                    }
+
+                    actionStartedAt =
+                        Date.now();
+
+                    actionClock.style.display =
+                        'block';
+
+                    actionClock.textContent =
+                        '⏱ ' +
+                        title +
+                        ': 00:00';
+
+                    actionProgressTimer =
+                        setInterval(
+                            () => {
+                                actionClock.textContent =
+                                    '⏱ ' +
+                                    title +
+                                    ': ' +
+                                    formatActionTime(
+                                        Date.now() -
+                                        actionStartedAt
+                                    );
+                            },
+                            1000
+                        );
+                }
+
+
+                function stopActionSweep() {
+                    if (actionSweepFrame) {
+                        cancelAnimationFrame(
+                            actionSweepFrame
+                        );
+
+                        actionSweepFrame =
+                            null;
+                    }
+                }
+
+
+                function renderProcessingCurtain(
+                    button,
+                    percentage
+                ) {
+                    const progress =
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                percentage
+                            )
+                        );
+
+                    button.style.background =
+                        'linear-gradient(' +
+                        '90deg, ' +
+                        ACTION_GREEN +
+                        ' 0%, ' +
+                        ACTION_GREEN +
+                        ' ' +
+                        progress +
+                        '%, ' +
+                        ACTION_RED +
+                        ' ' +
+                        progress +
+                        '%, ' +
+                        ACTION_RED +
+                        ' 100%' +
+                        ')';
+                }
+
+
+                function startProcessingCurtain(
+                    button
+                ) {
+                    stopActionSweep();
+
+                    processingCurtainStartedAt =
+                        performance.now();
+
+                    processingCurtainProgress =
+                        0;
+
+                    renderProcessingCurtain(
+                        button,
+                        0
+                    );
+
+
+                    function animate(
+                        now
+                    ) {
+                        const elapsed =
+                            now -
+                            processingCurtainStartedAt;
+
+
+                        /*
+                         * Avança rápido no começo e depois
+                         * desacelera.
+                         *
+                         * Nunca chega a 100% enquanto
+                         * o processamento não terminar.
+                         */
+                        processingCurtainProgress =
+                            Math.min(
+                                92,
+                                92 * (
+                                    1 -
+                                    Math.exp(
+                                        -elapsed /
+                                        50000
+                                    )
+                                )
+                            );
+
+
+                        renderProcessingCurtain(
+                            button,
+                            processingCurtainProgress
+                        );
+
+
+                        actionSweepFrame =
+                            requestAnimationFrame(
+                                animate
+                            );
+                    }
+
+
+                    actionSweepFrame =
+                        requestAnimationFrame(
+                            animate
+                        );
+                }
+
+
+                function finishProcessingCurtain(
+                    button
+                ) {
+                    return new Promise(
+                        resolve => {
+
+                            stopActionSweep();
+
+
+                            const initialProgress =
+                                processingCurtainProgress;
+
+                            const startedAt =
+                                performance.now();
+
+                            const duration =
+                                1800;
+
+
+                            function animateFinish(
+                                now
+                            ) {
+                                const elapsed =
+                                    now -
+                                    startedAt;
+
+                                const ratio =
+                                    Math.min(
+                                        1,
+                                        elapsed /
+                                        duration
+                                    );
+
+
+                                const progress =
+                                    initialProgress +
+                                    (
+                                        100 -
+                                        initialProgress
+                                    ) *
+                                    ratio;
+
+
+                                processingCurtainProgress =
+                                    progress;
+
+
+                                renderProcessingCurtain(
+                                    button,
+                                    progress
+                                );
+
+
+                                if (
+                                    ratio <
+                                    1
+                                ) {
+                                    actionSweepFrame =
+                                        requestAnimationFrame(
+                                            animateFinish
+                                        );
+
+                                    return;
+                                }
+
+
+                                actionSweepFrame =
+                                    null;
+
+                                processingCurtainProgress =
+                                    100;
+
+                                button.style.background =
+                                    ACTION_GREEN;
+
+                                resolve();
+                            }
+
+
+                            actionSweepFrame =
+                                requestAnimationFrame(
+                                    animateFinish
+                                );
+                        }
+                    );
+                }
+
+
+                function renderPublishingCurtain(
+                    button,
+                    percentage
+                ) {
+                    const progress =
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                percentage
+                            )
+                        );
+
+                    button.style.background =
+                        'linear-gradient(' +
+                        '90deg, ' +
+                        ACTION_BLUE +
+                        ' 0%, ' +
+                        ACTION_BLUE +
+                        ' ' +
+                        progress +
+                        '%, ' +
+                        ACTION_GREEN +
+                        ' ' +
+                        progress +
+                        '%, ' +
+                        ACTION_GREEN +
+                        ' 100%' +
+                        ')';
+                }
+
+
+                function startPublishingCurtain(
+                    button
+                ) {
+                    stopActionSweep();
+
+                    publishingCurtainStartedAt =
+                        performance.now();
+
+                    publishingCurtainProgress =
+                        0;
+
+                    renderPublishingCurtain(
+                        button,
+                        0
+                    );
+
+
+                    function animatePublishing(
+                        now
+                    ) {
+                        const elapsed =
+                            now -
+                            publishingCurtainStartedAt;
+
+
+                        /*
+                         * Azul avança enquanto a Meta trabalha,
+                         * mas nunca chega a 100% antes da
+                         * confirmação real.
+                         */
+                        publishingCurtainProgress =
+                            Math.min(
+                                92,
+                                92 * (
+                                    1 -
+                                    Math.exp(
+                                        -elapsed /
+                                        30000
+                                    )
+                                )
+                            );
+
+
+                        renderPublishingCurtain(
+                            button,
+                            publishingCurtainProgress
+                        );
+
+
+                        actionSweepFrame =
+                            requestAnimationFrame(
+                                animatePublishing
+                            );
+                    }
+
+
+                    actionSweepFrame =
+                        requestAnimationFrame(
+                            animatePublishing
+                        );
+                }
+
+
+                function finishPublishingCurtain(
+                    button
+                ) {
+                    return new Promise(
+                        resolve => {
+                            stopActionSweep();
+
+                            const initialProgress =
+                                publishingCurtainProgress;
+
+                            const startedAt =
+                                performance.now();
+
+                            const duration =
+                                1800;
+
+
+                            function animateFinish(
+                                now
+                            ) {
+                                const elapsed =
+                                    now -
+                                    startedAt;
+
+                                const ratio =
+                                    Math.min(
+                                        1,
+                                        elapsed /
+                                        duration
+                                    );
+
+                                const progress =
+                                    initialProgress +
+                                    (
+                                        100 -
+                                        initialProgress
+                                    ) *
+                                    ratio;
+
+                                publishingCurtainProgress =
+                                    progress;
+
+                                renderPublishingCurtain(
+                                    button,
+                                    progress
+                                );
+
+                                if (ratio < 1) {
+                                    actionSweepFrame =
+                                        requestAnimationFrame(
+                                            animateFinish
+                                        );
+
+                                    return;
+                                }
+
+                                actionSweepFrame =
+                                    null;
+
+                                publishingCurtainProgress =
+                                    100;
+
+                                button.style.background =
+                                    ACTION_BLUE;
+
+                                resolve();
+                            }
+
+
+                            actionSweepFrame =
+                                requestAnimationFrame(
+                                    animateFinish
+                                );
+                        }
+                    );
+                }
+
+
+                function setActionSolid(
+                    button,
+                    color
+                ) {
+                    stopActionSweep();
+
+                    button.style.background =
+                        color;
+                }
+
+
+                function sweepActionButton(
+                    button,
+                    fromColor,
+                    toColor,
+                    duration = 1400
+                ) {
+                    stopActionSweep();
+
+                    const startedAt =
+                        performance.now();
+
+
+                    function animateSweep(
+                        now
+                    ) {
+                        const elapsed =
+                            now -
+                            startedAt;
+
+                        const percentage =
+                            Math.min(
+                                100,
+                                (
+                                    elapsed /
+                                    duration
+                                ) * 100
+                            );
+
+
+                        button.style.background =
+                            'linear-gradient(' +
+                            '90deg, ' +
+                            toColor +
+                            ' 0%, ' +
+                            toColor +
+                            ' ' +
+                            percentage +
+                            '%, ' +
+                            fromColor +
+                            ' ' +
+                            percentage +
+                            '%, ' +
+                            fromColor +
+                            ' 100%' +
+                            ')';
+
+
+                        if (
+                            percentage <
+                            100
+                        ) {
+                            actionSweepFrame =
+                                requestAnimationFrame(
+                                    animateSweep
+                                );
+
+                            return;
+                        }
+
+
+                        actionSweepFrame =
+                            null;
+
+                        button.style.background =
+                            toColor;
+                    }
+
+
+                    actionSweepFrame =
+                        requestAnimationFrame(
+                            animateSweep
+                        );
+                }
+
+
+                function stopActionAnimation() {
+                    stopActionClock();
+                    stopActionSweep();
+
+                    actionCurrentMode =
+                        '';
+                }
+
+
+                function watchActionButton(
+                    button
+                ) {
+                    if (
+                        !button ||
+                        button.dataset
+                            .progressWatcher ===
+                            'true'
+                    ) {
+                        return;
+                    }
+
+
+                    button.dataset.progressWatcher =
+                        'true';
+
+
+                    const observer =
+                        new MutationObserver(
+                            () => {
+                                const label =
+                                    String(
+                                        button.textContent ||
+                                        ''
+                                    )
+                                        .trim()
+                                        .toLowerCase();
+
+
+                                const isPublished =
+                                    label.includes(
+                                        'publicado'
+                                    );
+
+
+                                const isPublishing =
+                                    label.includes(
+                                        'publicando'
+                                    ) ||
+                                    label.includes(
+                                        'enviando'
+                                    );
+
+
+                                const isReady =
+                                    label.includes(
+                                        'aprovado'
+                                    ) ||
+                                    label.includes(
+                                        'processado'
+                                    ) ||
+                                    label.includes(
+                                        'pronto para publicar'
+                                    );
+
+
+                                const isProcessing =
+                                    label.includes(
+                                        'processando'
+                                    ) ||
+                                    label.includes(
+                                        'preparando'
+                                    ) ||
+                                    label.includes(
+                                        'carregando'
+                                    ) ||
+                                    label.includes(
+                                        'finalizando'
+                                    );
+
+
+                                /*
+                                 * PROCESSANDO
+                                 * Sempre vermelho.
+                                 */
+                                if (
+                                    isProcessing &&
+                                    !isPublishing
+                                ) {
+                                    if (
+                                        actionCurrentMode !==
+                                        'processing'
+                                    ) {
+                                        actionCurrentMode =
+                                            'processing';
+
+                                        stopActionClock();
+
+                                        startActionClock(
+                                            'Tempo de processamento'
+                                        );
+
+                                        startProcessingCurtain(
+                                            button
+                                        );
+                                    }
+
+                                    return;
+                                }
+
+
+                                /*
+                                 * PROCESSAMENTO TERMINOU
+                                 * Vermelho -> Verde
+                                 * da esquerda para a direita.
+                                 */
+                                if (isReady) {
+                                    stopActionClock();
+
+                                    if (
+                                        actionCurrentMode !==
+                                        'ready'
+                                    ) {
+                                        actionCurrentMode =
+                                            'ready';
+
+                                        sweepActionButton(
+                                            button,
+                                            ACTION_RED,
+                                            ACTION_GREEN
+                                        );
+                                    }
+
+                                    return;
+                                }
+
+
+                                /*
+                                 * ENVIO / PUBLICAÇÃO
+                                 * Verde -> Azul
+                                 * da esquerda para a direita.
+                                 */
+                                if (isPublishing) {
+                                    if (
+                                        actionCurrentMode !==
+                                        'publishing'
+                                    ) {
+                                        actionCurrentMode =
+                                            'publishing';
+
+                                        stopActionClock();
+
+                                        startActionClock(
+                                            'Tempo de envio'
+                                        );
+
+                                        startPublishingCurtain(
+                                            button
+                                        );
+                                    }
+
+                                    return;
+                                }
+
+
+                                /*
+                                 * PUBLICADO
+                                 * Azul completo.
+                                 */
+                                if (isPublished) {
+                                    stopActionClock();
+
+                                    const wasPublishing =
+                                        actionCurrentMode ===
+                                        'publishing';
+
+                                    actionCurrentMode =
+                                        'published';
+
+                                    if (wasPublishing) {
+                                        finishPublishingCurtain(
+                                            button
+                                        );
+
+                                        return;
+                                    }
+
+                                    setActionSolid(
+                                        button,
+                                        ACTION_BLUE
+                                    );
+                                }
+                            }
+                        );
+
+
+                    observer.observe(
+                        button,
+                        {
+                            childList:
+                                true,
+
+                            characterData:
+                                true,
+
+                            subtree:
+                                true
+                        }
+                    );
+                }
+
+                function syncInstagramFooterAction(
+                    format
+                ) {
+                    stopActionAnimation();
+
+                    actionHost.innerHTML =
+                        '';
+
+
+                    let buttons =
+                        [];
+
+
+                    if (format === 'photo') {
+                        buttons = [
+                            generateButton,
+                            publishButton
+                        ];
+                    }
+
+
+                    if (format === 'carousel') {
+                        buttons = [
+                            carouselBuildButton,
+                            carouselApproveButton
+                        ];
+                    }
+
+
+                    if (format === 'reel') {
+                        buttons = [
+                            reelButton,
+                            reelApproveButton
+                        ];
+                    }
+
+
+                    for (
+                        const button
+                        of buttons
+                    ) {
+                        button.style.width =
+                            '100%';
+
+                        button.style.marginTop =
+                            button === buttons[0]
+                                ? '0'
+                                : '8px';
+
+                        button.style.transition =
+                            'background-color 4s linear, color .25s ease';
+
+                        actionHost.appendChild(
+                            button
+                        );
+
+
+                        /*
+                         * Se o Carrossel já foi publicado,
+                         * o botão azul deve permanecer clicável
+                         * para exibir a mensagem de publicação.
+                         */
+                        if (
+                            format === 'carousel' &&
+                            button === carouselApproveButton &&
+                            carouselAlreadyPublished
+                        ) {
+                            button.disabled =
+                                false;
+
+                            button.style.cursor =
+                                'pointer';
+                        }
+
+
+                        watchActionButton(
+                            button
+                        );
+                    }
+                }
+
                 function setInstagramFormatTab(
                     format
                 ) {
@@ -3303,6 +4795,16 @@
                         isReel
                             ? 'block'
                             : 'none';
+
+
+                    /*
+                     * Mantém a ação da aba atual sempre
+                     * no rodapé fixo acima de Fechar.
+                     */
+                    syncInstagramFooterAction(
+                        format
+                    );
+
 
                     const buttons = [
                         photoTabButton,
@@ -3403,7 +4905,7 @@
                                 '⏳ Processando Foto...';
 
                             generateButton.style.background =
-                                '#e1306c';
+                                ACTION_RED;
 
                             statusBox.textContent =
                                 'Preparando conteúdo...';
@@ -3490,7 +4992,7 @@
                                     : '';
 
                             const constructionNotice =
-                                '🔧 Nossa página de ofertas está em preparação. Em breve os links dos produtos estarão disponíveis na bio.';
+                                '🔗 Acesse o link da bio para ver esta oferta e outras oportunidades.';
 
                             textarea.value =
                                 [
@@ -3521,13 +5023,17 @@
                             statusBox.style.color =
                                 '#166534';
 
-                            generateButton.textContent =
-                                'Processamento concluído';
-
                             if (
                                 result.status === 'READY' &&
                                 auditStatus === 'APPROVED'
                             ) {
+                                generateButton.textContent =
+                                    'Finalizando processamento...';
+
+                                await finishProcessingCurtain(
+                                    generateButton
+                                );
+
                                 generateButton.style.display =
                                     'none';
 
@@ -3538,12 +5044,14 @@
                                     false;
 
                                 publishButton.textContent =
-                                    '✓ Aprovado para publicar';
+                                    '✓ Processado — pronto para publicar';
 
                                 publishButton.style.background =
-                                    '#16a34a';
+                                    ACTION_GREEN;
                             }
                         } catch (error) {
+                            stopActionAnimation();
+
                             console.error(
                                 '[INSTAGRAM] Erro ao gerar rascunho:',
                                 error
@@ -3565,7 +5073,7 @@
                                 'Tentar processar novamente';
 
                             generateButton.style.background =
-                                '#e1306c';
+                                ACTION_RED;
                         }
                     }
                 );
@@ -3623,23 +5131,32 @@
                 function setPhotoPublishedState(
                     publication
                 ) {
-                    publishButton.disabled =
+                    photoAlreadyPublished =
                         true;
+
+                    publishButton.disabled =
+                        false;
+
+                    publishButton.style.display =
+                        'block';
 
                     publishButton.textContent =
                         '✓ Publicado';
 
                     publishButton.style.background =
-                        '#2563eb';
+                        ACTION_BLUE;
 
                     publishButton.style.cursor =
-                        'default';
+                        'pointer';
 
                     textarea.disabled =
                         true;
 
                     generateButton.disabled =
                         true;
+
+                    generateButton.style.display =
+                        'none';
 
                     const publishedAt =
                         formatPublicationDate(
@@ -3747,6 +5264,13 @@
                 publishButton.addEventListener(
                     'click',
                     async () => {
+                        if (photoAlreadyPublished) {
+                            window.alert(
+                                'Esta Foto já foi publicada no Instagram.'
+                            );
+                            return;
+                        }
+
                         const confirmed =
                             window.confirm(
                                 'Confirma a aprovação e publicação deste conteúdo no Instagram?'
@@ -3793,7 +5317,7 @@
                                 '⏳ Publicando...';
 
                             publishButton.style.background =
-                                '#e1306c';
+                                ACTION_GREEN;
 
                             statusBox.textContent =
                                 '⏳ Enviando publicação para o Instagram...';
@@ -3949,10 +5473,10 @@
                                 false;
 
                             publishButton.textContent =
-                                '✓ Aprovado para publicar';
+                                '✓ Processado — pronto para publicar';
 
                             publishButton.style.background =
-                                '#16a34a';
+                                ACTION_GREEN;
                         }
                     }
                 );
@@ -3983,7 +5507,7 @@
                 modal.appendChild(photoPanel);
                 modal.appendChild(carouselPanel);
                 modal.appendChild(reelPanel);
-                modal.appendChild(closeButton);
+                modal.appendChild(actionFooter);
 
                 overlay.appendChild(modal);
 
@@ -3993,6 +5517,10 @@
 
                 loadPhotoPublicationState();
                 loadCarouselPublicationState();
+
+                reelPublicationStatePromise =
+                    loadReelPublicationState();
+
                 loadInstagramGallery();
 
                 console.log(

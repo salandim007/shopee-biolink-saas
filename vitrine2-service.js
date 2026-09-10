@@ -239,6 +239,11 @@ function createVitrine2Service(
                 catalogOptions
             );
 
+        catalog.promoteToTop(
+            product.marketplace,
+            product.itemId
+        );
+
         saveCatalog(
             catalog
         );

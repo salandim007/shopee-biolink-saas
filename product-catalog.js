@@ -628,6 +628,18 @@ class ProductCatalog {
     }
 
 
+    promoteToTop(
+        marketplace,
+        itemId
+    ) {
+        return this.setPosition(
+            marketplace,
+            itemId,
+            1
+        );
+    }
+
+
     setPosition(
         marketplace,
         itemId,
@@ -645,14 +657,74 @@ class ProductCatalog {
             );
         }
 
-        entry.visibility.position =
+        const normalizedPosition =
             normalizePosition(
                 position
             );
 
+        if (normalizedPosition === null) {
+            entry.visibility.position =
+                null;
+
+            return entry;
+        }
+
+        const orderedEntries =
+            this
+                .listAll()
+                .filter(candidate => {
+                    if (candidate === entry) {
+                        return false;
+                    }
+
+                    return (
+                        normalizePosition(
+                            candidate
+                                ?.visibility
+                                ?.position
+                        ) !== null
+                    );
+                })
+                .sort(
+                    (a, b) => {
+                        const positionA =
+                            normalizePosition(
+                                a.visibility.position
+                            );
+
+                        const positionB =
+                            normalizePosition(
+                                b.visibility.position
+                            );
+
+                        return (
+                            positionA -
+                            positionB
+                        );
+                    }
+                );
+
+        const insertionIndex =
+            Math.min(
+                normalizedPosition - 1,
+                orderedEntries.length
+            );
+
+        orderedEntries.splice(
+            insertionIndex,
+            0,
+            entry
+        );
+
+        orderedEntries.forEach(
+            (candidate, index) => {
+                candidate.visibility.position =
+                    index + 1;
+            }
+        );
+
         return entry;
     }
-
 
     setMarketingSelected(
         marketplace,

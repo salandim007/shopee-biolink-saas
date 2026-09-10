@@ -2104,3 +2104,55 @@ Após o Reel estar validado de ponta a ponta, seguir para Facebook reutilizando 
 
 Não voltar a colocar Affiliate API + varredura do Data Feed no caminho crítico do preparo/publicação de Marketing.
 
+
+---
+
+# Marco 2026-09-10 — Instagram MVP concluído ✅
+
+## Estado do Instagram
+
+O canal Instagram atingiu o MVP funcional completo.
+
+Validado em publicação real:
+
+- Foto simples publicada no Instagram.
+- Carrossel publicado no Instagram.
+- Reel publicado no Instagram.
+- IA local Ollama integrada à preparação de conteúdo.
+- Auditoria determinística integrada.
+- Histórico de publicação funcionando.
+- Proteção contra publicação duplicada em Foto, Carrossel e Reel.
+- Reel consulta o histórico antes de gerar novamente, evitando gasto desnecessário de IA e FFmpeg.
+- Galeria de fotos possui cache por produto durante a sessão do navegador.
+- Botões usam estados visuais de processamento, pronto e publicado.
+- Proxy de imagens implementado para Foto e Carrossel.
+- Meta deixa de depender diretamente das URLs do CDN da Shopee.
+- Proxy validado publicamente via webhook.mixdeproduto.com.
+- Reel continua usando MP4 gerado pelo FFmpeg.
+- Avatar final do Reel localizado em assets/video/avatar.mp4.
+
+## Infraestrutura provisória
+
+O Cloudflare Tunnel local continua apenas como solução temporária para desenvolvimento.
+
+A arquitetura definitiva de VPS ficará para etapa posterior.
+
+## Próxima etapa
+
+1. Pinterest.
+2. Renovação automática de produtos.
+3. Facebook.
+4. Somente quando Facebook estiver pelo menos 50% concluído:
+   - Edge TTS / nova camada de áudio e vídeo.
+   - divisão de infraestrutura Contabo + Oracle.
+
+## Catálogo
+
+A base de produtos continua sendo parte estrutural do sistema.
+
+A interface visual tradicional do Catálogo poderá futuramente ser reduzida ou removida, pois a Central de Marketing está se tornando a interface administrativa principal.
+
+## Decisão
+
+Instagram MVP: CONCLUÍDO ✅
+Próximo canal: Pinterest.

@@ -9,3 +9,7 @@ _lixo_temporario/
 chrome-shopee-profile/
 database.sqlite
 data/vitrine2-catalog.json
+*.bak
+*.backup-*
+tmp/
+instagram-prepare-atual.txt

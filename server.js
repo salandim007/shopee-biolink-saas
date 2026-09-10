@@ -18,6 +18,10 @@ const {
 const marketingRoutes =
     require('./marketing-routes');
 
+const {
+    defaultInstagramWebhookRouter
+} = require('./marketing/instagram-webhook-router');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const CHROME_EXECUTABLE_PATH = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
@@ -25,6 +29,11 @@ const CHROME_EXECUTABLE_PATH = process.env.CHROME_PATH || 'C:\\Program Files\\Go
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(
+    '/webhooks/instagram',
+    defaultInstagramWebhookRouter
+);
 
 app.use('/api/vitrine2', defaultVitrine2Router);
 app.use('/api/vitrine2', defaultVitrine2SyncRouter);
