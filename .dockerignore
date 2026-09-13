@@ -1,0 +1,16 @@
+.git
+.gitignore
+node_modules
+.env
+.env.*
+database.sqlite
+data/vitrine2-catalog.json
+data/shopee-feed
+chrome-shopee-profile
+chrome-shopee-profile-test
+tmp
+*.zip
+*.bak
+*.backup-*
+.vscode
+_lixo_temporario

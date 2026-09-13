@@ -13,3 +13,8 @@ data/vitrine2-catalog.json
 *.backup-*
 tmp/
 instagram-prepare-atual.txt
+*.bak*
+.env.production
+data/music/
+data/opportunity-decisions.json
+data/vitrine2-catalog.json.bak-*

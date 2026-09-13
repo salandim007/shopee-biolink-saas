@@ -140,13 +140,74 @@ async function downloadImage(
 }
 
 
+async function resolveBackgroundMusic(options = {}) {
+    const explicitPath =
+        String(
+            options.musicPath ||
+            ''
+        ).trim();
+
+    if (explicitPath) {
+        const resolved =
+            path.resolve(
+                explicitPath
+            );
+
+        try {
+            await fs.access(
+                resolved
+            );
+        } catch {
+            throw new ReelGeneratorError(
+                'A música de fundo informada não foi encontrada.',
+                'REEL_MUSIC_NOT_FOUND',
+                {
+                    musicPath:
+                        resolved
+                }
+            );
+        }
+
+        return resolved;
+    }
+
+
+    const defaultMusicPath =
+        path.resolve(
+            process.env.REEL_MUSIC_PATH ||
+            path.join(
+                process.cwd(),
+                'data',
+                'music',
+                'pixabay',
+                'bombinsound-no-copyright-vlog-499473.mp3'
+            )
+        );
+
+
+    try {
+        await fs.access(
+            defaultMusicPath
+        );
+    } catch {
+        return null;
+    }
+
+
+    return defaultMusicPath;
+}
+
+
 function buildFilterGraph({
     imageCount,
     width,
     height,
     fps,
     secondsPerImage,
-    transitionDuration
+    transitionDuration,
+    musicInputIndex = null,
+    totalDuration = null,
+    musicVolume = 0.16
 }) {
     const filters = [];
 
@@ -318,12 +379,91 @@ function buildFilterGraph({
             1000
         );
 
+    const avatarAudioLabel =
+        musicInputIndex === null
+            ? 'aout'
+            : 'avatarAudio';
+
+
     filters.push(
         `[${imageCount}:a]` +
         `asetpts=PTS-STARTPTS,` +
         `adelay=${audioDelayMs}:all=1` +
-        `[aout]`
+        `[${avatarAudioLabel}]`
     );
+
+
+    /*
+     * Música de fundo:
+     * começa no segundo zero,
+     * permanece durante todo o Reel,
+     * volume reduzido,
+     * fade suave no início e no final.
+     */
+    if (
+        musicInputIndex !==
+        null
+    ) {
+        const safeDuration =
+            Math.max(
+                1,
+                Number(
+                    totalDuration
+                ) || 1
+            );
+
+        const safeVolume =
+            Math.max(
+                0,
+                Math.min(
+                    1,
+                    Number(
+                        musicVolume
+                    ) || 0.16
+                )
+            );
+
+        const fadeInDuration =
+            Math.min(
+                0.6,
+                safeDuration / 4
+            );
+
+        const fadeOutDuration =
+            Math.min(
+                0.9,
+                safeDuration / 4
+            );
+
+        const fadeOutStart =
+            Math.max(
+                0,
+                safeDuration -
+                fadeOutDuration
+            );
+
+
+        filters.push(
+            `[${musicInputIndex}:a]` +
+            `asetpts=PTS-STARTPTS,` +
+            `volume=${safeVolume.toFixed(3)},` +
+            `atrim=0:${safeDuration.toFixed(3)},` +
+            `afade=t=in:st=0:d=${fadeInDuration.toFixed(3)},` +
+            `afade=t=out:st=${fadeOutStart.toFixed(3)}:` +
+            `d=${fadeOutDuration.toFixed(3)}` +
+            `[musicbg]`
+        );
+
+
+        filters.push(
+            `[avatarAudio][musicbg]` +
+            `amix=inputs=2:` +
+            `duration=longest:` +
+            `dropout_transition=0,` +
+            `atrim=0:${safeDuration.toFixed(3)}` +
+            `[aout]`
+        );
+    }
 
 
     return filters.join(';');
@@ -552,6 +692,51 @@ async function generateReel(options = {}) {
         );
     }
 
+
+    const productDuration =
+        (
+            imageUrls.length *
+            secondsPerImage
+        ) -
+        (
+            Math.max(
+                0,
+                imageUrls.length - 1
+            ) *
+            transitionDuration
+        );
+
+    const durationSeconds =
+        productDuration +
+        closingDuration -
+        transitionDuration;
+
+    const musicPath =
+        await resolveBackgroundMusic(
+            options
+        );
+
+
+    if (musicPath) {
+        console.log(
+            '[REEL MUSIC] Trilha selecionada:',
+            path.basename(
+                musicPath
+            )
+        );
+    } else {
+        console.log(
+            '[REEL MUSIC] Nenhuma trilha local disponível.'
+        );
+    }
+
+
+    const musicInputIndex =
+        musicPath
+            ? localImages.length + 1
+            : null;
+
+
     const outputPath =
         path.join(
             jobDirectory,
@@ -569,7 +754,12 @@ async function generateReel(options = {}) {
             transitionDuration,
             closingDuration,
             fontFile,
-            boldFontFile
+            boldFontFile,
+            musicInputIndex,
+            totalDuration:
+                durationSeconds,
+            musicVolume:
+                0.16
         });
 
     const args = [
@@ -596,6 +786,16 @@ async function generateReel(options = {}) {
     );
 
 
+    if (musicPath) {
+        args.push(
+            '-stream_loop',
+            '-1',
+            '-i',
+            musicPath
+        );
+    }
+
+
     args.push(
         '-filter_complex',
         filterGraph,
@@ -613,7 +813,13 @@ async function generateReel(options = {}) {
         'aac',
 
         '-b:a',
-        '192k',
+        '128k',
+
+        '-ar',
+        '48000',
+
+        '-ac',
+        '2',
 
         '-preset',
         'medium',
@@ -638,24 +844,6 @@ async function generateReel(options = {}) {
         args
     );
 
-    const productDuration =
-        (
-            imageUrls.length *
-            secondsPerImage
-        ) -
-        (
-            Math.max(
-                0,
-                imageUrls.length - 1
-            ) *
-            transitionDuration
-        );
-
-    const durationSeconds =
-        productDuration +
-        closingDuration -
-        transitionDuration;
-
     return {
         success:
             true,
@@ -676,7 +864,19 @@ async function generateReel(options = {}) {
         durationSeconds:
             Number(
                 durationSeconds.toFixed(2)
-            )
+            ),
+
+        musicEnabled:
+            Boolean(
+                musicPath
+            ),
+
+        musicTrack:
+            musicPath
+                ? path.basename(
+                    musicPath
+                )
+                : null
     };
 }
 

@@ -19,6 +19,7 @@
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     >
+    <meta name="google" content="notranslate">
 </head>
 
 <body class="bg-slate-50 text-slate-900">
@@ -277,7 +278,7 @@
                     </a>
 
                     <a
-                        href="/admin/vitrine2/marketing/outros"
+                        href="/admin/vitrine2/marketing/pinterest"
                         class="
                             inline-flex
                             items-center
@@ -4139,7 +4140,6 @@
 
                             stopActionSweep();
 
-
                             const initialProgress =
                                 processingCurtainProgress;
 
@@ -4147,12 +4147,62 @@
                                 performance.now();
 
                             const duration =
-                                1800;
+                                900;
+
+                            let finishFrame =
+                                null;
+
+                            let finished =
+                                false;
+
+
+                            function complete() {
+
+                                if (finished) {
+                                    return;
+                                }
+
+                                finished =
+                                    true;
+
+                                if (finishFrame) {
+                                    cancelAnimationFrame(
+                                        finishFrame
+                                    );
+
+                                    finishFrame =
+                                        null;
+                                }
+
+                                processingCurtainProgress =
+                                    100;
+
+                                renderProcessingCurtain(
+                                    button,
+                                    100
+                                );
+
+                                button.style.background =
+                                    ACTION_GREEN;
+
+                                resolve();
+                            }
+
+
+                            const safetyTimer =
+                                setTimeout(
+                                    complete,
+                                    duration + 1200
+                                );
 
 
                             function animateFinish(
                                 now
                             ) {
+                                if (finished) {
+                                    return;
+                                }
+
                                 const elapsed =
                                     now -
                                     startedAt;
@@ -4164,7 +4214,6 @@
                                         duration
                                     );
 
-
                                 const progress =
                                     initialProgress +
                                     (
@@ -4173,22 +4222,17 @@
                                     ) *
                                     ratio;
 
-
                                 processingCurtainProgress =
                                     progress;
-
 
                                 renderProcessingCurtain(
                                     button,
                                     progress
                                 );
 
+                                if (ratio < 1) {
 
-                                if (
-                                    ratio <
-                                    1
-                                ) {
-                                    actionSweepFrame =
+                                    finishFrame =
                                         requestAnimationFrame(
                                             animateFinish
                                         );
@@ -4196,21 +4240,15 @@
                                     return;
                                 }
 
+                                clearTimeout(
+                                    safetyTimer
+                                );
 
-                                actionSweepFrame =
-                                    null;
-
-                                processingCurtainProgress =
-                                    100;
-
-                                button.style.background =
-                                    ACTION_GREEN;
-
-                                resolve();
+                                complete();
                             }
 
 
-                            actionSweepFrame =
+                            finishFrame =
                                 requestAnimationFrame(
                                     animateFinish
                                 );

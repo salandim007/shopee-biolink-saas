@@ -1,0 +1,46 @@
+services:
+  shopee-biolink:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: shopee-biolink
+
+    restart: unless-stopped
+
+    env_file:
+      - .env.production
+
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+
+      CHROME_PATH: /usr/bin/chromium
+      FFMPEG_PATH: /usr/bin/ffmpeg
+
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: qwen3.5:0.8b
+
+    ports:
+      - "127.0.0.1:3100:3000"
+
+    volumes:
+      - ./database.sqlite:/app/database.sqlite
+      - ./data/vitrine2-catalog.json:/app/data/vitrine2-catalog.json
+      - ./data/opportunity-decisions.json:/app/data/opportunity-decisions.json
+      - ./tmp:/app/tmp
+      - ./data/shopee-feed:/app/data/shopee-feed:ro
+      - ./data/music:/app/data/music:ro
+
+    networks:
+      - proxy
+      - ollama
+
+networks:
+  proxy:
+    external: true
+    name: nginx-proxy-manager_default
+
+  ollama:
+    external: true
+    name: ollama-docker_default

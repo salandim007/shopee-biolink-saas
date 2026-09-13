@@ -296,7 +296,7 @@
                     </a>
 
                     <a
-                        href="/admin/vitrine2/marketing/outros"
+                        href="/admin/vitrine2/marketing/pinterest"
                         class="
                             inline-flex
                             items-center
@@ -516,7 +516,7 @@
                             Kwai
                         </option>
 
-                        <option value="outros">
+                        <option value="pinterest">
                             Pinterest
                         </option>
 
@@ -961,7 +961,8 @@
             )
                 .filter(
                     entry =>
-                        entry?.visibility?.published
+                        entry?.visibility?.published ||
+                        entry?.marketing?.selected === true
                 )
                 .map(
                     entry => ({
@@ -1001,7 +1002,7 @@
                     'bg-orange-50 text-orange-700'
             },
             {
-                key: 'outros',
+                key: 'pinterest',
                 label: 'Pinterest',
                 selectedClass:
                     'bg-violet-50 text-violet-700'
@@ -1282,7 +1283,7 @@
                                     text-slate-500
                                 "
                             >
-                                Nenhum produto publicado disponível para Marketing.
+                                Nenhum produto disponível na Central de Marketing.
                             </td>
                         </tr>
                     `;
@@ -1552,7 +1553,7 @@
                     facebook: 'Facebook',
                     tiktok: 'TikTok',
                     kwai: 'Kwai',
-                    outros: 'Pinterest'
+                    pinterest: 'Pinterest'
                 };
 
                 const actionText =

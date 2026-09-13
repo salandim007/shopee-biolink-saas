@@ -10,6 +10,11 @@ const express =
     require('express');
 
 const {
+    buildSignedMetaImageUrl,
+    buildSignedMetaReelUrl
+} = require('./meta-media-public');
+
+const {
     captureShopeeMedia
 } = require('./shopee-browser-media-capture');
 
@@ -103,12 +108,8 @@ function toMetaImageUrl(
         return imageUrl;
     }
 
-    return (
-        MARKETING_PUBLIC_BASE_URL +
-        '/admin/vitrine2/marketing/media/image?url=' +
-        encodeURIComponent(
-            imageUrl
-        )
+    return buildSignedMetaImageUrl(
+        imageUrl
     );
 }
 
@@ -383,9 +384,9 @@ const pages = {
         title: 'Kwai'
     },
 
-    outros: {
+    pinterest: {
         view: 'marketing-outros',
-        title: 'Outros canais'
+        title: 'Pinterest'
     }
 };
 
@@ -395,6 +396,20 @@ router.get(
     (req, res) => {
         res.redirect(
             '/admin/vitrine2/marketing/overview'
+        );
+    }
+);
+
+
+/*
+ * Compatibilidade temporária:
+ * URLs antigas /marketing/outros continuam funcionando.
+ */
+router.get(
+    '/outros',
+    (req, res) => {
+        res.redirect(
+            '/admin/vitrine2/marketing/pinterest'
         );
     }
 );
@@ -1291,20 +1306,6 @@ router.get(
 router.post(
     '/meta/publish',
     async (req, res) => {
-        if (
-            process.env.NODE_ENV ===
-            'production'
-        ) {
-            return res.status(404).json({
-                success: false,
-                error: {
-                    code: 'NOT_FOUND',
-                    message:
-                        'Rota não encontrada.'
-                }
-            });
-        }
-
         const body =
             req.body || {};
 
@@ -1561,6 +1562,12 @@ router.post(
                     }
                 });
             }
+
+
+            normalizedVideoUrl =
+                buildSignedMetaReelUrl(
+                    normalizedVideoUrl
+                );
 
 
             if (

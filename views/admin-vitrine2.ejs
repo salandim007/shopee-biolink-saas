@@ -60,6 +60,264 @@
             line-height: 1;
         }
     </style>
+
+<style id="adminCompactStyle">
+
+    /* ÁREA PRINCIPAL */
+    .admin-main-compact {
+        padding-top: 16px !important;
+        padding-bottom: 16px !important;
+    }
+
+    /* TOTALIZADORES */
+    .summary-compact-grid {
+        gap: 8px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .summary-compact-card {
+        min-height: 48px !important;
+        padding: 9px 13px !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+    }
+
+    .summary-compact-card > div:first-child {
+        margin: 0 !important;
+        font-size: 10px !important;
+        line-height: 1.1 !important;
+    }
+
+    .summary-compact-card > div:last-child {
+        margin: 0 !important;
+        font-size: 16px !important;
+        line-height: 1.1 !important;
+        text-align: right !important;
+    }
+
+    /* ADICIONAR PRODUTO */
+    .import-compact-card {
+        padding: 11px 16px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .import-compact-card form {
+        margin: 0 !important;
+        gap: 8px !important;
+    }
+
+    #shopeeImportUrl {
+        min-height: 40px !important;
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+    }
+
+    #shopeeImportButton {
+        min-height: 40px !important;
+        padding: 8px 14px !important;
+    }
+
+    /* BUSCAR MELHORES PRODUTOS */
+    #opportunitySearchPanel {
+        padding: 11px 16px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .opportunity-controls-compact {
+        display: grid !important;
+
+        grid-template-columns:
+            auto
+            minmax(100px, .65fr)
+            minmax(145px, .9fr)
+            minmax(190px, 1.2fr)
+            auto !important;
+
+        align-items: end !important;
+        gap: 8px !important;
+    }
+
+    .opportunity-title-inline {
+        min-height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    .opportunity-title-inline > div:first-child {
+        width: 36px !important;
+        height: 36px !important;
+        flex: 0 0 36px !important;
+        border-radius: 12px !important;
+    }
+
+    .opportunity-title-inline h2 {
+        font-size: 14px !important;
+        white-space: nowrap !important;
+        margin: 0 !important;
+    }
+
+    .opportunity-controls-compact label {
+        margin-bottom: 3px !important;
+        font-size: 10px !important;
+        line-height: 1.1 !important;
+    }
+
+    .opportunity-controls-compact select {
+        height: 40px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        border-radius: 10px !important;
+        font-size: 13px !important;
+    }
+
+    #opportunitySearchButton {
+        width: auto !important;
+        min-width: 105px !important;
+        height: 40px !important;
+        padding: 0 14px !important;
+        border-radius: 10px !important;
+        font-size: 13px !important;
+        white-space: nowrap !important;
+    }
+
+    .opportunity-note-compact {
+        margin-top: 7px !important;
+        padding: 6px 0 0 0 !important;
+        min-height: 0 !important;
+        border: 0 !important;
+        border-top: 1px solid rgb(241 245 249) !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+    }
+
+    /* FILTROS */
+    .catalog-filters-compact {
+        padding: 11px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .catalog-filters-compact input,
+    .catalog-filters-compact select {
+        min-height: 40px !important;
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+    }
+
+    .catalog-filters-compact .mt-3 {
+        margin-top: 7px !important;
+    }
+
+    /* NOTEBOOK / TABLET */
+    @media (max-width: 1100px) {
+        .opportunity-controls-compact {
+            grid-template-columns: 1fr 1fr 1fr 1fr !important;
+        }
+
+        .opportunity-title-inline {
+            grid-column: 1 / -1;
+        }
+
+        #opportunitySearchButton {
+            width: 100% !important;
+        }
+    }
+
+    /* CELULAR */
+    @media (max-width: 700px) {
+        .opportunity-controls-compact {
+            grid-template-columns: 1fr 1fr !important;
+        }
+
+        .opportunity-title-inline {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .opportunity-controls-compact {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+</style>
+
+
+<style id="opportunityCascadeStyle">
+
+    @media (min-width: 1101px) {
+
+        .opportunity-controls-compact {
+            grid-template-columns:
+                auto
+                minmax(90px, .55fr)
+                minmax(135px, .80fr)
+                minmax(145px, .90fr)
+                minmax(160px, 1fr)
+                auto
+                !important;
+        }
+
+    }
+
+    .opportunity-subcategory-control select {
+        width: 100%;
+    }
+
+</style>
+
+
+<style id="subcategoryBorderFix">
+
+    #opportunitySubcategory {
+        width: 100%;
+
+        height: 40px;
+
+        padding:
+            0
+            10px;
+
+        border:
+            1px solid
+            rgb(226 232 240);
+
+        border-radius:
+            10px;
+
+        background-color:
+            white;
+
+        font-size:
+            13px;
+
+        outline:
+            none;
+    }
+
+    #opportunitySubcategory:focus {
+        border-color:
+            rgb(56 189 248);
+    }
+
+    #opportunitySubcategory:disabled {
+        background-color:
+            rgb(248 250 252);
+
+        color:
+            rgb(100 116 139);
+    }
+
+</style>
+
 </head>
 
 <body class="bg-slate-50 text-slate-900">
@@ -476,6 +734,274 @@
                     </button>
                 </form>
             </div>
+
+            <!-- BUSCA DE OPORTUNIDADES -->
+
+            <div
+                id="opportunitySearchPanel"
+                class="
+                    bg-white
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    p-5
+                    mb-6
+                "
+            >
+                <div
+                    class="
+                        flex
+                        flex-col
+                        lg:flex-row
+                        lg:items-center
+                        lg:justify-between
+                        gap-4
+                        mb-5
+                    "
+                >
+                    <div
+                        class="
+                            flex
+                            items-start
+                            gap-3
+                        "
+                    >
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-2xl
+                                bg-emerald-50
+                                text-emerald-700
+                                flex
+                                items-center
+                                justify-center
+                                shrink-0
+                            "
+                        >
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+
+                        <div>
+                            <h2
+                                class="
+                                    text-lg
+                                    font-extrabold
+                                    text-slate-900
+                                "
+                            >
+                                Buscar melhores produtos
+                            </h2>
+
+                            <p
+                                class="
+                                    text-sm
+                                    text-slate-500
+                                    mt-1
+                                "
+                            >
+                                Encontre novas oportunidades sem alterar
+                                os produtos que já estão na Vitrine.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-full
+                            bg-sky-50
+                            text-sky-700
+                            px-3
+                            py-1.5
+                            text-xs
+                            font-bold
+                            self-start
+                        "
+                    >
+                        <i class="fa-solid fa-store"></i>
+                        Shopee conectada
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        grid
+                        grid-cols-1
+                        md:grid-cols-2
+                        xl:grid-cols-4
+                        gap-3
+                    "
+                >
+                    <div>
+                        <label
+                            for="opportunityMarketplace"
+                            class="
+                                block
+                                text-xs
+                                font-bold
+                                text-slate-600
+                                mb-1.5
+                            "
+                        >
+                            Marketplace
+                        </label>
+
+                        <select
+                            id="opportunityMarketplace"
+                            class="
+                                w-full
+                                rounded-xl
+                                border
+                                border-slate-200
+                                px-4
+                                py-3
+                                text-sm
+                                bg-white
+                                outline-none
+                                focus:border-sky-400
+                            "
+                        >
+                            <option value="shopee">
+                                Shopee
+                            </option>
+                        </select>
+                    </div>
+
+
+                    <div>
+                        <label
+                            for="opportunityMode"
+                            class="
+                                block
+                                text-xs
+                                font-bold
+                                text-slate-600
+                                mb-1.5
+                            "
+                        >
+                            Modo de busca
+                        </label>
+
+                        <select
+                            id="opportunityMode"
+                            class="
+                                w-full
+                                rounded-xl
+                                border
+                                border-slate-200
+                                px-4
+                                py-3
+                                text-sm
+                                bg-white
+                                outline-none
+                                focus:border-sky-400
+                            "
+                        >
+                            <option value="performance">
+                                Melhor performance
+                            </option>
+
+                            <option value="category">
+                                Por categoria
+                            </option>
+                        </select>
+                    </div>
+
+
+                    <div>
+                        <label
+                            for="opportunityCategory"
+                            class="
+                                block
+                                text-xs
+                                font-bold
+                                text-slate-600
+                                mb-1.5
+                            "
+                        >
+                            Categoria
+                        </label>
+
+                        <select
+                            id="opportunityCategory"
+                           
+                            class="
+                                w-full
+                                rounded-xl
+                                border
+                                border-slate-200
+                                px-4
+                                py-3
+                                text-sm
+                                bg-slate-50
+                                text-slate-500
+                                outline-none
+                            "
+                        >
+                            <option>
+                                Selecione busca por categoria
+                            </option>
+                        </select>
+                    </div>
+
+
+                    <div
+                        class="
+                            flex
+                            items-end
+                        "
+                    >
+                        <button
+                            id="opportunitySearchButton"
+                            type="button"
+                            disabled
+                            class="
+                                w-full
+                                inline-flex
+                                items-center
+                                justify-center
+                                gap-2
+                                rounded-xl
+                                bg-emerald-600
+                                text-white
+                                px-5
+                                py-3
+                                text-sm
+                                font-bold
+                                opacity-60
+                                cursor-not-allowed
+                            "
+                        >
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                            Buscar oportunidades
+                        </button>
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        mt-4
+                        rounded-xl
+                        bg-slate-50
+                        border
+                        border-slate-100
+                        px-4
+                        py-3
+                        text-xs
+                        text-slate-500
+                    "
+                >
+                    Primeiro você analisa os candidatos.
+                    Nenhum produto será adicionado,
+                    removido ou substituído automaticamente.
+                </div>
+            </div>
+
 
             <!-- FILTROS -->
 
@@ -3088,6 +3614,3152 @@
         updateSortIndicators();
         loadProducts();
     </script>
+
+
+<script id="adminCompactLayout">
+(() => {
+
+    function findLeafByText(root, wanted) {
+        return Array.from(
+            root.querySelectorAll('*')
+        ).find(element =>
+            element.children.length === 0 &&
+            element.textContent.trim() === wanted
+        );
+    }
+
+
+    /* TOTALIZADORES */
+
+    const totalLabel =
+        findLeafByText(
+            document,
+            'TOTAL'
+        );
+
+    if (totalLabel) {
+        const card =
+            totalLabel.closest(
+                '.bg-white.rounded-2xl'
+            );
+
+        const grid =
+            card?.parentElement;
+
+        if (grid) {
+            grid.classList.add(
+                'summary-compact-grid'
+            );
+
+            Array.from(
+                grid.children
+            ).forEach(child => {
+                child.classList.add(
+                    'summary-compact-card'
+                );
+            });
+
+            const section =
+                grid.closest(
+                    'section'
+                );
+
+            section?.classList.add(
+                'admin-main-compact'
+            );
+        }
+    }
+
+
+    /* ADICIONAR PRODUTO */
+
+    const importInput =
+        document.getElementById(
+            'shopeeImportUrl'
+        );
+
+    if (importInput) {
+        const importCard =
+            importInput.closest(
+                '.bg-white.rounded-2xl'
+            );
+
+        if (importCard) {
+            importCard.classList.add(
+                'import-compact-card'
+            );
+
+            const title =
+                findLeafByText(
+                    importCard,
+                    'Adicionar produto da Shopee'
+                );
+
+            const description =
+                findLeafByText(
+                    importCard,
+                    'Cole o link de um produto encontrado na Shopee ou no painel de Afiliados.'
+                );
+
+            if (title) {
+                const headingArea =
+                    title.closest(
+                        '.flex'
+                    );
+
+                if (
+                    headingArea &&
+                    !headingArea.contains(
+                        importInput
+                    )
+                ) {
+                    headingArea.style.display =
+                        'none';
+                } else {
+                    title.style.display =
+                        'none';
+                }
+            }
+
+            if (description) {
+                description.style.display =
+                    'none';
+            }
+        }
+    }
+
+
+    /* BUSCAR MELHORES PRODUTOS */
+
+    const opportunityPanel =
+        document.getElementById(
+            'opportunitySearchPanel'
+        );
+
+    if (opportunityPanel) {
+        const directChildren =
+            Array.from(
+                opportunityPanel.children
+            );
+
+        const header =
+            directChildren[0];
+
+        const controls =
+            directChildren[1];
+
+        const note =
+            directChildren[2];
+
+        if (
+            header &&
+            controls
+        ) {
+            const titleArea =
+                header.firstElementChild;
+
+            if (titleArea) {
+                const description =
+                    titleArea.querySelector(
+                        'p'
+                    );
+
+                if (description) {
+                    description.style.display =
+                        'none';
+                }
+
+                titleArea.classList.add(
+                    'opportunity-title-inline'
+                );
+
+                controls.prepend(
+                    titleArea
+                );
+            }
+
+            header.style.display =
+                'none';
+
+            controls.classList.add(
+                'opportunity-controls-compact'
+            );
+        }
+
+        if (note) {
+            note.classList.add(
+                'opportunity-note-compact'
+            );
+        }
+    }
+
+
+    /* FILTROS */
+
+    const catalogSearch =
+        document.getElementById(
+            'searchInput'
+        );
+
+    if (catalogSearch) {
+        const filtersCard =
+            catalogSearch.closest(
+                '.bg-white.rounded-2xl'
+            );
+
+        filtersCard?.classList.add(
+            'catalog-filters-compact'
+        );
+    }
+
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script id="opportunityCascadeController">
+(() => {
+
+    const marketplace =
+        document.getElementById(
+            'opportunityMarketplace'
+        );
+
+    const mode =
+        document.getElementById(
+            'opportunityMode'
+        );
+
+    const category =
+        document.getElementById(
+            'opportunityCategory'
+        );
+
+    const button =
+        document.getElementById(
+            'opportunitySearchButton'
+        );
+
+    const panel =
+        document.getElementById(
+            'opportunitySearchPanel'
+        );
+
+
+    if (
+        !marketplace ||
+        !mode ||
+        !category ||
+        !button ||
+        !panel
+    ) {
+        console.error(
+            '[OPORTUNIDADES] Controles não encontrados.'
+        );
+
+        return;
+    }
+
+
+    /*
+     * ========================================================
+     * CRIA SUBCATEGORIA
+     * ========================================================
+     */
+
+    const categoryControl =
+        category.parentElement;
+
+
+    let subcategory =
+        document.getElementById(
+            'opportunitySubcategory'
+        );
+
+
+    if (!subcategory) {
+
+        const wrapper =
+            document.createElement(
+                'div'
+            );
+
+        wrapper.className =
+            'opportunity-control opportunity-subcategory-control';
+
+
+        const label =
+            document.createElement(
+                'label'
+            );
+
+        label.htmlFor =
+            'opportunitySubcategory';
+
+        label.textContent =
+            'Subcategoria';
+
+
+        subcategory =
+            document.createElement(
+                'select'
+            );
+
+        subcategory.id =
+            'opportunitySubcategory';
+
+        subcategory.disabled =
+            true;
+
+        subcategory.innerHTML =
+            '<option value="">Selecione a categoria</option>';
+
+
+        wrapper.appendChild(
+            label
+        );
+
+        wrapper.appendChild(
+            subcategory
+        );
+
+
+        categoryControl.insertAdjacentElement(
+            'afterend',
+            wrapper
+        );
+    }
+
+
+    /*
+     * ========================================================
+     * ESTADO
+     * ========================================================
+     */
+
+    let categoryTree =
+        [];
+
+
+    /*
+     * ========================================================
+     * UTILITÁRIOS
+     * ========================================================
+     */
+
+    function escapeHtml(value) {
+
+        return String(
+            value ?? ''
+        )
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+
+    function safeUrl(value) {
+
+        const url =
+            String(
+                value || ''
+            ).trim();
+
+
+        if (
+            url.startsWith('https://') ||
+            url.startsWith('http://')
+        ) {
+            return escapeHtml(
+                url
+            );
+        }
+
+
+        return '#';
+    }
+
+
+    function money(value) {
+
+        const number =
+            Number(
+                value
+            );
+
+
+        if (
+            !Number.isFinite(
+                number
+            )
+        ) {
+            return '—';
+        }
+
+
+        return new Intl.NumberFormat(
+            'pt-BR',
+            {
+                style:
+                    'currency',
+
+                currency:
+                    'BRL'
+            }
+        ).format(
+            number
+        );
+    }
+
+
+    function number(value) {
+
+        const n =
+            Number(
+                value
+            );
+
+
+        if (
+            !Number.isFinite(
+                n
+            )
+        ) {
+            return '—';
+        }
+
+
+        return new Intl.NumberFormat(
+            'pt-BR'
+        ).format(
+            n
+        );
+    }
+
+
+    function percent(value) {
+
+        const n =
+            Number(
+                value
+            );
+
+
+        if (
+            !Number.isFinite(
+                n
+            )
+        ) {
+            return '—';
+        }
+
+
+        return `${Math.round(n * 100)}%`;
+    }
+
+
+    function addOption(
+        select,
+        value,
+        label
+    ) {
+
+        const option =
+            document.createElement(
+                'option'
+            );
+
+        option.value =
+            String(value);
+
+        option.textContent =
+            label;
+
+        select.appendChild(
+            option
+        );
+    }
+
+
+    /*
+     * ========================================================
+     * CATEGORIAS
+     * ========================================================
+     */
+
+    async function loadCategories() {
+
+        category.disabled =
+            true;
+
+        subcategory.disabled =
+            true;
+
+
+        category.innerHTML =
+            '<option value="">Carregando categorias...</option>';
+
+
+        subcategory.innerHTML =
+            '<option value="">Selecione a categoria</option>';
+
+
+        try {
+
+            const response =
+                await fetch(
+                    '/api/vitrine2/opportunities/categories'
+                    + '?marketplace='
+                    + encodeURIComponent(
+                        marketplace.value
+                    )
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+                throw new Error(
+                    data.error ||
+                    'Erro ao carregar categorias.'
+                );
+            }
+
+
+            categoryTree =
+                data.categories || [];
+
+
+            category.innerHTML =
+                '<option value="">Todas as categorias</option>';
+
+
+            for (
+                const main
+                of categoryTree
+            ) {
+
+                addOption(
+                    category,
+                    main.id,
+                    main.displayName
+                );
+            }
+
+
+            category.disabled =
+                false;
+
+
+            console.log(
+                '[OPORTUNIDADES] Categorias principais:',
+                categoryTree.length
+            );
+
+
+        } catch (error) {
+
+            category.innerHTML =
+                '<option value="">Erro ao carregar categorias</option>';
+
+
+            category.disabled =
+                false;
+
+
+            console.error(
+                '[OPORTUNIDADES]',
+                error
+            );
+        }
+
+
+        syncButton();
+    }
+
+
+    function loadSubcategories() {
+
+        subcategory.innerHTML =
+            '<option value="">Todas as subcategorias</option>';
+
+
+        if (
+            !category.value
+        ) {
+
+            subcategory.disabled =
+                true;
+
+            subcategory.innerHTML =
+                '<option value="">Selecione a categoria</option>';
+
+            syncButton();
+
+            return;
+        }
+
+
+        const main =
+            categoryTree.find(
+                item =>
+                    String(item.id) ===
+                    String(category.value)
+            );
+
+
+        if (
+            !main ||
+            !Array.isArray(
+                main.subcategories
+            ) ||
+            main.subcategories.length === 0
+        ) {
+
+            subcategory.disabled =
+                true;
+
+            syncButton();
+
+            return;
+        }
+
+
+        for (
+            const sub
+            of main.subcategories
+        ) {
+
+            addOption(
+                subcategory,
+                sub.id,
+                sub.displayName
+            );
+        }
+
+
+        subcategory.disabled =
+            false;
+
+        syncButton();
+    }
+
+
+    function selectedCategoryId() {
+
+        if (
+            subcategory.value
+        ) {
+            return subcategory.value;
+        }
+
+
+        if (
+            category.value
+        ) {
+            return category.value;
+        }
+
+
+        return null;
+    }
+
+
+    /*
+     * ========================================================
+     * BOTÃO
+     * ========================================================
+     */
+
+    function syncButton() {
+
+        const categoryId =
+            selectedCategoryId();
+
+
+        if (
+            mode.value ===
+            'performance'
+        ) {
+
+            /*
+             * Melhor performance geral:
+             * categoria opcional.
+             */
+
+            button.disabled =
+                false;
+
+        } else {
+
+            /*
+             * Por categoria:
+             * precisa ao menos da categoria principal.
+             */
+
+            button.disabled =
+                !categoryId;
+        }
+
+
+        button.classList.toggle(
+            'opacity-60',
+            button.disabled
+        );
+
+
+        button.classList.toggle(
+            'cursor-not-allowed',
+            button.disabled
+        );
+    }
+
+
+    /*
+     * ========================================================
+     * RESULTADOS
+     * ========================================================
+     */
+
+    let opportunityView =
+        'opportunities';
+
+
+    function getOpportunityNavigation() {
+
+        let navigation =
+            document.getElementById(
+                'opportunityViewTabs'
+            );
+
+
+        if (navigation) {
+            return navigation;
+        }
+
+
+        navigation =
+            document.createElement(
+                'div'
+            );
+
+        navigation.id =
+            'opportunityViewTabs';
+
+        navigation.className =
+            'flex flex-wrap items-center gap-2 mb-3';
+
+        navigation.innerHTML = `
+            <button
+                type="button"
+                data-opportunity-view="opportunities"
+                class="
+                    rounded-xl
+                    px-4
+                    py-2
+                    text-sm
+                    font-bold
+                    border
+                "
+            >
+                Oportunidades
+            </button>
+
+            <button
+                type="button"
+                data-opportunity-view="saved"
+                class="
+                    rounded-xl
+                    px-4
+                    py-2
+                    text-sm
+                    font-bold
+                    border
+                "
+            >
+                Salvos
+            </button>
+
+            <button
+                type="button"
+                data-opportunity-view="ignored"
+                class="
+                    rounded-xl
+                    px-4
+                    py-2
+                    text-sm
+                    font-bold
+                    border
+                "
+            >
+                Ignorados
+            </button>
+        `;
+
+
+        navigation.addEventListener(
+            'click',
+            async event => {
+
+                const tab =
+                    event.target.closest(
+                        '[data-opportunity-view]'
+                    );
+
+                if (!tab) {
+                    return;
+                }
+
+                const view =
+                    tab.dataset.opportunityView;
+
+                if (view === 'opportunities') {
+                    opportunityView =
+                        'opportunities';
+
+                    syncOpportunityNavigation();
+
+                    await search();
+
+                    return;
+                }
+
+                await loadOpportunityDecisions(
+                    view
+                );
+            }
+        );
+
+
+        panel.insertAdjacentElement(
+            'afterend',
+            navigation
+        );
+
+
+        return navigation;
+    }
+
+
+    function syncOpportunityNavigation() {
+
+        const navigation =
+            getOpportunityNavigation();
+
+
+        navigation
+            .querySelectorAll(
+                '[data-opportunity-view]'
+            )
+            .forEach(
+                button => {
+
+                    const active =
+                        button.dataset
+                            .opportunityView ===
+                        opportunityView;
+
+
+                    button.classList.toggle(
+                        'bg-sky-600',
+                        active
+                    );
+
+                    button.classList.toggle(
+                        'text-white',
+                        active
+                    );
+
+                    button.classList.toggle(
+                        'border-sky-600',
+                        active
+                    );
+
+                    button.classList.toggle(
+                        'bg-white',
+                        !active
+                    );
+
+                    button.classList.toggle(
+                        'text-slate-700',
+                        !active
+                    );
+
+                    button.classList.toggle(
+                        'border-slate-200',
+                        !active
+                    );
+                }
+            );
+    }
+
+
+    function getResultsBox() {
+
+        let box =
+            document.getElementById(
+                'opportunityResults'
+            );
+
+
+        if (box) {
+            return box;
+        }
+
+
+        box =
+            document.createElement(
+                'div'
+            );
+
+        box.id =
+            'opportunityResults';
+
+        box.className =
+            'bg-white rounded-2xl border border-slate-200 p-4 mb-4';
+
+
+        const navigation =
+            getOpportunityNavigation();
+
+        navigation.insertAdjacentElement(
+            'afterend',
+            box
+        );
+
+
+        return box;
+    }
+
+
+    function renderProducts(data) {
+
+        const box =
+            getResultsBox();
+
+
+        const products =
+            data.products || [];
+
+
+        if (
+            products.length === 0
+        ) {
+
+            box.innerHTML = `
+                <div class="text-sm text-slate-500">
+                    Nenhuma oportunidade encontrada.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        const cards =
+            products
+                .map(product => {
+
+                    const rating =
+                        Number(
+                            product.ratingStar
+                        );
+
+
+                    const discount =
+                        Number(
+                            product.priceDiscountRate
+                        ) || 0;
+
+
+                    return `
+                        <article
+                            class="
+                                border
+                                border-slate-200
+                                rounded-xl
+                                overflow-hidden
+                                bg-white
+                            "
+                        >
+
+                            <div
+                                class="
+                                    aspect-square
+                                    bg-slate-50
+                                "
+                            >
+                                <img
+                                    src="${safeUrl(product.imageUrl)}"
+                                    alt=""
+                                    loading="lazy"
+                                    class="
+                                        w-full
+                                        h-full
+                                        object-cover
+                                    "
+                                >
+                            </div>
+
+
+                            <div class="p-3">
+
+                                <div
+                                    class="
+                                        text-sm
+                                        font-bold
+                                        leading-snug
+                                        h-10
+                                        overflow-hidden
+                                    "
+                                >
+                                    ${escapeHtml(product.productName)}
+                                </div>
+
+
+                                <div
+                                    class="
+                                        mt-2
+                                        font-extrabold
+                                        text-sky-700
+                                    "
+                                >
+                                    ${money(product.price)}
+                                </div>
+
+
+                                <div
+                                    class="
+                                        mt-2
+                                        text-xs
+                                        text-slate-600
+                                        leading-5
+                                    "
+                                >
+
+                                    <div
+                                        class="
+                                            flex
+                                            items-center
+                                            justify-between
+                                            gap-3
+                                        "
+                                    >
+                                        <span>
+                                            Vendas
+                                            <strong class="text-slate-800">
+                                                ${number(product.sales)}
+                                            </strong>
+                                        </span>
+
+                                        <span class="text-right">
+                                            Avaliação
+                                            <strong class="text-slate-800">
+                                                ${
+                                                    Number.isFinite(rating)
+                                                        ? rating
+                                                            .toFixed(1)
+                                                            .replace('.', ',')
+                                                        : '—'
+                                                }
+                                            </strong>
+                                        </span>
+                                    </div>
+
+
+                                    <div
+                                        class="
+                                            flex
+                                            items-center
+                                            justify-between
+                                            gap-3
+                                        "
+                                    >
+                                        <span>
+                                            Desconto
+                                            <strong class="text-slate-800">
+                                                ${discount}%
+                                            </strong>
+                                        </span>
+
+                                        <span class="text-right">
+                                            Comissão
+                                            <strong class="text-emerald-700">
+                                                ${percent(product.commissionRate)}
+                                            </strong>
+                                        </span>
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        mt-3
+                                        grid
+                                        grid-cols-2
+                                        gap-2
+                                    "
+                                    data-opportunity-actions
+                                    data-marketplace="${escapeHtml(
+                                        product.marketplace ||
+                                        marketplace.value ||
+                                        'shopee'
+                                    )}"
+                                    data-item-id="${escapeHtml(
+                                        product.itemId
+                                    )}"
+                                    data-product-url="${safeUrl(
+                                        product.productLink ||
+                                        product.offerLink
+                                    )}"
+                                    data-product-json="${escapeHtml(
+                                        JSON.stringify(
+                                            product
+                                        )
+                                    )}"
+                                    data-saved="${
+                                        product
+                                            .opportunityState
+                                            ?.saved
+                                            ? 'true'
+                                            : 'false'
+                                    }"
+                                    data-catalog-exists="${
+                                        product.catalogState?.exists
+                                            ? 'true'
+                                            : 'false'
+                                    }"
+                                    data-published="${
+                                        product.catalogState?.published
+                                            ? 'true'
+                                            : 'false'
+                                    }"
+                                    data-marketing-selected="${
+                                        product.catalogState?.marketingSelected
+                                            ? 'true'
+                                            : 'false'
+                                    }"
+                                    data-instagram="${
+                                        product.catalogState?.channels?.instagram
+                                            ? 'true'
+                                            : 'false'
+                                    }"
+                                >
+
+                                    <button
+                                        type="button"
+                                        data-opportunity-action="publish"
+                                        ${
+                                            product.catalogState?.published
+                                                ? 'disabled'
+                                                : ''
+                                        }
+                                        class="
+                                            min-h-10
+                                            rounded-lg
+                                            px-2
+                                            py-2
+                                            bg-sky-600
+                                            text-white
+                                            text-[11px]
+                                            font-bold
+                                            leading-tight
+                                            hover:bg-sky-700
+                                            disabled:opacity-50
+                                            disabled:cursor-not-allowed
+                                        "
+                                    >
+                                        ${
+                                            product.catalogState?.published
+                                                ? '✓ Na Vitrine'
+                                                : 'Publicar na Vitrine'
+                                        }
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-opportunity-action="admin"
+                                        ${
+                                            product.catalogState?.exists
+                                                ? 'disabled'
+                                                : ''
+                                        }
+                                        class="
+                                            min-h-10
+                                            rounded-lg
+                                            px-2
+                                            py-2
+                                            bg-slate-100
+                                            text-slate-700
+                                            text-[11px]
+                                            font-bold
+                                            leading-tight
+                                            hover:bg-slate-200
+                                            disabled:opacity-50
+                                            disabled:cursor-not-allowed
+                                        "
+                                    >
+                                        ${
+                                            product.catalogState?.exists
+                                                ? '✓ No Admin'
+                                                : 'Adicionar ao Admin'
+                                        }
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-opportunity-action="marketing"
+                                        ${
+                                            product.catalogState
+                                                ?.marketingSelected
+                                                ? 'disabled'
+                                                : ''
+                                        }
+                                        title="Enviar diretamente para o Instagram"
+                                        class="
+                                            min-h-10
+                                            rounded-lg
+                                            px-2
+                                            py-2
+                                            bg-violet-50
+                                            text-violet-700
+                                            text-[11px]
+                                            font-bold
+                                            leading-tight
+                                            hover:bg-violet-100
+                                            disabled:opacity-50
+                                            disabled:cursor-not-allowed
+                                        "
+                                    >
+                                        ${
+                                            product.catalogState
+                                                ?.marketingSelected
+                                                ? '✓ No Marketing'
+                                                : 'Enviar ao Marketing'
+                                        }
+                                    </button>
+
+                                    <div class="relative">
+
+                                        <button
+                                            type="button"
+                                            data-opportunity-action="more"
+                                            aria-label="Mais opções"
+                                            title="Mais opções"
+                                            class="
+                                                w-full
+                                                min-h-10
+                                                rounded-lg
+                                                border
+                                                border-slate-200
+                                                bg-white
+                                                text-slate-600
+                                                text-xl
+                                                font-black
+                                                hover:bg-slate-50
+                                            "
+                                        >
+                                            ⋯
+                                        </button>
+
+                                        <div
+                                            data-opportunity-more-menu
+                                            class="
+                                                hidden
+                                                absolute
+                                                right-0
+                                                bottom-full
+                                                mb-2
+                                                z-30
+                                                min-w-[170px]
+                                                rounded-xl
+                                                border
+                                                border-slate-200
+                                                bg-white
+                                                shadow-xl
+                                                p-1
+                                            "
+                                        >
+
+                                            
+                                            <div
+                                                class="
+                                                    px-3
+                                                    pt-2
+                                                    pb-1
+                                                    text-[10px]
+                                                    font-extrabold
+                                                    uppercase
+                                                    tracking-wide
+                                                    text-slate-400
+                                                "
+                                            >
+                                                Canais de Marketing
+                                            </div>
+
+                                            <label class="
+                                                flex items-center gap-2
+                                                rounded-lg px-3 py-2
+                                                text-xs cursor-pointer
+                                                hover:bg-slate-50
+                                            ">
+                                                <input
+                                                    type="checkbox"
+                                                    data-marketing-channel="instagram"
+                                                    ${
+                                                        product.catalogState
+                                                            ?.channels
+                                                            ?.instagram
+                                                            ? 'checked'
+                                                            : ''
+                                                    }
+                                                >
+                                                Instagram
+                                            </label>
+
+                                            <label class="
+                                                flex items-center gap-2
+                                                rounded-lg px-3 py-2
+                                                text-xs cursor-pointer
+                                                hover:bg-slate-50
+                                            ">
+                                                <input
+                                                    type="checkbox"
+                                                    data-marketing-channel="facebook"
+                                                    ${
+                                                        product.catalogState
+                                                            ?.channels
+                                                            ?.facebook
+                                                            ? 'checked'
+                                                            : ''
+                                                    }
+                                                >
+                                                Facebook
+                                            </label>
+
+                                            <label class="
+                                                flex items-center gap-2
+                                                rounded-lg px-3 py-2
+                                                text-xs cursor-pointer
+                                                hover:bg-slate-50
+                                            ">
+                                                <input
+                                                    type="checkbox"
+                                                    data-marketing-channel="tiktok"
+                                                    ${
+                                                        product.catalogState
+                                                            ?.channels
+                                                            ?.tiktok
+                                                            ? 'checked'
+                                                            : ''
+                                                    }
+                                                >
+                                                TikTok
+                                            </label>
+
+                                            <label class="
+                                                flex items-center gap-2
+                                                rounded-lg px-3 py-2
+                                                text-xs cursor-pointer
+                                                hover:bg-slate-50
+                                            ">
+                                                <input
+                                                    type="checkbox"
+                                                    data-marketing-channel="kwai"
+                                                    ${
+                                                        product.catalogState
+                                                            ?.channels
+                                                            ?.kwai
+                                                            ? 'checked'
+                                                            : ''
+                                                    }
+                                                >
+                                                Kwai
+                                            </label>
+
+                                            <label class="
+                                                flex items-center gap-2
+                                                rounded-lg px-3 py-2
+                                                text-xs cursor-pointer
+                                                hover:bg-slate-50
+                                            ">
+                                                <input
+                                                    type="checkbox"
+                                                    data-marketing-channel="pinterest"
+                                                    ${
+                                                        product.catalogState
+                                                            ?.channels
+                                                            ?.pinterest
+                                                            ? 'checked'
+                                                            : ''
+                                                    }
+                                                >
+                                                Pinterest
+                                            </label>
+
+                                            <div class="
+                                                my-1
+                                                border-t
+                                                border-slate-100
+                                            "></div>
+
+<a
+                                                href="${safeUrl(
+                                                    product.offerLink ||
+                                                    product.productLink
+                                                )}"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="
+                                                    block
+                                                    rounded-lg
+                                                    px-3
+                                                    py-2
+                                                    text-xs
+                                                    font-bold
+                                                    text-sky-700
+                                                    hover:bg-sky-50
+                                                "
+                                            >
+                                                Ver na Shopee
+                                            </a>
+
+                                            <button
+                                                type="button"
+                                                data-opportunity-action="save-later"
+                                                ${
+                                                    product
+                                                        .opportunityState
+                                                        ?.saved
+                                                        ? 'disabled'
+                                                        : ''
+                                                }
+                                                class="
+                                                    w-full
+                                                    text-left
+                                                    rounded-lg
+                                                    px-3
+                                                    py-2
+                                                    text-xs
+                                                    font-bold
+                                                    text-slate-700
+                                                    hover:bg-slate-50
+                                                    disabled:text-emerald-700
+                                                    disabled:cursor-default
+                                                "
+                                            >
+                                                ${
+                                                    product
+                                                        .opportunityState
+                                                        ?.saved
+                                                        ? '✓ Salvo para depois'
+                                                        : 'Salvar para depois'
+                                                }
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                data-opportunity-action="ignore-product"
+                                                class="
+                                                    w-full
+                                                    text-left
+                                                    rounded-lg
+                                                    px-3
+                                                    py-2
+                                                    text-xs
+                                                    font-bold
+                                                    text-slate-700
+                                                    hover:bg-red-50
+                                                    hover:text-red-700
+                                                "
+                                            >
+                                                Ignorar produto
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                data-opportunity-action="copy-link"
+                                                class="
+                                                    w-full
+                                                    text-left
+                                                    rounded-lg
+                                                    px-3
+                                                    py-2
+                                                    text-xs
+                                                    font-bold
+                                                    text-slate-700
+                                                    hover:bg-slate-50
+                                                "
+                                            >
+                                                Copiar link da Shopee
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        data-opportunity-feedback
+                                        class="
+                                            hidden
+                                            col-span-2
+                                            rounded-lg
+                                            px-2
+                                            py-2
+                                            text-[11px]
+                                            font-semibold
+                                        "
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+                    `;
+
+                })
+                .join('');
+
+
+        box.innerHTML = `
+            <div
+                class="
+                    flex
+                    items-center
+                    justify-between
+                    gap-3
+                    mb-3
+                "
+            >
+
+                <div>
+
+                    <div class="font-extrabold">
+                        Oportunidades encontradas
+                    </div>
+
+                    <div
+                        class="
+                            text-xs
+                            text-slate-500
+                        "
+                    >
+                        ${products.length} exibidos •
+                        ${number(data.scanned)} analisados •
+                        ${number(data.qualified)} classificados
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="
+                    grid
+                    grid-cols-2
+                    lg:grid-cols-4
+                    gap-3
+                "
+            >
+                ${cards}
+            </div>
+        `;
+    }
+
+
+    async function loadOpportunityDecisions(
+        view
+    ) {
+        opportunityView =
+            view;
+
+        syncOpportunityNavigation();
+
+        const box =
+            getResultsBox();
+
+        box.innerHTML = `
+            <div class="text-sm text-slate-500">
+                Carregando...
+            </div>
+        `;
+
+
+        const response =
+            await fetch(
+                '/api/vitrine2/opportunities/decisions'
+            );
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+            throw new Error(
+                data.error ||
+                'Não foi possível carregar.'
+            );
+        }
+
+
+        if (view === 'saved') {
+
+            const products =
+                (data.saved || [])
+                    .map(
+                        entry => ({
+                            ...(entry.product || {}),
+
+                            marketplace:
+                                entry.marketplace ||
+                                entry.product
+                                    ?.marketplace ||
+                                'shopee',
+
+                            itemId:
+                                entry.itemId ||
+                                entry.product
+                                    ?.itemId,
+
+                            opportunityState: {
+                                ...(
+                                    entry.product
+                                        ?.opportunityState ||
+                                    {}
+                                ),
+
+                                saved: true,
+                                ignored: false
+                            }
+                        })
+                    );
+
+
+            renderProducts({
+                products,
+                scanned:
+                    products.length,
+                qualified:
+                    products.length
+            });
+
+
+            const results =
+                getResultsBox();
+
+            const heading =
+                results.querySelector(
+                    '.font-extrabold'
+                );
+
+            if (heading) {
+                heading.textContent =
+                    'Produtos salvos';
+            }
+
+
+            results
+                .querySelectorAll(
+                    '[data-opportunity-actions]'
+                )
+                .forEach(
+                    group => {
+
+                        const button =
+                            group.querySelector(
+                                '[data-opportunity-action="save-later"]'
+                            );
+
+                        if (!button) {
+                            return;
+                        }
+
+                        button.disabled =
+                            false;
+
+                        button.dataset
+                            .opportunityAction =
+                            'remove-saved';
+
+                        button.textContent =
+                            'Remover dos salvos';
+                    }
+                );
+
+            return;
+        }
+
+
+        renderIgnoredProducts(
+            data.ignored || []
+        );
+    }
+
+
+    function renderIgnoredProducts(
+        items
+    ) {
+        const box =
+            getResultsBox();
+
+
+        if (!items.length) {
+            box.innerHTML = `
+                <div class="text-sm text-slate-500">
+                    Nenhum produto ignorado.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        const cards =
+            items.map(
+                entry => {
+
+                    const product =
+                        entry.product || {};
+
+                    const name =
+                        product.productName ||
+                        `Produto Shopee ${entry.itemId}`;
+
+                    const image =
+                        product.imageUrl
+                            ? `
+                                <img
+                                    src="${safeUrl(
+                                        product.imageUrl
+                                    )}"
+                                    alt=""
+                                    class="
+                                        w-full
+                                        h-full
+                                        object-cover
+                                    "
+                                >
+                            `
+                            : `
+                                <div
+                                    class="
+                                        w-full
+                                        h-full
+                                        flex
+                                        items-center
+                                        justify-center
+                                        text-xs
+                                        text-slate-400
+                                    "
+                                >
+                                    Sem imagem
+                                </div>
+                            `;
+
+
+                    return `
+                        <article
+                            class="
+                                border
+                                border-slate-200
+                                rounded-xl
+                                overflow-hidden
+                                bg-white
+                            "
+                        >
+                            <div
+                                class="
+                                    aspect-square
+                                    bg-slate-50
+                                "
+                            >
+                                ${image}
+                            </div>
+
+                            <div class="p-3">
+
+                                <div
+                                    class="
+                                        text-sm
+                                        font-bold
+                                        leading-snug
+                                        h-10
+                                        overflow-hidden
+                                    "
+                                >
+                                    ${escapeHtml(name)}
+                                </div>
+
+                                <div
+                                    class="
+                                        mt-2
+                                        text-xs
+                                        text-slate-500
+                                    "
+                                >
+                                    Item ${escapeHtml(
+                                        String(
+                                            entry.itemId
+                                        )
+                                    )}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    data-restore-ignored
+                                    data-marketplace="${escapeHtml(
+                                        entry.marketplace
+                                    )}"
+                                    data-item-id="${escapeHtml(
+                                        String(
+                                            entry.itemId
+                                        )
+                                    )}"
+                                    class="
+                                        mt-3
+                                        w-full
+                                        rounded-lg
+                                        bg-sky-600
+                                        text-white
+                                        px-3
+                                        py-2
+                                        text-xs
+                                        font-bold
+                                        hover:bg-sky-700
+                                    "
+                                >
+                                    Restaurar produto
+                                </button>
+
+                            </div>
+                        </article>
+                    `;
+                }
+            )
+            .join('');
+
+
+        box.innerHTML = `
+            <div
+                class="
+                    flex
+                    items-center
+                    justify-between
+                    mb-3
+                "
+            >
+                <div>
+                    <div class="font-extrabold">
+                        Produtos ignorados
+                    </div>
+
+                    <div
+                        class="
+                            text-xs
+                            text-slate-500
+                        "
+                    >
+                        ${items.length} ignorados
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="
+                    grid
+                    grid-cols-2
+                    lg:grid-cols-4
+                    gap-3
+                "
+            >
+                ${cards}
+            </div>
+        `;
+    }
+
+
+    async function removeSavedOpportunity(
+        group
+    ) {
+        const marketplace =
+            group.dataset.marketplace;
+
+        const itemId =
+            group.dataset.itemId;
+
+
+        await requestJson(
+            `/api/vitrine2/opportunities/saved/${encodeURIComponent(
+                marketplace
+            )}/${encodeURIComponent(
+                itemId
+            )}`,
+            {
+                method: 'DELETE'
+            }
+        );
+
+
+        const card =
+            group.closest(
+                'article'
+            );
+
+        if (card) {
+            card.remove();
+        }
+    }
+
+
+    /*
+     * ========================================================
+     * BUSCA
+     * ========================================================
+     */
+
+    async function search() {
+
+        const categoryId =
+            selectedCategoryId();
+
+
+        if (
+            mode.value ===
+            'category' &&
+            !categoryId
+        ) {
+            return;
+        }
+
+
+        const params =
+            new URLSearchParams({
+                marketplace:
+                    marketplace.value,
+
+                pages:
+                    '2',
+
+                limit:
+                    '50',
+
+                minimumSales:
+                    '1',
+
+                top:
+                    '20'
+            });
+
+
+        /*
+         * MELHOR PERFORMANCE
+         *
+         * A categoria é OPCIONAL.
+         * Se escolhida, enviamos os DOIS:
+         *
+         * listType=2
+         * categoryId=...
+         */
+
+        if (
+            mode.value ===
+            'performance'
+        ) {
+
+            params.set(
+                'listType',
+                '2'
+            );
+
+
+            if (
+                categoryId
+            ) {
+
+                params.set(
+                    'categoryId',
+                    categoryId
+                );
+            }
+
+
+        } else {
+
+            params.set(
+                'categoryId',
+                categoryId
+            );
+        }
+
+
+        const original =
+            button.innerHTML;
+
+
+        button.disabled =
+            true;
+
+
+        button.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Buscando...';
+
+
+        try {
+
+            const response =
+                await fetch(
+                    '/api/vitrine2/opportunities/search?'
+                    + params.toString()
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+
+                throw new Error(
+                    data.error ||
+                    'Erro ao buscar oportunidades.'
+                );
+            }
+
+
+            renderProducts(
+                data
+            );
+
+
+        } catch (error) {
+
+            const box =
+                getResultsBox();
+
+
+            box.innerHTML = `
+                <div
+                    class="
+                        bg-red-50
+                        text-red-700
+                        rounded-xl
+                        p-3
+                        text-sm
+                        font-bold
+                    "
+                >
+                    ${escapeHtml(error.message)}
+                </div>
+            `;
+
+
+        } finally {
+
+            button.innerHTML =
+                original;
+
+            syncButton();
+        }
+    }
+
+
+    getOpportunityNavigation();
+    syncOpportunityNavigation();
+
+
+    /*
+     * ========================================================
+     * EVENTOS
+     * ========================================================
+     */
+
+    category.addEventListener(
+        'change',
+        loadSubcategories
+    );
+
+
+    subcategory.addEventListener(
+        'change',
+        syncButton
+    );
+
+
+    mode.addEventListener(
+        'change',
+        syncButton
+    );
+
+
+    marketplace.addEventListener(
+        'change',
+        () => {
+
+            categoryTree =
+                [];
+
+            loadCategories();
+        }
+    );
+
+
+    button.addEventListener(
+        'click',
+        search
+    );
+
+
+    /*
+     * ========================================================
+     * INICIALIZAÇÃO
+     * ========================================================
+     */
+
+    category.disabled =
+        false;
+
+    category.classList.remove(
+        'bg-slate-50',
+        'text-slate-500'
+    );
+
+
+    loadCategories();
+
+})();
+</script>
+
+<script id="opportunityActionController">
+(() => {
+
+    const panel =
+        document.getElementById(
+            'opportunitySearchPanel'
+        );
+
+    if (!panel) {
+        return;
+    }
+
+
+    function apiPart(value) {
+        return encodeURIComponent(
+            String(
+                value || ''
+            )
+        );
+    }
+
+
+    async function requestJson(
+        url,
+        options = {}
+    ) {
+        const response =
+            await fetch(
+                url,
+                {
+                    credentials:
+                        'same-origin',
+
+                    ...options,
+
+                    headers: {
+                        'Content-Type':
+                            'application/json',
+
+                        ...(
+                            options.headers ||
+                            {}
+                        )
+                    }
+                }
+            );
+
+        let data = {};
+
+        try {
+            data =
+                await response.json();
+        } catch (_) {
+            data = {};
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                `Erro HTTP ${response.status}`
+            );
+        }
+
+        return data;
+    }
+
+
+    function showFeedback(
+        group,
+        message,
+        type = 'success'
+    ) {
+        let toast =
+            document.getElementById(
+                'opportunityToast'
+            );
+
+        if (!toast) {
+            toast =
+                document.createElement(
+                    'div'
+                );
+
+            toast.id =
+                'opportunityToast';
+
+            toast.style.position =
+                'fixed';
+
+            toast.style.top =
+                '90px';
+
+            toast.style.right =
+                '24px';
+
+            toast.style.zIndex =
+                '9999';
+
+            toast.style.maxWidth =
+                '360px';
+
+            toast.style.padding =
+                '12px 16px';
+
+            toast.style.borderRadius =
+                '12px';
+
+            toast.style.fontSize =
+                '13px';
+
+            toast.style.fontWeight =
+                '700';
+
+            toast.style.boxShadow =
+                '0 12px 30px rgba(15,23,42,.18)';
+
+            toast.style.transition =
+                'opacity .2s ease, transform .2s ease';
+
+            document.body.appendChild(
+                toast
+            );
+        }
+
+
+        toast.textContent =
+            type === 'error'
+                ? `✕ ${message}`
+                : `✓ ${message}`;
+
+
+        if (type === 'error') {
+
+            toast.style.background =
+                '#fef2f2';
+
+            toast.style.color =
+                '#b91c1c';
+
+            toast.style.border =
+                '1px solid #fecaca';
+
+        } else {
+
+            toast.style.background =
+                '#ecfdf5';
+
+            toast.style.color =
+                '#047857';
+
+            toast.style.border =
+                '1px solid #a7f3d0';
+        }
+
+
+        toast.style.display =
+            'block';
+
+        toast.style.opacity =
+            '1';
+
+        toast.style.transform =
+            'translateY(0)';
+
+
+        clearTimeout(
+            window
+                .opportunityToastTimer
+        );
+
+
+        window.opportunityToastTimer =
+            setTimeout(
+                () => {
+
+                    toast.style.opacity =
+                        '0';
+
+                    toast.style.transform =
+                        'translateY(-6px)';
+
+                    setTimeout(
+                        () => {
+                            toast.style.display =
+                                'none';
+                        },
+                        220
+                    );
+                },
+                3200
+            );
+    }
+
+    function refreshButtons(group) {
+
+        const exists =
+            group.dataset.catalogExists ===
+            'true';
+
+        const published =
+            group.dataset.published ===
+            'true';
+
+        const marketingSelected =
+            group.dataset.marketingSelected ===
+            'true';
+
+
+        const publishButton =
+            group.querySelector(
+                '[data-opportunity-action="publish"]'
+            );
+
+        const adminButton =
+            group.querySelector(
+                '[data-opportunity-action="admin"]'
+            );
+
+        const marketingButton =
+            group.querySelector(
+                '[data-opportunity-action="marketing"]'
+            );
+
+
+        if (publishButton) {
+
+            publishButton.disabled =
+                published;
+
+            publishButton.textContent =
+                published
+                    ? '✓ Na Vitrine'
+                    : 'Publicar na Vitrine';
+        }
+
+
+        if (adminButton) {
+
+            adminButton.disabled =
+                exists;
+
+            adminButton.textContent =
+                exists
+                    ? '✓ No Admin'
+                    : 'Adicionar ao Admin';
+        }
+
+
+        if (marketingButton) {
+
+            marketingButton.disabled =
+                marketingSelected;
+
+            marketingButton.textContent =
+                marketingSelected
+                    ? '✓ No Marketing'
+                    : 'Enviar ao Marketing';
+        }
+    }
+
+
+    async function importProduct(
+        group,
+        published
+    ) {
+
+        const url =
+            String(
+                group.dataset.productUrl ||
+                ''
+            ).trim();
+
+        if (
+            !url ||
+            url === '#'
+        ) {
+            throw new Error(
+                'Produto sem URL válida para importação.'
+            );
+        }
+
+        await requestJson(
+            '/api/vitrine2/import/api',
+            {
+                method: 'POST',
+
+                body:
+                    JSON.stringify({
+                        url,
+                        published
+                    })
+            }
+        );
+
+        group.dataset.catalogExists =
+            'true';
+
+        if (published) {
+            group.dataset.published =
+                'true';
+        }
+    }
+
+
+    async function publishProduct(group) {
+
+        const marketplace =
+            group.dataset.marketplace;
+
+        const itemId =
+            group.dataset.itemId;
+
+        const exists =
+            group.dataset.catalogExists ===
+            'true';
+
+
+        if (!exists) {
+
+            await importProduct(
+                group,
+                true
+            );
+
+        } else {
+
+            await requestJson(
+                `/api/vitrine2/products/${
+                    apiPart(marketplace)
+                }/${
+                    apiPart(itemId)
+                }/published`,
+                {
+                    method: 'PATCH',
+
+                    body:
+                        JSON.stringify({
+                            published: true
+                        })
+                }
+            );
+
+            group.dataset.published =
+                'true';
+        }
+
+
+        showFeedback(
+            group,
+            'Publicado na Vitrine.'
+        );
+
+        refreshButtons(
+            group
+        );
+    }
+
+
+    async function addToAdmin(group) {
+
+        if (
+            group.dataset.catalogExists ===
+            'true'
+        ) {
+            refreshButtons(
+                group
+            );
+
+            return;
+        }
+
+
+        await importProduct(
+            group,
+            false
+        );
+
+
+        showFeedback(
+            group,
+            'Adicionado ao Admin.'
+        );
+
+        refreshButtons(
+            group
+        );
+    }
+
+
+    function opportunityProductFromGroup(
+        group
+    ) {
+        let product = {};
+
+        try {
+            product =
+                JSON.parse(
+                    group.dataset
+                        .productJson ||
+                    '{}'
+                );
+        } catch (_) {
+            product = {};
+        }
+
+        return {
+            ...product,
+
+            marketplace:
+                product.marketplace ||
+                group.dataset.marketplace ||
+                'shopee',
+
+            itemId:
+                product.itemId ||
+                group.dataset.itemId
+        };
+    }
+
+
+    async function saveOpportunityForLater(
+        group
+    ) {
+        const product =
+            opportunityProductFromGroup(
+                group
+            );
+
+        await requestJson(
+            '/api/vitrine2/opportunities/saved',
+            {
+                method: 'POST',
+
+                body:
+                    JSON.stringify({
+                        product
+                    })
+            }
+        );
+
+        group.dataset.saved =
+            'true';
+
+        const button =
+            group.querySelector(
+                '[data-opportunity-action="save-later"]'
+            );
+
+        if (button) {
+            button.disabled =
+                true;
+
+            button.textContent =
+                '✓ Salvo para depois';
+        }
+
+        showFeedback(
+            group,
+            'Produto salvo para revisar depois.'
+        );
+    }
+
+
+    async function ignoreOpportunityProduct(
+        group
+    ) {
+        const product =
+            opportunityProductFromGroup(
+                group
+            );
+
+        await requestJson(
+            '/api/vitrine2/opportunities/ignored',
+            {
+                method: 'POST',
+
+                body:
+                    JSON.stringify({
+                        product
+                    })
+            }
+        );
+
+        const card =
+            group.closest(
+                'article'
+            );
+
+        showFeedback(
+            group,
+            'Produto ignorado. Ele não aparecerá nas próximas buscas.'
+        );
+
+        if (card) {
+            setTimeout(
+                () => {
+                    card.remove();
+                },
+                550
+            );
+        }
+    }
+
+
+    async function copyOpportunityLink(
+        group
+    ) {
+        const url =
+            String(
+                group.dataset.productUrl ||
+                ''
+            ).trim();
+
+        if (
+            !url ||
+            url === '#'
+        ) {
+            throw new Error(
+                'Link da Shopee não disponível.'
+            );
+        }
+
+        await navigator
+            .clipboard
+            .writeText(
+                url
+            );
+
+        showFeedback(
+            group,
+            'Link da Shopee copiado.'
+        );
+    }
+
+
+    async function sendToMarketing(group) {
+
+        const marketplace =
+            group.dataset.marketplace;
+
+        const itemId =
+            group.dataset.itemId;
+
+
+        /*
+         * Produto precisa existir no catálogo,
+         * mas não precisa estar publicado na Vitrine.
+         */
+        if (
+            group.dataset.catalogExists !==
+            'true'
+        ) {
+            await importProduct(
+                group,
+                false
+            );
+        }
+
+
+        /*
+         * VISÃO GERAL É SEMPRE O DESTINO PRINCIPAL.
+         * Nenhum canal é obrigatório.
+         */
+        await requestJson(
+            `/api/vitrine2/products/${
+                apiPart(marketplace)
+            }/${
+                apiPart(itemId)
+            }/marketing/selected`,
+            {
+                method: 'PATCH',
+
+                body:
+                    JSON.stringify({
+                        selected: true
+                    })
+            }
+        );
+
+
+        const channelInputs =
+            Array.from(
+                group.querySelectorAll(
+                    '[data-marketing-channel]'
+                )
+            );
+
+
+        const selectedChannels = [];
+
+
+        /*
+         * Os canais marcados no ⋯ são adicionais
+         * à Visão Geral.
+         */
+        for (
+            const input of channelInputs
+        ) {
+            const channel =
+                input.dataset
+                    .marketingChannel;
+
+            const enabled =
+                input.checked === true;
+
+
+            await requestJson(
+                `/api/vitrine2/products/${
+                    apiPart(marketplace)
+                }/${
+                    apiPart(itemId)
+                }/marketing/channel/${
+                    apiPart(channel)
+                }`,
+                {
+                    method: 'PATCH',
+
+                    body:
+                        JSON.stringify({
+                            enabled
+                        })
+                }
+            );
+
+
+            if (enabled) {
+                selectedChannels.push(
+                    channel
+                );
+            }
+        }
+
+
+        group.dataset.marketingSelected =
+            'true';
+
+
+        const labels = {
+            instagram: 'Instagram',
+            facebook: 'Facebook',
+            tiktok: 'TikTok',
+            kwai: 'Kwai',
+            pinterest: 'Pinterest'
+        };
+
+
+        let message =
+            'Enviado à Visão Geral do Marketing.';
+
+
+        if (
+            selectedChannels.length > 0
+        ) {
+            const names =
+                selectedChannels
+                    .map(
+                        channel =>
+                            labels[channel] ||
+                            channel
+                    )
+                    .join(', ');
+
+            message =
+                `Enviado à Visão Geral + ${names}.`;
+        }
+
+
+        showFeedback(
+            group,
+            message
+        );
+
+        refreshButtons(
+            group
+        );
+    }
+
+    document.addEventListener(
+        'click',
+        async event => {
+
+            const button =
+                event.target.closest(
+                    '[data-opportunity-action]'
+                );
+
+            if (!button) {
+                return;
+            }
+
+
+            const action =
+                button.dataset
+                    .opportunityAction;
+
+
+            if (action === 'more') {
+
+                const wrapper =
+                    button.parentElement;
+
+                const menu =
+                    wrapper?.querySelector(
+                        '[data-opportunity-more-menu]'
+                    );
+
+                document
+                    .querySelectorAll(
+                        '[data-opportunity-more-menu]'
+                    )
+                    .forEach(
+                        otherMenu => {
+
+                            if (
+                                otherMenu !==
+                                menu
+                            ) {
+                                otherMenu
+                                    .classList
+                                    .add(
+                                        'hidden'
+                                    );
+                            }
+                        }
+                    );
+
+                menu
+                    ?.classList
+                    .toggle(
+                        'hidden'
+                    );
+
+                return;
+            }
+
+
+            const group =
+                button.closest(
+                    '[data-opportunity-actions]'
+                );
+
+            if (!group) {
+                return;
+            }
+
+
+            const wasDisabled =
+                button.disabled;
+
+            if (wasDisabled) {
+                return;
+            }
+
+
+            button.disabled =
+                true;
+
+
+            try {
+
+                if (
+                    action ===
+                    'publish'
+                ) {
+                    await publishProduct(
+                        group
+                    );
+                }
+
+
+                if (
+                    action ===
+                    'admin'
+                ) {
+                    await addToAdmin(
+                        group
+                    );
+                }
+
+
+                if (
+                    action ===
+                    'marketing'
+                ) {
+                    await sendToMarketing(
+                        group
+                    );
+                }
+
+
+                if (
+                    action ===
+                    'save-later'
+                ) {
+                    await saveOpportunityForLater(
+                        group
+                    );
+                }
+
+
+                if (
+                    action ===
+                    'ignore-product'
+                ) {
+                    await ignoreOpportunityProduct(
+                        group
+                    );
+                }
+
+
+                if (
+                    action ===
+                    'copy-link'
+                ) {
+                    await copyOpportunityLink(
+                        group
+                    );
+                }
+
+            } catch (error) {
+
+                console.error(
+                    '[OPORTUNIDADES] Erro na ação:',
+                    error
+                );
+
+                showFeedback(
+                    group,
+                    error.message ||
+                    'Não foi possível concluir a ação.',
+                    'error'
+                );
+
+            } finally {
+
+                refreshButtons(
+                    group
+                );
+
+                if (
+                    action !== 'publish' &&
+                    action !== 'admin' &&
+                    action !== 'marketing' &&
+                    action !== 'save-later'
+                ) {
+                    button.disabled =
+                        false;
+                }
+            }
+        }
+    );
+
+
+    document.addEventListener(
+        'click',
+        async event => {
+
+            const tab =
+                event.target.closest(
+                    '[data-opportunity-view]'
+                );
+
+
+            if (tab) {
+
+                const view =
+                    tab.dataset
+                        .opportunityView;
+
+
+                try {
+
+                    if (
+                        view ===
+                        'opportunities'
+                    ) {
+                        opportunityView =
+                            'opportunities';
+
+                        syncOpportunityNavigation();
+
+                        await search();
+
+                        return;
+                    }
+
+
+                    await loadOpportunityDecisions(
+                        view
+                    );
+
+                } catch (error) {
+
+                    const box =
+                        getResultsBox();
+
+                    box.innerHTML = `
+                        <div
+                            class="
+                                bg-red-50
+                                text-red-700
+                                rounded-xl
+                                p-3
+                                text-sm
+                                font-bold
+                            "
+                        >
+                            ${escapeHtml(
+                                error.message
+                            )}
+                        </div>
+                    `;
+                }
+
+                return;
+            }
+
+
+            const restoreButton =
+                event.target.closest(
+                    '[data-restore-ignored]'
+                );
+
+
+            if (restoreButton) {
+
+                restoreButton.disabled =
+                    true;
+
+                try {
+
+                    await requestJson(
+                        `/api/vitrine2/opportunities/ignored/${encodeURIComponent(
+                            restoreButton.dataset
+                                .marketplace
+                        )}/${encodeURIComponent(
+                            restoreButton.dataset
+                                .itemId
+                        )}`,
+                        {
+                            method:
+                                'DELETE'
+                        }
+                    );
+
+
+                    restoreButton
+                        .closest(
+                            'article'
+                        )
+                        ?.remove();
+
+
+                    showMessage(
+                        'Produto restaurado. Ele poderá voltar às pesquisas.'
+                    );
+
+                } catch (error) {
+
+                    restoreButton.disabled =
+                        false;
+
+                    showMessage(
+                        error.message ||
+                        'Não foi possível restaurar.',
+                        'error'
+                    );
+                }
+
+                return;
+            }
+        }
+    );
+
+
+    document.addEventListener(
+        'click',
+        event => {
+
+            if (
+                event.target.closest(
+                    '[data-opportunity-action="more"]'
+                ) ||
+                event.target.closest(
+                    '[data-opportunity-more-menu]'
+                )
+            ) {
+                return;
+            }
+
+
+            document
+                .querySelectorAll(
+                    '[data-opportunity-more-menu]'
+                )
+                .forEach(
+                    menu =>
+                        menu.classList.add(
+                            'hidden'
+                        )
+                );
+        }
+    );
+
+})();
+</script>
+
 
 </body>
 </html>

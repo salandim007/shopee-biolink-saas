@@ -10,7 +10,7 @@ const DEFAULT_MARKETING_CHANNELS = Object.freeze({
     facebook: false,
     tiktok: false,
     kwai: false,
-    outros: false
+    pinterest: false
 });
 
 
@@ -33,7 +33,7 @@ const MARKETING_CHANNELS = Object.freeze([
     'facebook',
     'tiktok',
     'kwai',
-    'outros'
+    'pinterest'
 ]);
 
 
@@ -193,10 +193,12 @@ function normalizeMarketingChannels(
                 DEFAULT_MARKETING_CHANNELS.kwai
             ),
 
-        outros:
+        pinterest:
             normalizeBoolean(
-                source.outros,
-                DEFAULT_MARKETING_CHANNELS.outros
+                source.pinterest !== undefined
+                    ? source.pinterest
+                    : source.outros,
+                DEFAULT_MARKETING_CHANNELS.pinterest
             )
     };
 }
@@ -354,16 +356,19 @@ function normalizeMarketing(
         );
 
     /*
-     * A seleção de Marketing é consequência dos canais.
+     * A seleção para a Visão Geral do Marketing
+     * é independente dos canais.
      *
-     * Com pelo menos um canal marcado, o produto está
-     * selecionado. Sem canais marcados, ele volta para
-     * not_selected.
+     * Um produto pode estar selecionado para Marketing
+     * sem Instagram, Facebook, TikTok, Kwai ou Pinterest.
+     *
+     * Os canais são destinos adicionais e opcionais.
      */
     const selected =
-        Object.values(
-            channels
-        ).some(Boolean);
+        normalizeBoolean(
+            source.selected,
+            false
+        );
 
     let status =
         normalizeMarketingStatus(
@@ -754,20 +759,6 @@ class ProductCatalog {
                 entry.marketing
                     ?.channels
             );
-
-        const hasEnabledChannel =
-            Object.values(
-                currentChannels
-            ).some(Boolean);
-
-        if (
-            normalizedSelected &&
-            !hasEnabledChannel
-        ) {
-            throw new Error(
-                'Selecione pelo menos um canal de Marketing.'
-            );
-        }
 
         entry.marketing =
             normalizeMarketing({

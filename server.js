@@ -19,8 +19,17 @@ const marketingRoutes =
     require('./marketing-routes');
 
 const {
+    metaMediaPublicRouter
+} = require('./meta-media-public');
+
+const {
     defaultInstagramWebhookRouter
 } = require('./marketing/instagram-webhook-router');
+
+const {
+    requireAdminAuth,
+    requireVitrine2ApiAuth
+} = require('./admin-auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,13 +39,92 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+/*
+ * ============================================================
+ * WEBHOOKS PÚBLICOS
+ * ============================================================
+ *
+ * Meta/Instagram precisam conseguir chamar estas rotas.
+ */
 app.use(
     '/webhooks/instagram',
     defaultInstagramWebhookRouter
 );
 
-app.use('/api/vitrine2', defaultVitrine2Router);
-app.use('/api/vitrine2', defaultVitrine2SyncRouter);
+
+/*
+ * MÍDIA PÚBLICA ASSINADA PARA META
+ */
+app.use(
+    '/media/meta',
+    metaMediaPublicRouter
+);
+
+
+/*
+ * ============================================================
+ * SEGURANÇA ADMINISTRATIVA
+ * ============================================================
+ */
+
+/*
+ * Protege qualquer rota /admin atual ou futura.
+ */
+app.use(
+    '/admin',
+    requireAdminAuth
+);
+
+
+/*
+ * Na API da Vitrine somente:
+ *
+ * GET /products/published
+ *
+ * permanece público.
+ *
+ * Todo o restante exige autenticação.
+ */
+app.use(
+    '/api/vitrine2',
+    requireVitrine2ApiAuth
+);
+
+
+/*
+ * APIs antigas/internas.
+ */
+app.use(
+    '/api/shopee',
+    requireAdminAuth
+);
+
+app.use(
+    '/api/produtos',
+    requireAdminAuth
+);
+
+app.use(
+    '/teste-captura-shopee',
+    requireAdminAuth
+);
+
+
+/*
+ * ============================================================
+ * ROTAS DA APLICAÇÃO
+ * ============================================================
+ */
+
+app.use(
+    '/api/vitrine2',
+    defaultVitrine2Router
+);
+
+app.use(
+    '/api/vitrine2',
+    defaultVitrine2SyncRouter
+);
 
 app.use(
     '/admin/vitrine2/marketing',
@@ -48,6 +136,14 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.get('/vitrine2', (req, res) => {
     res.render('vitrine2');
+});
+
+app.get('/privacidade', (req, res) => {
+    res.render('privacidade');
+});
+
+app.get('/termos', (req, res) => {
+    res.render('termos');
 });
 
 app.get('/admin/vitrine2', (req, res) => {
@@ -1870,7 +1966,7 @@ db.run('CREATE UNIQUE INDEX IF NOT EXISTS idx_produtos_url_original ON produtos(
 });
 
 app.get('/', (req, res) => {
-    res.redirect('/l/achadosdaana');
+    res.redirect('/vitrine2');
 });
 
 // ROTA CORRIGIDA: Agora renderiza corretamente a lojinha com filtros e busca ativa

@@ -8,6 +8,12 @@ const {
     toPublicCatalogEntries
 } = require('./vitrine2-public-product');
 
+const marketplaces =
+    require('./marketplaces/registry');
+
+const opportunityDecisions =
+    require('./opportunity-decisions-store');
+
 
 function createVitrine2Router(options = {}) {
     const router = express.Router();
@@ -15,6 +21,598 @@ function createVitrine2Router(options = {}) {
     const service =
         options.service ||
         defaultVitrine2Service;
+
+
+    /*
+     * ============================================================
+     * OPORTUNIDADES / MARKETPLACES
+     * ============================================================
+     */
+
+    /*
+     * GET /api/vitrine2/opportunities/marketplaces
+     */
+    router.get(
+        '/opportunities/marketplaces',
+        (req, res) => {
+            try {
+                res.json({
+                    success: true,
+                    marketplaces:
+                        marketplaces.listMarketplaces()
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao listar marketplaces:',
+                    error
+                );
+
+                res.status(500).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível listar marketplaces.'
+                });
+            }
+        }
+    );
+
+
+    /*
+     * GET /api/vitrine2/opportunities/categories
+     *
+     * Exemplos:
+     * ?marketplace=shopee
+     * ?marketplace=shopee&term=jeans
+     */
+    router.get(
+        '/opportunities/categories',
+        (req, res) => {
+            try {
+                const marketplace =
+                    String(
+                        req.query.marketplace ||
+                        'shopee'
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                const term =
+                    String(
+                        req.query.term ||
+                        ''
+                    ).trim();
+
+                const categories =
+                    term
+                        ? marketplaces.searchCategories({
+                            marketplace,
+                            term
+                        })
+                        : marketplaces.listCategories({
+                            marketplace
+                        });
+
+                res.json({
+                    success: true,
+                    marketplace,
+                    term:
+                        term || null,
+                    count:
+                        categories.length,
+                    categories
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao listar categorias:',
+                    error
+                );
+
+                res.status(400).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível listar categorias.'
+                });
+            }
+        }
+    );
+
+
+    /*
+     * ============================================================
+     * DECISÕES DAS OPORTUNIDADES
+     * ============================================================
+     */
+
+    router.get(
+        '/opportunities/decisions',
+        (req, res) => {
+            try {
+                res.json({
+                    success: true,
+                    summary:
+                        opportunityDecisions
+                            .getSummary(),
+                    saved:
+                        opportunityDecisions
+                            .listSaved(),
+                    ignored:
+                        opportunityDecisions
+                            .listIgnored()
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao listar decisões:',
+                    error
+                );
+
+                res.status(500).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível carregar as decisões.'
+                });
+            }
+        }
+    );
+
+
+    router.post(
+        '/opportunities/saved',
+        (req, res) => {
+            try {
+                const product =
+                    req.body?.product;
+
+                const saved =
+                    opportunityDecisions
+                        .saveForLater(
+                            product
+                        );
+
+                res.json({
+                    success: true,
+                    saved,
+                    summary:
+                        opportunityDecisions
+                            .getSummary()
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao salvar oportunidade:',
+                    error
+                );
+
+                res.status(400).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível salvar o produto.'
+                });
+            }
+        }
+    );
+
+
+    router.delete(
+        '/opportunities/saved/:marketplace/:itemId',
+        (req, res) => {
+            try {
+                const {
+                    marketplace,
+                    itemId
+                } = req.params;
+
+                const removed =
+                    opportunityDecisions
+                        .removeSaved(
+                            marketplace,
+                            itemId
+                        );
+
+                res.json({
+                    success: true,
+                    removed,
+                    summary:
+                        opportunityDecisions
+                            .getSummary()
+                });
+            } catch (error) {
+                res.status(400).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível remover dos salvos.'
+                });
+            }
+        }
+    );
+
+
+    router.post(
+        '/opportunities/ignored',
+        (req, res) => {
+            try {
+                const product =
+                    req.body?.product;
+
+                const ignored =
+                    opportunityDecisions
+                        .ignoreProduct(
+                            product
+                        );
+
+                res.json({
+                    success: true,
+                    ignored,
+                    summary:
+                        opportunityDecisions
+                            .getSummary()
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao ignorar oportunidade:',
+                    error
+                );
+
+                res.status(400).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível ignorar o produto.'
+                });
+            }
+        }
+    );
+
+
+    router.delete(
+        '/opportunities/ignored/:marketplace/:itemId',
+        (req, res) => {
+            try {
+                const {
+                    marketplace,
+                    itemId
+                } = req.params;
+
+                const removed =
+                    opportunityDecisions
+                        .removeIgnored(
+                            marketplace,
+                            itemId
+                        );
+
+                res.json({
+                    success: true,
+                    removed,
+                    summary:
+                        opportunityDecisions
+                            .getSummary()
+                });
+            } catch (error) {
+                res.status(400).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível restaurar o produto.'
+                });
+            }
+        }
+    );
+
+
+    /*
+     * GET /api/vitrine2/opportunities/search
+     *
+     * Exemplo:
+     * ?marketplace=shopee&categoryId=100103
+     */
+    router.get(
+        '/opportunities/search',
+        async (req, res) => {
+            try {
+                const marketplace =
+                    String(
+                        req.query.marketplace ||
+                        'shopee'
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                const categoryId =
+                    req.query.categoryId
+                        ? Number(
+                            req.query.categoryId
+                        )
+                        : null;
+
+                const keyword =
+                    String(
+                        req.query.keyword ||
+                        ''
+                    ).trim() ||
+                    null;
+
+                const listType =
+                    req.query.listType !== undefined &&
+                    req.query.listType !== ''
+                        ? Number(
+                            req.query.listType
+                        )
+                        : null;
+
+                const pages =
+                    Math.min(
+                        5,
+                        Math.max(
+                            1,
+                            Number(
+                                req.query.pages
+                            ) || 1
+                        )
+                    );
+
+                const limitPerPage =
+                    Math.min(
+                        50,
+                        Math.max(
+                            1,
+                            Number(
+                                req.query.limit
+                            ) || 20
+                        )
+                    );
+
+                const minimumSales =
+                    Math.max(
+                        0,
+                        Number(
+                            req.query.minimumSales
+                        ) || 0
+                    );
+
+                const top =
+                    Math.min(
+                        50,
+                        Math.max(
+                            1,
+                            Number(
+                                req.query.top
+                            ) || 20
+                        )
+                    );
+
+                const hasListType =
+                    listType !== null &&
+                    Number.isFinite(
+                        listType
+                    );
+
+                if (
+                    !categoryId &&
+                    !keyword &&
+                    !hasListType
+                ) {
+                    return res
+                        .status(400)
+                        .json({
+                            success: false,
+                            error:
+                                'Informe categoryId, keyword ou listType.'
+                        });
+                }
+
+                const result =
+                    await marketplaces
+                        .searchOpportunities({
+                            marketplace,
+                            categoryId,
+                            keyword,
+                            listType,
+                            pages,
+                            limitPerPage,
+                            minimumSales,
+                            top
+                        });
+
+                /*
+                 * Acrescenta aos candidatos o estado atual
+                 * deles dentro do catálogo.
+                 *
+                 * Isso permite que a tela de Oportunidades
+                 * saiba se o produto:
+                 *
+                 * - ainda é novo;
+                 * - já está no Admin;
+                 * - já está publicado na Vitrine;
+                 * - já foi selecionado para Marketing;
+                 * - já está ligado a algum canal.
+                 *
+                 * Nenhum produto é alterado aqui.
+                 * Esta rota continua sendo somente de consulta.
+                 */
+                const catalogEntries =
+                    service.listAll();
+
+                const catalogByKey =
+                    new Map(
+                        catalogEntries.map(
+                            entry => {
+                                const product =
+                                    entry?.product || {};
+
+                                const key =
+                                    `${String(
+                                        product.marketplace ||
+                                        ''
+                                    ).toLowerCase()}:${String(
+                                        product.itemId ||
+                                        ''
+                                    )}`;
+
+                                return [
+                                    key,
+                                    entry
+                                ];
+                            }
+                        )
+                    );
+
+                const products =
+                    Array.isArray(
+                        result?.products
+                    )
+                        ? result.products.map(
+                            product => {
+                                const key =
+                                    `${String(
+                                        marketplace ||
+                                        product.marketplace ||
+                                        ''
+                                    ).toLowerCase()}:${String(
+                                        product.itemId ||
+                                        ''
+                                    )}`;
+
+                                const entry =
+                                    catalogByKey.get(
+                                        key
+                                    ) || null;
+
+                                return {
+                                    ...product,
+
+                                    catalogState: {
+                                        exists:
+                                            Boolean(
+                                                entry
+                                            ),
+
+                                        published:
+                                            Boolean(
+                                                entry
+                                                    ?.visibility
+                                                    ?.published
+                                            ),
+
+                                        marketingSelected:
+                                            Boolean(
+                                                entry
+                                                    ?.marketing
+                                                    ?.selected
+                                            ),
+
+                                        channels:
+                                            entry
+                                                ?.marketing
+                                                ?.channels &&
+                                            typeof entry
+                                                .marketing
+                                                .channels ===
+                                                'object'
+                                                ? entry
+                                                    .marketing
+                                                    .channels
+                                                : {}
+                                    }
+                                };
+                            }
+                        )
+                        : [];
+
+                const savedKeys =
+                    new Set(
+                        opportunityDecisions
+                            .listSaved()
+                            .map(
+                                item =>
+                                    opportunityDecisions
+                                        .createKey(
+                                            item.marketplace,
+                                            item.itemId
+                                        )
+                            )
+                    );
+
+                const ignoredKeys =
+                    new Set(
+                        opportunityDecisions
+                            .listIgnored()
+                            .map(
+                                item =>
+                                    opportunityDecisions
+                                        .createKey(
+                                            item.marketplace,
+                                            item.itemId
+                                        )
+                            )
+                    );
+
+                const productsWithDecisions =
+                    products
+                        .filter(
+                            product => {
+                                const key =
+                                    opportunityDecisions
+                                        .createKey(
+                                            marketplace ||
+                                                product.marketplace,
+                                            product.itemId
+                                        );
+
+                                return !ignoredKeys.has(
+                                    key
+                                );
+                            }
+                        )
+                        .map(
+                            product => {
+                                const key =
+                                    opportunityDecisions
+                                        .createKey(
+                                            marketplace ||
+                                                product.marketplace,
+                                            product.itemId
+                                        );
+
+                                return {
+                                    ...product,
+
+                                    opportunityState: {
+                                        saved:
+                                            savedKeys.has(
+                                                key
+                                            ),
+
+                                        ignored:
+                                            false
+                                    }
+                                };
+                            }
+                        );
+
+                res.json({
+                    success: true,
+                    ...result,
+                    products:
+                        productsWithDecisions
+                });
+            } catch (error) {
+                console.error(
+                    '[VITRINE2] Erro ao buscar oportunidades:',
+                    error
+                );
+
+                res.status(400).json({
+                    success: false,
+                    error:
+                        error.message ||
+                        'Não foi possível buscar oportunidades.'
+                });
+            }
+        }
+    );
 
 
     /*

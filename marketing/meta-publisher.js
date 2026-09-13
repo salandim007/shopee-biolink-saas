@@ -672,10 +672,24 @@ function createMetaPublisher(options = {}) {
                     containerStatus.status_code;
 
 
+                const statusMessage =
+                    String(
+                        containerStatus?.status ||
+                        ''
+                    ).trim();
+
                 console.log(
                     '[INSTAGRAM REEL] Status:',
                     statusCode || 'PROCESSANDO',
+                    statusMessage
+                        ? `- ${statusMessage}`
+                        : '',
                     `tentativa ${attempt}/${REEL_STATUS_MAX_ATTEMPTS}`
+                );
+
+                console.log(
+                    '[INSTAGRAM REEL] Resposta Meta:',
+                    JSON.stringify(containerStatus)
                 );
 
 

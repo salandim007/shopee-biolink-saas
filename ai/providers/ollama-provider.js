@@ -184,6 +184,7 @@ class OllamaProvider extends AIProvider {
         const {
             timeoutMs:
                 requestedTimeout,
+            think = null,
             ...modelOptions
         } = normalizedRequest.options;
 
@@ -221,6 +222,13 @@ class OllamaProvider extends AIProvider {
             messages,
             stream: false
         };
+
+        if (
+            typeof think === 'boolean'
+        ) {
+            payload.think =
+                think;
+        }
 
         if (
             normalizedRequest.format !==
