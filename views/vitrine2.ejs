@@ -13,7 +13,7 @@
         content="Vitrine de ofertas, achadinhos e produtos selecionados."
     >
 
-    <title>Vitrine 2 | Ofertas e Achadinhos</title>
+    <title>Mix de Produtos | Achadinhos e Ofertas</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -225,6 +225,79 @@
         .category-chip:active span[class*="bg-sky-50"] {
             background: #f8fafc;
             color: #475569;
+        }
+
+
+
+        /* ================================================ */
+        /* MENU CATEGORIAS - IDENTIDADE MIX AZUL + VERDE   */
+        /* ================================================ */
+
+        #topCategoryChips .category-chip {
+            background: #ffffff;
+            color: #334155;
+            border-color: #e2e8f0;
+
+            box-shadow:
+                0 3px 0 #d1d5db,
+                0 7px 14px rgba(15, 23, 42, .06);
+        }
+
+        #topCategoryChips .category-chip:hover {
+            background: #f0fdf4;
+            color: #15803d;
+            border-color: #86efac;
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 4px 0 #86efac,
+                0 9px 18px rgba(34, 197, 94, .12);
+        }
+
+        #topCategoryChips .category-chip:active {
+            transform:
+                translateY(1px)
+                scale(.98);
+        }
+
+        #topCategoryChips .category-chip.active {
+            background:
+                linear-gradient(
+                    135deg,
+                    #16a34a,
+                    #22c55e
+                );
+
+            color: #ffffff;
+            border-color: #16a34a;
+
+            box-shadow:
+                0 3px 0 #15803d,
+                0 8px 18px rgba(34, 197, 94, .20);
+        }
+
+        #topCategoryChips .category-chip.active span,
+        #topCategoryChips .category-chip.active i {
+            color: #ffffff !important;
+        }
+
+        #topCategoryChips
+        .category-chip:hover
+        span[class*="bg-sky-50"] {
+            background: #dcfce7 !important;
+            color: #15803d !important;
+        }
+
+        #sortProducts {
+            border-color: #bbf7d0;
+        }
+
+        #sortProducts:hover,
+        #sortProducts:focus {
+            border-color: #22c55e;
+            box-shadow:
+                0 0 0 3px rgba(34, 197, 94, .10);
         }
 
 
@@ -453,10 +526,158 @@
             margin-bottom: 4px;
         }
 
+    
+        /* Popup Shopee maior em celular/tablet */
+        @media (max-width: 1023px) {
+            #shopeeConfirmModal {
+                padding: 12px !important;
+            }
+
+            #shopeeConfirmModal > div {
+                width: 92vw !important;
+                max-width: 760px !important;
+                padding: 36px 30px !important;
+                border-radius: 32px !important;
+            }
+
+            #shopeeConfirmModal > div > div:first-child {
+                width: 76px !important;
+                height: 76px !important;
+                margin-bottom: 22px !important;
+            }
+
+            #shopeeConfirmTitle {
+                font-size: 28px !important;
+                line-height: 1.2 !important;
+            }
+
+            #shopeeConfirmTitle + p {
+                font-size: 17px !important;
+                line-height: 1.65 !important;
+                margin-top: 18px !important;
+            }
+
+            #shopeeConfirmTitle + p + p {
+                font-size: 14px !important;
+                line-height: 1.6 !important;
+                margin-top: 16px !important;
+            }
+
+            #continueToShopeeButton {
+                min-height: 64px !important;
+                font-size: 17px !important;
+            }
+
+            #cancelShopeeButton {
+                min-height: 60px !important;
+                font-size: 16px !important;
+            }
+        }
+
     </style>
+
+    <!-- AJUSTE VISUAL AZUL + VERDE MIX DE PRODUTOS -->
+    <style>
+        :root {
+            --mix-green: #22c55e;
+            --mix-green-dark: #16a34a;
+            --mix-green-soft: #ecfdf5;
+            --mix-green-border: #bbf7d0;
+        }
+
+        /* Categorias principais */
+        #topCategoryChips .category-chip {
+            border-color: #e2e8f0;
+            background: #ffffff;
+            transition:
+                background-color .2s ease,
+                border-color .2s ease,
+                color .2s ease,
+                transform .2s ease,
+                box-shadow .2s ease;
+        }
+
+        #topCategoryChips .category-chip:hover {
+            border-color: var(--mix-green-border);
+            background: var(--mix-green-soft);
+            color: var(--mix-green-dark);
+            transform: translateY(-1px);
+        }
+
+        #topCategoryChips .category-chip.active {
+            background: linear-gradient(
+                135deg,
+                var(--mix-green-dark),
+                var(--mix-green)
+            ) !important;
+            border-color: var(--mix-green-dark) !important;
+            color: #ffffff !important;
+            box-shadow:
+                0 6px 16px rgba(34, 197, 94, .20);
+        }
+
+        #topCategoryChips .category-chip.active i,
+        #topCategoryChips .category-chip.active span {
+            color: #ffffff !important;
+        }
+
+        /* Ícones das categorias */
+        #topCategoryChips
+        .category-chip
+        span[class*="bg-sky-50"] {
+            background: var(--mix-green-soft) !important;
+            color: var(--mix-green-dark) !important;
+        }
+
+        /* Ordenação / recomendados */
+        #sortProducts {
+            border-color: var(--mix-green-border);
+        }
+
+        #sortProducts:hover,
+        #sortProducts:focus {
+            border-color: var(--mix-green);
+            box-shadow:
+                0 0 0 3px rgba(34, 197, 94, .10);
+        }
+
+        /* Pequeno detalhe verde no bloco de categorias */
+        #topCategoryChips {
+            scrollbar-color:
+                var(--mix-green-border)
+                transparent;
+        }
+    </style>
+
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1320222547838718');
+    fbq('track', 'PageView');
+    </script>
+    <!-- End Meta Pixel Code -->
+
 </head>
 
 <body>
+    <noscript>
+        <img
+            height="1"
+            width="1"
+            style="display:none"
+            src="https://www.facebook.com/tr?id=1320222547838718&ev=PageView&noscript=1"
+            alt=""
+        >
+    </noscript>
+
+
 
     <!-- ====================================================== -->
     <!-- TOP BAR                                                -->
@@ -566,10 +787,14 @@
                         shadow-sky-100
                     "
                 >
-                    <i class="fa-solid fa-bag-shopping text-xl"></i>
+                    <img
+                        src="/mix-de-produtos-logo-v1.png"
+                        alt="Mix de Produtos"
+                        class="w-11 h-11 rounded-xl object-cover"
+                    >
                 </div>
 
-                <div class="hidden sm:block">
+                <div class="block min-w-0">
 
                     <div
                         class="
@@ -579,7 +804,7 @@
                             tracking-tight
                         "
                     >
-                        Minha Vitrine
+                        Mix de Produtos
                     </div>
 
                     <div
@@ -607,7 +832,7 @@
             <div
                 class="
                     hidden
-                    lg:flex
+                    lg:hidden
                     items-center
                     gap-5
                     text-sm
@@ -646,6 +871,7 @@
             <button
                 id="mobileMenuButton"
                 class="
+                    hidden
                     lg:hidden
                     ml-auto
                     w-11
@@ -860,6 +1086,7 @@
                         id="openCategoryMenu"
                         type="button"
                         class="
+                            hidden
                             min-w-0
                             flex
                             items-center
@@ -923,6 +1150,22 @@
                             </span>
                         </span>
                     </button>
+
+                    <!-- Categorias visíveis da vitrine -->
+                    <div
+                        id="topCategoryChips"
+                        class="
+                            min-w-0
+                            flex-1
+                            flex
+                            items-center
+                            gap-2
+                            overflow-x-auto
+                            py-1
+                        "
+                        style="scrollbar-width:none;"
+                        aria-label="Categorias de produtos"
+                    ></div>
 
                     <div
                         class="
@@ -998,6 +1241,50 @@
         ></div>
 
 
+        <!-- ================================================== -->
+        <!-- BANNER INSTITUCIONAL MIX DE PRODUTOS               -->
+        <!-- ================================================== -->
+
+        <section
+            id="mixProductsHero"
+            class="
+                container-main
+                pt-3
+                pb-3
+                sm:pt-4
+                sm:pb-4
+            "
+        >
+            <div
+                class="
+                    overflow-hidden
+                    rounded-[22px]
+                    sm:rounded-[28px]
+                    shadow-sm
+                    bg-white
+                "
+            >
+                <picture>
+                    <source
+                        media="(max-width: 767px)"
+                        srcset="/banner-vitrine-mobile-final.png"
+                    >
+
+                    <img
+                        src="/banner-vitrine-desktop-final.png"
+                        alt="Mix de Produtos - Achadinhos e ofertas"
+                        class="
+                            block
+                            w-full
+                            h-auto
+                            md:max-h-[430px]
+                            md:object-cover
+                        "
+                        loading="eager"
+                    >
+                </picture>
+            </div>
+        </section>
 
 
         <!-- ================================================== -->
@@ -1383,8 +1670,8 @@
                 class="
                     grid
                     grid-cols-2
-                    md:grid-cols-3
-                    lg:grid-cols-5
+                     
+                    lg:grid-cols-4
                     gap-2.5
                     md:gap-3
                     lg:gap-3
@@ -1498,7 +1785,8 @@
             justify-center
             bg-slate-950/55
             backdrop-blur-sm
-            p-4
+            p-2
+            sm:p-4
         "
         role="dialog"
         aria-modal="true"
@@ -1507,12 +1795,15 @@
 
         <div
             class="
-                w-full
-                max-w-md
-                rounded-3xl
+                w-[96vw]
+                max-w-none
+                rounded-[28px]
                 bg-white
-                p-6
+                p-7
                 shadow-2xl
+                sm:w-full
+                sm:max-w-md
+                sm:rounded-3xl
                 sm:p-7
             "
         >
@@ -1520,10 +1811,12 @@
             <div
                 class="
                     mx-auto
-                    mb-4
+                    mb-5
                     flex
-                    h-14
-                    w-14
+                    h-16
+                    w-16
+                    sm:h-14
+                    sm:w-14
                     items-center
                     justify-center
                     rounded-2xl
@@ -1531,14 +1824,15 @@
                     text-blue-600
                 "
             >
-                <i class="fa-solid fa-arrow-up-right-from-square text-xl"></i>
+                <i class="fa-solid fa-arrow-up-right-from-square text-2xl sm:text-xl"></i>
             </div>
 
             <h2
                 id="shopeeConfirmTitle"
                 class="
                     text-center
-                    text-xl
+                    text-2xl
+                    sm:text-xl
                     font-extrabold
                     tracking-tight
                     text-slate-900
@@ -1551,7 +1845,8 @@
                 class="
                     mt-3
                     text-center
-                    text-sm
+                    text-[15px]
+                    sm:text-sm
                     leading-6
                     text-slate-600
                 "
@@ -1565,7 +1860,8 @@
                 class="
                     mt-3
                     text-center
-                    text-xs
+                    text-[13px]
+                    sm:text-xs
                     leading-5
                     text-slate-400
                 "
@@ -1587,7 +1883,8 @@
                     type="button"
                     class="
                         flex
-                        min-h-[50px]
+                        min-h-[56px]
+                        sm:min-h-[50px]
                         w-full
                         items-center
                         justify-center
@@ -1596,7 +1893,8 @@
                         bg-blue-500
                         px-5
                         py-3
-                        text-sm
+                        text-[15px]
+                        sm:text-sm
                         font-bold
                         text-white
                         transition
@@ -1612,7 +1910,8 @@
                     id="cancelShopeeButton"
                     type="button"
                     class="
-                        min-h-[48px]
+                        min-h-[54px]
+                        sm:min-h-[48px]
                         w-full
                         rounded-2xl
                         border
@@ -1825,6 +2124,9 @@
 
         const categoryChipsElement =
             document.getElementById('categoryChips');
+
+        const topCategoryChipsElement =
+            document.getElementById('topCategoryChips');
 
         const categoryMenuTitleElement =
             document.getElementById('categoryMenuTitle');
@@ -2137,11 +2439,40 @@ const sortProducts =
                             src="${escapeHtml(product.image)}"
                             alt="${escapeHtml(product.title)}"
                             loading="lazy"
+                            data-offer-link="${escapeHtml(product.affiliateLink)}"
+                            data-item-id="${escapeHtml(product.itemId || '')}"
+                            data-shop-id="${escapeHtml(product.shopId || '')}"
+                            data-product-title="${escapeHtml(product.title || '')}"
+                            data-product-price="${escapeHtml(product.price || '')}"
+                            onclick="openShopeeConfirm(
+                                event,
+                                this.dataset.offerLink,
+                                this.dataset.itemId,
+                                this.dataset.shopId,
+                                this.dataset.productTitle,
+                                this.dataset.productPrice
+                            )"
+                            role="link"
+                            tabindex="0"
+                            onkeydown="
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    openShopeeConfirm(
+                                        event,
+                                        this.dataset.offerLink,
+                                        this.dataset.itemId,
+                                        this.dataset.shopId,
+                                        this.dataset.productTitle,
+                                        this.dataset.productPrice
+                                    );
+                                }
+                            "
                             class="
                                 product-image
                                 w-full
                                 h-full
                                 object-cover
+                                cursor-pointer
                             "
                             onerror="
                                 this.style.display='none';
@@ -2226,7 +2557,18 @@ const sortProducts =
                             <a
                                 href="#"
                                 data-offer-link="${escapeHtml(product.affiliateLink)}"
-                                onclick="openShopeeConfirm(event, this.dataset.offerLink)"
+                                data-item-id="${escapeHtml(product.itemId || '')}"
+                                data-shop-id="${escapeHtml(product.shopId || '')}"
+                                data-product-title="${escapeHtml(product.title || '')}"
+                                data-product-price="${escapeHtml(product.price || '')}"
+                                onclick="openShopeeConfirm(
+                                    event,
+                                    this.dataset.offerLink,
+                                    this.dataset.itemId,
+                                    this.dataset.shopId,
+                                    this.dataset.productTitle,
+                                    this.dataset.productPrice
+                                )"
                                 class="
                                     w-full
                                     bg-sky-400
@@ -3117,6 +3459,74 @@ const sortProducts =
                     );
 
 
+            if (topCategoryChipsElement) {
+                topCategoryChipsElement.innerHTML = '';
+
+                const topCategories = [
+                    {
+                        label: 'Todos',
+                        value: ''
+                    },
+                    ...sorted.map(
+                        category => ({
+                            label: category,
+                            value: category
+                        })
+                    )
+                ];
+
+                topCategories.forEach(
+                    item => {
+                        const button =
+                            document.createElement('button');
+
+                        const active =
+                            normalizeText(currentCategory) ===
+                            normalizeText(item.value);
+
+                        button.type =
+                            'button';
+
+                        button.className = [
+                            'shrink-0',
+                            'whitespace-nowrap',
+                            'rounded-full',
+                            'border',
+                            'px-3',
+                            'sm:px-4',
+                            'py-2',
+                            'text-xs',
+                            'sm:text-sm',
+                            'font-bold',
+                            'transition',
+                            active
+                                ? 'bg-sky-500 text-white border-sky-500'
+                                : 'bg-white text-slate-700 border-slate-200 hover:border-sky-300 hover:text-sky-700'
+                        ].join(' ');
+
+                        button.textContent =
+                            item.label;
+
+                        button.addEventListener(
+                            'click',
+                            () => {
+                                applyCategoryFilter(
+                                    item.value,
+                                    ''
+                                );
+
+                                renderCategories();
+                            }
+                        );
+
+                        topCategoryChipsElement.appendChild(
+                            button
+                        );
+                    }
+                );
+            }
+
+
             sorted.forEach(
                 category => {
 
@@ -3801,11 +4211,16 @@ renderAllProducts();
          */
 
         let pendingShopeeUrl = '';
+        let pendingShopeeProduct = null;
 
 
         function openShopeeConfirm(
             event,
-            url
+            url,
+            itemId,
+            shopId,
+            productTitle,
+            productPrice
         ) {
 
             if (event) {
@@ -3814,6 +4229,13 @@ renderAllProducts();
 
             pendingShopeeUrl =
                 String(url || '').trim();
+
+            pendingShopeeProduct = {
+                itemId: String(itemId || '').trim(),
+                shopId: String(shopId || '').trim(),
+                title: String(productTitle || '').trim(),
+                price: Number(productPrice)
+            };
 
             if (!pendingShopeeUrl) {
                 return;
@@ -3857,6 +4279,9 @@ renderAllProducts();
 
             pendingShopeeUrl =
                 '';
+
+            pendingShopeeProduct =
+                null;
         }
 
 
@@ -3877,9 +4302,36 @@ renderAllProducts();
                 const targetUrl =
                     pendingShopeeUrl;
 
+                const productData =
+                    pendingShopeeProduct;
+
                 if (!targetUrl) {
                     closeShopeeConfirm();
                     return;
+                }
+
+                /*
+                 * Evento detalhado do produto para análise futura.
+                 * Mantemos nome separado do evento manual criado na Meta.
+                 */
+                if (
+                    typeof fbq === 'function' &&
+                    productData
+                ) {
+                    fbq(
+                        'trackCustom',
+                        'ProductOutboundClick',
+                        {
+                            item_id: productData.itemId,
+                            shop_id: productData.shopId,
+                            product_title: productData.title,
+                            value: Number.isFinite(productData.price)
+                                ? productData.price
+                                : 0,
+                            currency: 'BRL',
+                            marketplace: 'shopee'
+                        }
+                    );
                 }
 
                 /*
