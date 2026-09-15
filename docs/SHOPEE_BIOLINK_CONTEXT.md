@@ -2156,3 +2156,108 @@ A interface visual tradicional do Catálogo poderá futuramente ser reduzida ou 
 
 Instagram MVP: CONCLUÍDO ✅
 Próximo canal: Pinterest.
+
+---
+
+# Marco 2026-09-14 — Feed Meta e renovação de catálogo
+
+## Feed Meta
+
+Estado validado:
+
+- feed Meta automático funcionando;
+- 122 produtos publicados no feed atual;
+- ID estável no formato `shopee-shopId-itemId`;
+- preço no formato `00.00 BRL`;
+- link afiliado preservado;
+- imagem pública;
+- `availability: in stock`;
+- `condition: new`;
+- tratamento de `brand` e `identifier_exists`;
+- CSV UTF-8 com BOM;
+- gravação por arquivo temporário;
+- feed privado protegido por token;
+- `product_type` adicionado usando:
+  `category1 > category2 > category3`;
+- descrição não deve ser igual ao título;
+- usar descrição real quando disponível;
+- quando não houver descrição real, usar fallback seguro;
+- não inventar tamanho de produto.
+
+## Feed oficial Shopee
+
+Fonte principal:
+
+`data/shopee-feed/feed-oficial-novo.csv`
+
+Snapshot analisado em 14/09/2026:
+
+- aproximadamente 2.818.286 produtos;
+- arquivo pode conter bytes NUL (`\x00`);
+- leitura deve ser feita em streaming e de forma tolerante;
+- `description` real está disponível;
+- `model_names` contém variações e pode trazer tamanhos reais;
+- nunca inferir/inventar tamanho quando não houver informação confiável.
+
+Campos relevantes disponíveis:
+
+- shop_rating
+- itemid
+- sale_price
+- item_rating
+- discount_percentage
+- price
+- description
+- title
+- global_category1
+- global_category2
+- global_category3
+- image_link
+- image_link_3
+- model_ids
+- model_names
+- shop_name
+- product_link
+- product_short link
+
+## Estratégia futura de catálogo vivo
+
+A renovação automática deverá valer tanto para:
+
+- Vitrine 2;
+- Meta;
+- futuros canais externos.
+
+Direção:
+
+- manter produtos com melhor desempenho;
+- preservar produtos com cliques/conversão;
+- substituir gradualmente produtos fracos;
+- usar o feed oficial como grande reserva de candidatos;
+- evitar troca completa do catálogo de uma só vez;
+- renovação planejada em ciclos semanais.
+
+## Estado atual da renovação
+
+NÃO ativar ainda substituição automática por desempenho.
+
+Motivo:
+
+Ainda não existe histórico suficiente para distinguir corretamente:
+
+- produto realmente fraco;
+- produto novo;
+- produto pouco exposto;
+- produto aceito/rejeitado por cada canal;
+- desempenho ao longo do tempo.
+
+O sistema já possui contador de cliques por produto no banco.
+
+Por enquanto:
+
+- operar em modo de observação;
+- acumular dados;
+- não remover produtos automaticamente por baixo desempenho.
+
+Reavaliar a ativação da rotação automática após aproximadamente 1 a 2 meses de histórico real.
+

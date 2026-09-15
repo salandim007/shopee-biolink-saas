@@ -31,6 +31,7 @@ services:
       - ./tmp:/app/tmp
       - ./data/shopee-feed:/app/data/shopee-feed:ro
       - ./data/music:/app/data/music:ro
+      - ./data/meta:/app/data/meta
 
     networks:
       - proxy

@@ -32,10 +32,101 @@ const {
 } = require('./admin-auth');
 
 const app = express();
+
+app.use(
+    express.static(
+        require('path').join(__dirname, 'public')
+    )
+);
+
 const PORT = process.env.PORT || 3000;
 const CHROME_EXECUTABLE_PATH = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
 app.use(cors());
+/*
+ * ============================================================
+ * META - CATÁLOGO VITRINE 2
+ * ============================================================
+ *
+ * Feed privado por URL com token.
+ * O arquivo não fica dentro da pasta public.
+ * ============================================================
+ */
+
+app.get(
+    '/meta-feed/:token/catalog.csv',
+    (req, res) => {
+        const fs =
+            require('fs');
+
+        const path =
+            require('path');
+
+        const tokenFile =
+            path.join(
+                __dirname,
+                'data',
+                'meta',
+                'feed-token.txt'
+            );
+
+        const catalogFile =
+            path.join(
+                __dirname,
+                'data',
+                'meta',
+                'catalog_vitrine2.csv'
+            );
+
+        if (
+            !fs.existsSync(tokenFile) ||
+            !fs.existsSync(catalogFile)
+        ) {
+            return res
+                .status(404)
+                .send('Feed não disponível.');
+        }
+
+        const expectedToken =
+            fs.readFileSync(
+                tokenFile,
+                'utf8'
+            ).trim();
+
+        if (
+            !expectedToken ||
+            req.params.token !== expectedToken
+        ) {
+            return res
+                .status(404)
+                .send('Não encontrado.');
+        }
+
+        res.setHeader(
+            'Content-Type',
+            'text/csv; charset=utf-8'
+        );
+
+        res.setHeader(
+            'Cache-Control',
+            'no-store'
+        );
+
+        res.setHeader(
+            'X-Robots-Tag',
+            'noindex, nofollow'
+        );
+
+        res.setHeader(
+            'Content-Disposition',
+            'inline; filename="catalog_vitrine2.csv"'
+        );
+
+        return res.sendFile(
+            catalogFile
+        );
+    }
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

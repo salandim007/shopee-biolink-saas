@@ -18,3 +18,10 @@ instagram-prepare-atual.txt
 data/music/
 data/opportunity-decisions.json
 data/vitrine2-catalog.json.bak-*
+
+# Python
+__pycache__/
+*.pyc
+
+# Meta feed gerado e credenciais privadas
+data/meta/
