@@ -1828,5 +1828,8 @@ router.post(
     }
 );
 
+const facebookGroupRadarRoutes = require("./facebook-group-radar-routes");
+router.use("/facebook/groups", facebookGroupRadarRoutes);
+
 module.exports =
     router;
