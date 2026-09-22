@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar de Grupos</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f6f9;
+    color:#1c1e21;
+}
+.page{
+    max-width:900px;
+    margin:auto;
+    padding:16px;
+}
+.card{
+    background:#fff;
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:14px;
+}
+h1{margin:0 0 6px}
+.small{color:#65676b}
+.stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+.number{
+    font-size:26px;
+    font-weight:bold;
+}
+input,button{
+    width:100%;
+    padding:14px;
+    font-size:16px;
+    border-radius:10px;
+    box-sizing:border-box;
+}
+input{
+    border:1px solid #ccd0d5;
+    margin-bottom:10px;
+}
+button{
+    border:0;
+    background:#1877f2;
+    color:#fff;
+    font-weight:bold;
+}
+#results{margin-top:14px}
+.group{
+    border-top:1px solid #eee;
+    padding:14px 0;
+}
+.group:first-child{border-top:0}
+.score{
+    color:#1877f2;
+    font-weight:bold;
+}
+a{color:#1877f2}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+<div class="card">
+    <h1>📡 Radar de Grupos</h1>
+    <div class="small">
+        Melhores grupos do Facebook para cada produto.
+    </div>
+</div>
+
+<div class="stats">
+    <div class="card">
+        <div class="number"><%= stats.groups.total %></div>
+        <div class="small">Grupos encontrados</div>
+    </div>
+
+    <div class="card">
+        <div class="number"><%= stats.groups.active %></div>
+        <div class="small">Grupos ativos</div>
+    </div>
+</div>
+
+<div class="card">
+    <input
+        id="itemId"
+        placeholder="Item ID do produto"
+        inputmode="numeric"
+    >
+
+    <button onclick="carregarSugestoes()">
+        Sugestões de grupos para postar
+    </button>
+
+    <button
+        onclick="prepararPesquisa()"
+        style="margin-top:10px;background:#42b72a"
+    >
+        Preparar pesquisa
+    </button>
+
+    <div id="keywords" style="margin-top:14px"></div>
+
+    <div id="results"></div>
+
+<hr style="border:0;border-top:1px solid #eee;margin:20px 0">
+
+<h2>Grupos descobertos</h2>
+
+<div class="small">
+    Grupos encontrados pelo FB Validador.
+</div>
+
+<div id="discovered" style="margin-top:12px">
+    Carregando...
+</div>
+</div>
+
+</div>
+
+<script>
+async function buscar(){
+    const itemId =
+        document.getElementById('itemId').value.trim();
+
+    if(!itemId){
+        alert('Informe o Item ID.');
+        return;
+    }
+
+    const box =
+        document.getElementById('results');
+
+    box.innerHTML = 'Pesquisando...';
+
+    try{
+        const r = await fetch(
+            '/admin/vitrine2/marketing/facebook/groups/api/ranked?itemId=' +
+            encodeURIComponent(itemId)
+        );
+
+        const data = await r.json();
+
+        if(!data.groups || !data.groups.length){
+            box.innerHTML =
+                '<p>Nenhum grupo pesquisado ainda para este produto.</p>';
+            return;
+        }
+
+        box.innerHTML =
+            data.groups.map(g => `
+                <div class="group">
+                    <b>${g.name}</b><br>
+                    ${Number(g.members_count || 0).toLocaleString('pt-BR')}
+                    membros<br>
+
+                    <span class="score">
+                        ${Number(g.total_score || 0).toFixed(0)} pontos
+                    </span><br>
+
+                    <a href="${g.url}" target="_blank">
+                        Abrir grupo no Facebook
+                    </a>
+                </div>
+            `).join('');
+    }
+    catch(error){
+        box.innerHTML = 'Erro ao carregar o Radar.';
+    }
+}
+
+async function carregarDescobertos(){
+    const box=document.getElementById('discovered');
+
+    try{
+        const r=await fetch(
+            '/admin/vitrine2/marketing/facebook/groups/api/discovered'
+        );
+
+        const data=await r.json();
+
+        if(!data.groups || !data.groups.length){
+            box.innerHTML='Nenhum grupo encontrado.';
+            return;
+        }
+
+        box.innerHTML=
+            '<b>'+data.count+' grupos encontrados</b><br><br>'+
+            data.groups.map(g => `
+                <div class="group">
+                    <b>${String(g.name || '')}</b><br>
+                    <span class="small">
+                        ${String(g.privacy || 'Unknown')}
+                        •
+                        ${String(g.membership_status || 'Unknown')}
+                    </span><br>
+
+                    <a
+                        href="${g.url}"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        Abrir grupo
+                    </a>
+                </div>
+            `).join('');
+
+    }catch(error){
+        box.innerHTML='Erro ao carregar grupos.';
+    }
+}
+
+carregarDescobertos();
+
+
+
+
+
+async function salvarAtividadeGrupo(groupId){
+    const hoje=document.getElementById('group-posts-today-'+groupId);
+    const mes=document.getElementById('group-posts-month-'+groupId);
+    const crescimento=document.getElementById('group-growth-week-'+groupId);
+    const status=document.getElementById('group-activity-status-'+groupId);
+
+    if(hoje.value==='' || mes.value==='' || crescimento.value===''){
+        status.textContent='Preencha os três campos.';
+        return;
+    }
+
+    status.textContent='Salvando...';
+
+    try{
+        const r=await fetch(
+            '/admin/vitrine2/marketing/facebook/groups/api/group-activity',
+            {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    groupId,
+                    groupPostsToday:Number(hoje.value),
+                    groupPostsLastMonth:Number(mes.value),
+                    membersGrowthWeek:Number(crescimento.value)
+                })
+            }
+        );
+
+        const data=await r.json();
+
+        if(!r.ok){
+            throw new Error(data.error || 'Erro ao salvar.');
+        }
+
+        status.textContent='Atividade do grupo salva.';
+    }catch(e){
+        status.textContent='Erro: '+e.message;
+    }
+}
+
+async function salvarAtividade(groupId){
+    const input =
+        document.getElementById(
+            'posts-' + groupId
+        );
+
+    const status =
+        document.getElementById(
+            'activity-status-' + groupId
+        );
+
+    const postsToday =
+        Number(input.value);
+
+    if(
+        !Number.isFinite(postsToday) ||
+        postsToday < 0
+    ){
+        alert('Informe a quantidade de posts de hoje.');
+        return;
+    }
+
+    status.textContent='Salvando...';
+
+    try{
+        const r=await fetch(
+            '/admin/vitrine2/marketing/facebook/groups/api/activity',
+            {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                    groupId,
+                    postsToday
+                })
+            }
+        );
+
+        const data=await r.json();
+
+        if(!r.ok){
+            throw new Error(
+                data.error ||
+                'Erro ao salvar atividade.'
+            );
+        }
+
+        status.textContent=
+            'Nós publicamos ' +
+            postsToday +
+            ' vez(es) hoje';
+
+    }catch(error){
+        status.textContent=
+            'Erro: ' + error.message;
+    }
+}
+
+
+function atualizarNumeracaoGrupos(){
+    const grupos=[
+        ...document.querySelectorAll('#results .group')
+    ];
+
+    let posicao=1;
+
+    grupos.forEach(g=>{
+        const numero=
+            g.querySelector('.group-position');
+
+        if(g.style.display==='none'){
+            return;
+        }
+
+        if(numero){
+            numero.textContent=posicao++;
+        }
+    });
+}
+
+function ordenarGrupos(tipo){
+    const box=document.getElementById('results');
+
+    const grupos=[
+        ...box.querySelectorAll('.group')
+    ];
+
+    grupos.sort((a,b)=>{
+        if(tipo==='activity'){
+            const mesA=
+                a.dataset.month==='' ? -1 : Number(a.dataset.month);
+
+            const mesB=
+                b.dataset.month==='' ? -1 : Number(b.dataset.month);
+
+            if(mesB!==mesA){
+                return mesB-mesA;
+            }
+
+            const hojeA=
+                a.dataset.today==='' ? -1 : Number(a.dataset.today);
+
+            const hojeB=
+                b.dataset.today==='' ? -1 : Number(b.dataset.today);
+
+            if(hojeB!==hojeA){
+                return hojeB-hojeA;
+            }
+        }
+
+        if(tipo==='score'){
+            return Number(b.dataset.score)-
+                   Number(a.dataset.score);
+        }
+
+        return Number(a.dataset.original)-
+               Number(b.dataset.original);
+    });
+
+    grupos.forEach(g=>box.appendChild(g));
+
+    atualizarNumeracaoGrupos();
+}
+
+function filtrarSemAtividade(ativo){
+    const grupos=[
+        ...document.querySelectorAll('#results .group')
+    ];
+
+    grupos.forEach(g=>{
+        const mes=g.dataset.month;
+        const hoje=g.dataset.today;
+
+        const medido=
+            mes!=='' || hoje!=='';
+
+        const semAtividade=
+            medido &&
+            Number(mes || 0)===0 &&
+            Number(hoje || 0)===0;
+
+        g.style.display=
+            ativo && semAtividade
+                ? 'none'
+                : '';
+    });
+
+    atualizarNumeracaoGrupos();
+}
+
+
+async function definirRadarGrupo(groupId, enabled){
+    const r=await fetch(
+        '/admin/vitrine2/marketing/facebook/groups/api/radar-enabled',
+        {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                groupId,
+                enabled
+            })
+        }
+    );
+
+    const data=await r.json();
+
+    if(!r.ok){
+        throw new Error(
+            data.error || 'Erro ao alterar grupo.'
+        );
+    }
+
+    return data;
+}
+
+async function desativarGrupo(groupId){
+    try{
+        await definirRadarGrupo(groupId,false);
+
+        await carregarSugestoes();
+
+        if(typeof carregarDesativados==='function'){
+            await carregarDesativados();
+        }
+    }catch(e){
+        alert('Erro ao desativar grupo: '+e.message);
+    }
+}
+
+async function reativarGrupo(groupId){
+    try{
+        await definirRadarGrupo(groupId,true);
+
+        await carregarSugestoes();
+
+        if(typeof carregarDesativados==='function'){
+            await carregarDesativados();
+        }
+    }catch(e){
+        alert('Erro ao reativar grupo: '+e.message);
+    }
+}
+
+async function carregarSugestoes(){
+    const itemId =
+        document.getElementById('itemId').value.trim();
+
+    if(!itemId){
+        alert('Informe o Item ID.');
+        return;
+    }
+
+    const box =
+        document.getElementById('results');
+
+    box.innerHTML='Carregando sugestões...';
+
+    try{
+        const r=await fetch(
+            '/admin/vitrine2/marketing/facebook/groups/api/suggestions?itemId=' +
+            encodeURIComponent(itemId)
+        );
+
+        const data=await r.json();
+
+        if(!r.ok){
+            throw new Error(
+                data.error || 'Erro ao carregar sugestões.'
+            );
+        }
+
+        if(!data.suggestions || !data.suggestions.length){
+            box.innerHTML=
+                '<p>Nenhum grupo disponível para este produto.</p>';
+            return;
+        }
+
+        box.innerHTML=
+            '<h2>Sugestões de grupos para postar</h2>'+
+            '<div class="small">'+
+            data.product.title+
+            '</div><br>'+
+            '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px">'+
+            '<select onchange="ordenarGrupos(this.value)" style="max-width:220px">'+
+            '<option value="score">Melhor nota</option>'+
+            '<option value="activity">Mais ativos primeiro</option>'+
+            '</select>'+
+            '<label class="small">'+
+            '<input type="checkbox" onchange="filtrarSemAtividade(this.checked)"> '+
+            'Ocultar grupos sem atividade'+
+            '</label>'+
+            '</div>'+
+            data.suggestions.map((g,i)=>`
+                <div
+                    class="group"
+                    data-original="${i}"
+                    data-score="${Number(g.totalScore || 0)}"
+                    data-month="${g.group_posts_last_month ?? ''}"
+                    data-today="${g.group_posts_today ?? ''}"
+                >
+
+                    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+                        <b>
+                            <span class="group-position">${i+1}</span>.
+                            <a
+                                href="${g.url}"
+                                target="_blank"
+                                rel="noopener"
+                                style="color:#0d6efd;text-decoration:none"
+                            >${g.name}</a>
+                        </b>
+
+                        <span class="small" style="white-space:nowrap">
+                            ${Number(g.members_count || 0).toLocaleString('pt-BR')}
+                            membros
+                            •
+                            <span class="score">${g.totalScore} pontos</span>
+                        </span>
+                    </div>
+
+                    <br>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px">
+                        <div style="font-weight:700">
+                            Atividade do grupo
+                        </div>
+
+                        <button
+                            type="button"
+                            onclick="desativarGrupo(${g.id})"
+                            style="width:auto;padding:6px 10px;font-size:12px"
+                        >
+                            Desativar
+                        </button>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;text-align:center">
+                        <div>
+                            <div class="small">Hoje</div>
+                            <b>
+                                ${g.group_posts_today != null
+                                    ? Number(g.group_posts_today).toLocaleString('pt-BR') + ' posts'
+                                    : '-'}
+                            </b>
+                        </div>
+
+                        <div>
+                            <div class="small">Último mês</div>
+                            <b>
+                                ${g.group_posts_last_month != null
+                                    ? Number(g.group_posts_last_month).toLocaleString('pt-BR') + ' posts'
+                                    : '-'}
+                            </b>
+                        </div>
+
+                        <div>
+                            <div class="small">Crescimento</div>
+                            <b>
+                                ${g.members_growth_week != null
+                                    ? (Number(g.members_growth_week) >= 0 ? '+' : '') +
+                                      Number(g.members_growth_week).toLocaleString('pt-BR') +
+                                      ' membros'
+                                    : '-'}
+                            </b>
+                        </div>
+                    </div>
+
+                    <details style="display:none;margin-top:8px">
+                        <summary class="small" style="cursor:pointer">
+                            Atualizar atividade do grupo
+                        </summary>
+
+                        <div style="display:grid;gap:6px;max-width:320px;margin-top:8px">
+                            <input
+                                id="group-posts-today-${g.id}"
+                                type="number"
+                                min="0"
+                                placeholder="Posts do grupo hoje"
+                                value="${g.group_posts_today ?? ''}"
+                            >
+
+                            <input
+                                id="group-posts-month-${g.id}"
+                                type="number"
+                                min="0"
+                                placeholder="Posts no último mês"
+                                value="${g.group_posts_last_month ?? ''}"
+                            >
+
+                            <input
+                                id="group-growth-week-${g.id}"
+                                type="number"
+                                placeholder="Crescimento semanal"
+                                value="${g.members_growth_week ?? ''}"
+                            >
+
+                            <button
+                                type="button"
+                                onclick="salvarAtividadeGrupo(${g.id})"
+                            >
+                                Salvar atividade do grupo
+                            </button>
+
+                            <div
+                                id="group-activity-status-${g.id}"
+                                class="small"
+                            ></div>
+                        </div>
+                    </details>
+
+                    <div style="display:none">
+                    <div style="margin-top:12px;font-weight:700">
+                        Nossa atividade
+                    </div>
+
+                    <div style="display:flex;gap:8px;align-items:center;max-width:300px">
+                        <input
+                            id="posts-${g.id}"
+                            type="number"
+                            min="0"
+                            inputmode="numeric"
+                            placeholder="Nossos posts hoje"
+                            value="${g.posts_today ?? ''}"
+                            style="margin:0"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="salvarAtividade(${g.id})"
+                            style="width:auto;padding:12px"
+                        >
+                            Salvar
+                        </button>
+                    </div>
+
+                    <div
+                        id="activity-status-${g.id}"
+                        class="small"
+                        style="margin-top:5px"
+                    >
+                        ${
+                            g.posts_today !== null &&
+                            g.posts_today !== undefined
+                                ? 'Atividade registrada: ' +
+                                  g.posts_today +
+                                  ' posts hoje'
+                                : 'Nenhuma publicação nossa registrada hoje'
+                        }
+                    </div>
+
+                    </div>
+
+                    <br>
+
+                    <span class="small">
+                        ${g.reasons.join(' • ')}
+                    </span>
+
+
+                </div>
+            `).join('');
+
+    }catch(error){
+        box.innerHTML=error.message;
+    }
+}
+
+async function prepararPesquisa(){
+    const itemId =
+        document.getElementById('itemId').value.trim();
+
+    if(!itemId){
+        alert('Informe o Item ID.');
+        return;
+    }
+
+    const box =
+        document.getElementById('keywords');
+
+    box.innerHTML='Preparando pesquisa...';
+
+    try{
+        const r=await fetch(
+            '/admin/vitrine2/marketing/facebook/groups/api/product-keywords?itemId=' +
+            encodeURIComponent(itemId)
+        );
+
+        const data=await r.json();
+
+        if(!r.ok){
+            throw new Error(
+                data.error || 'Erro ao preparar pesquisa.'
+            );
+        }
+
+        box.innerHTML =
+            '<b>'+data.product.title+'</b><br><br>'+
+            '<b>Palavras-chave:</b><br>'+
+            data.keywords
+                .map(k => '• '+k)
+                .join('<br>');
+
+    }catch(error){
+        box.innerHTML=error.message;
+    }
+}
+
+</script>
+
+</body>
+</html>
