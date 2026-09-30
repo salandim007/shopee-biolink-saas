@@ -288,3 +288,62 @@ Nunca assumir que duas fotos representam um limite da UI.
 Marcador pesquisável:
 
 SHOPEE_MEDIA_PIPELINE
+
+
+---
+
+## 11. TRANSIÇÃO CONFIRMADA — 17/09 → 23/09/2026
+
+Em 17/09/2026 o projeto possuía fluxo de captura de múltiplas
+mídias capaz de trabalhar com várias imagens e vídeo.
+
+Esse fluxo dependia da captura da página/sessão da Shopee.
+
+Em 23/09/2026 a arquitetura principal da Central foi alterada.
+
+O Chrome/Puppeteer deixou de ser a fonte principal da nova Central.
+
+A nova arquitetura passou a usar:
+
+Shopee Data Feed oficial
+→ FULL / DELTA
+→ catalog.sqlite
+→ product-media-service.js
+→ Central de Produtos
+
+Essa migração resolveu a dependência do navegador para o catálogo,
+mas NÃO substituiu a antiga fonte de galeria completa.
+
+O Data Feed atual fornece somente:
+
+- image_link
+- image_link_3
+
+A Affiliate Open API productOfferV2 fornece:
+
+- imageUrl
+
+Não existe atualmente uma fonte NÃO-Chrome já validada e integrada
+que forneça 5 a 15 imagens reais por produto.
+
+Portanto:
+
+- catálogo/sincronização oficial: CONCLUÍDO;
+- até 2 imagens pelo feed: CONCLUÍDO;
+- interface para múltiplas imagens: CONCLUÍDA;
+- product-media-library preparada: CONCLUÍDA;
+- nova fonte automática de múltiplas mídias sem Chrome: PENDENTE.
+
+REGRA:
+
+Não repetir investigação sobre por que aparecem somente 2 imagens.
+A causa já está confirmada.
+
+Não voltar ao Chrome/Puppeteer como arquitetura principal.
+
+O próximo trabalho de mídia deve começar diretamente pela criação
+ou integração da camada de enriquecimento de múltiplas mídias.
+
+Marcador:
+
+SHOPEE_MEDIA_ENRICHMENT_PENDING
