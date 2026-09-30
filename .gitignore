@@ -25,3 +25,15 @@ __pycache__/
 
 # Meta feed gerado e credenciais privadas
 data/meta/
+/data/shopee-feed-api/
+
+# Dados de runtime e assets antigos
+/data/ai/
+/data/facebook-radar/
+/public/banner-vitrine-desktop.png
+/public/banner-vitrine-desktop-v2.png
+/public/banner-vitrine-desktop-v3.png
+/public/banner-vitrine-mobile.png
+/public/banner-vitrine-mobile-v2.png
+/public/banner-vitrine-mobile-v3.png
+/public/mix-de-produtos-logo-128.png

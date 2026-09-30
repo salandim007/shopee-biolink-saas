@@ -20,6 +20,7 @@ services:
 
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL: qwen3.5:0.8b
+      AI_TIMEOUT_MS: 120000
 
     ports:
       - "127.0.0.1:3100:3000"
@@ -30,8 +31,11 @@ services:
       - ./data/opportunity-decisions.json:/app/data/opportunity-decisions.json
       - ./tmp:/app/tmp
       - ./data/shopee-feed:/app/data/shopee-feed:ro
+      - ./data/shopee-feed-api:/app/data/shopee-feed-api
+      - ./scripts:/app/scripts:ro
       - ./data/music:/app/data/music:ro
       - ./data/meta:/app/data/meta
+      - ./data/ai:/app/data/ai
 
     networks:
       - proxy
