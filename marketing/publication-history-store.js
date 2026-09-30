@@ -125,6 +125,35 @@ async function initialize() {
             item_id
         )
     `);
+
+    await run(`
+        CREATE TABLE IF NOT EXISTS marketing_publication_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            marketplace TEXT NOT NULL,
+            item_id TEXT NOT NULL,
+            channel TEXT NOT NULL,
+            format TEXT NOT NULL,
+
+            status TEXT NOT NULL,
+
+            media_id TEXT,
+            external_post_id TEXT,
+
+            published_at TEXT,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    await run(`
+        CREATE INDEX IF NOT EXISTS
+            idx_marketing_publication_events_product
+        ON marketing_publication_events (
+            marketplace,
+            item_id,
+            published_at
+        )
+    `);
 }
 
 
@@ -198,6 +227,124 @@ async function listProductPublications({
             String(itemId)
         ]
     );
+}
+
+
+async function getProductPublicationStats({
+    marketplace = 'shopee',
+    itemId
+}) {
+    await ready;
+
+    const normalizedItemId =
+        String(itemId || '').trim();
+
+    if (!normalizedItemId) {
+        throw new Error(
+            'itemId é obrigatório.'
+        );
+    }
+
+    const totalRow =
+        await get(
+            `
+                SELECT
+                    COUNT(*) AS total,
+                    MAX(published_at) AS lastPublishedAt
+                FROM marketing_publication_events
+                WHERE marketplace = ?
+                  AND item_id = ?
+                  AND status = 'PUBLISHED'
+            `,
+            [
+                marketplace,
+                normalizedItemId
+            ]
+        );
+
+    const channelRows =
+        await all(
+            `
+                SELECT
+                    channel,
+                    COUNT(*) AS total,
+                    MAX(published_at) AS lastPublishedAt
+                FROM marketing_publication_events
+                WHERE marketplace = ?
+                  AND item_id = ?
+                  AND status = 'PUBLISHED'
+                GROUP BY channel
+                ORDER BY total DESC
+            `,
+            [
+                marketplace,
+                normalizedItemId
+            ]
+        );
+
+    const formatRows =
+        await all(
+            `
+                SELECT
+                    channel,
+                    format,
+                    COUNT(*) AS total,
+                    MAX(published_at) AS lastPublishedAt
+                FROM marketing_publication_events
+                WHERE marketplace = ?
+                  AND item_id = ?
+                  AND status = 'PUBLISHED'
+                GROUP BY channel, format
+                ORDER BY channel, total DESC
+            `,
+            [
+                marketplace,
+                normalizedItemId
+            ]
+        );
+
+    const byChannel = {};
+
+    for (const row of channelRows) {
+        byChannel[row.channel] = {
+            total:
+                Number(row.total || 0),
+
+            lastPublishedAt:
+                row.lastPublishedAt || null
+        };
+    }
+
+    return {
+        total:
+            Number(
+                totalRow?.total || 0
+            ),
+
+        lastPublishedAt:
+            totalRow?.lastPublishedAt || null,
+
+        byChannel,
+
+        formats:
+            formatRows.map(
+                row => ({
+                    channel:
+                        row.channel,
+
+                    format:
+                        row.format,
+
+                    total:
+                        Number(
+                            row.total || 0
+                        ),
+
+                    lastPublishedAt:
+                        row.lastPublishedAt || null
+                })
+            )
+    };
 }
 
 
@@ -279,30 +426,60 @@ async function markPublished({
 }) {
     await ready;
 
-    await run(
-        `
-            UPDATE marketing_publications
-            SET
-                status = 'PUBLISHED',
-                media_id = ?,
-                published_at = CURRENT_TIMESTAMP,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE marketplace = ?
-              AND item_id = ?
-              AND channel = ?
-              AND format = ?
-        `,
-        [
-            mediaId
-                ? String(mediaId)
-                : null,
+    const updateResult =
+        await run(
+            `
+                UPDATE marketing_publications
+                SET
+                    status = 'PUBLISHED',
+                    media_id = ?,
+                    published_at = CURRENT_TIMESTAMP,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE marketplace = ?
+                  AND item_id = ?
+                  AND channel = ?
+                  AND format = ?
+            `,
+            [
+                mediaId
+                    ? String(mediaId)
+                    : null,
 
-            marketplace,
-            String(itemId),
-            channel,
-            format
-        ]
-    );
+                marketplace,
+                String(itemId),
+                channel,
+                format
+            ]
+        );
+
+    if (updateResult.changes > 0) {
+        await run(
+            `
+                INSERT INTO marketing_publication_events (
+                    marketplace,
+                    item_id,
+                    channel,
+                    format,
+                    status,
+                    media_id,
+                    published_at
+                )
+                VALUES (
+                    ?, ?, ?, ?, 'PUBLISHED', ?,
+                    CURRENT_TIMESTAMP
+                )
+            `,
+            [
+                marketplace,
+                String(itemId),
+                channel,
+                format,
+                mediaId
+                    ? String(mediaId)
+                    : null
+            ]
+        );
+    }
 
     return getPublication({
         marketplace,
@@ -401,6 +578,7 @@ module.exports = {
     getPublication,
     getPublicationByMediaId,
     listProductPublications,
+    getProductPublicationStats,
     beginPublication,
     markPublished,
     markFailed

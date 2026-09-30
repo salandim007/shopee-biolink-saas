@@ -1,0 +1,3250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Central de Produtos e Mídias</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f4f6f8;
+  color:#17202a;
+}
+main{
+  max-width:1400px;
+  margin:auto;
+  padding:20px;
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:center;
+}
+h1{margin-bottom:5px}
+small{color:#687582}
+.toolbar{
+  background:white;
+  padding:14px;
+  border-radius:14px;
+  margin:20px 0;
+}
+.tabs{
+  display:flex;
+  gap:10px;
+  margin-bottom:12px;
+}
+button{
+  padding:10px 14px;
+  border:0;
+  border-radius:9px;
+  cursor:pointer;
+}
+.active{
+  background:#fff0ec;
+  color:#ee4d2d;
+  font-weight:bold;
+}
+.search{
+  display:flex;
+  gap:8px;
+}
+.search input{
+  flex:1;
+  padding:11px;
+  border:1px solid #ddd;
+  border-radius:9px;
+}
+#grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+@media(max-width:800px){
+  #grid{grid-template-columns:repeat(2,1fr)}
+}
+
+.report-header{
+  background:#ffffff;
+  border:1px solid #edf1f4;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:18px;
+}
+.report-kicker{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:#7b8794;
+  margin-bottom:8px;
+}
+.report-title{
+  margin:0;
+  font-size:18px;
+  line-height:1.35;
+  color:#18212b;
+}
+.report-sub{
+  margin-top:6px;
+  color:#6b7785;
+  font-size:13px;
+}
+.report-price{
+  margin-top:14px;
+  color:#ee4d2d;
+  font-size:28px;
+  font-weight:700;
+}
+.report-section{
+  margin-top:18px;
+}
+.report-section-title{
+  margin:0 0 10px;
+  font-size:13px;
+  color:#6b7785;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.report-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.info-card{
+  background:#fff;
+  border:1px solid #edf1f4;
+  border-radius:14px;
+  padding:12px 13px;
+}
+.info-label{
+  display:block;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:#7b8794;
+  margin-bottom:6px;
+}
+.info-value{
+  display:block;
+  font-size:15px;
+  font-weight:600;
+  color:#18212b;
+}
+.info-value.soft{
+  font-weight:500;
+}
+@media(max-width:700px){
+  .report-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+</style>
+
+<style>
+#produtoPainel{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  display:none;
+  justify-content:flex-end;
+  z-index:1000;
+}
+#produtoPainel.aberto{display:flex}
+.painel-box{
+  width:min(600px,100%);
+  height:100%;
+  background:white;
+  overflow:auto;
+  box-shadow:-15px 0 40px rgba(0,0,0,.18);
+}
+.painel-topo{
+  position:sticky;
+  top:0;
+  background:white;
+  padding:16px;
+  border-bottom:1px solid #eee;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.painel-conteudo{padding:18px}
+#fecharPainel{
+  font-size:22px;
+  background:#f1f3f5;
+}
+</style>
+
+
+<style id="ai-central-style">
+:root{
+  --central-blue:#2563eb;
+  --central-blue-soft:#eff6ff;
+  --central-green:#16a34a;
+  --central-green-soft:#f0fdf4;
+  --central-border:#e7edf3;
+  --central-muted:#6b7785;
+}
+
+.tabs button{
+  background:#f6f8fa;
+  color:#66727f;
+  transition:.18s ease;
+}
+
+.tabs button.active{
+  background:var(--central-blue-soft);
+  color:var(--central-blue);
+  font-weight:700;
+}
+
+.search button{
+  background:var(--central-blue);
+  color:#fff;
+  font-weight:600;
+}
+
+.ai-view{
+  display:none;
+}
+
+.ai-view.ativo{
+  display:block;
+}
+
+.ai-summary{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin:0 0 18px;
+}
+
+.ai-summary-card{
+  background:#fff;
+  border:1px solid var(--central-border);
+  border-radius:15px;
+  padding:16px;
+  box-shadow:0 4px 12px rgba(23,32,42,.04);
+}
+
+.ai-summary-card.blue{
+  border-top:3px solid var(--central-blue);
+}
+
+.ai-summary-card.green{
+  border-top:3px solid var(--central-green);
+}
+
+.ai-summary-label{
+  display:block;
+  color:var(--central-muted);
+  font-size:12px;
+  margin-bottom:7px;
+}
+
+.ai-summary-value{
+  display:block;
+  font-size:25px;
+  font-weight:700;
+  color:#17202a;
+}
+
+.ai-section{
+  background:#fff;
+  border:1px solid var(--central-border);
+  border-radius:16px;
+  padding:16px;
+  margin-top:14px;
+}
+
+.ai-section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.ai-section-title{
+  margin:0;
+  font-size:17px;
+  color:#18212b;
+}
+
+.ai-section-sub{
+  margin-top:4px;
+  color:var(--central-muted);
+  font-size:12px;
+}
+
+.ai-products{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.ai-card{
+  border:1px solid var(--central-border);
+  border-radius:14px;
+  padding:14px;
+  background:#fff;
+  box-shadow:0 3px 10px rgba(23,32,42,.035);
+}
+
+.ai-card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.ai-item{
+  font-size:11px;
+  color:#7b8794;
+}
+
+.ai-decision{
+  display:inline-flex;
+  align-items:center;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+}
+
+.ai-decision.promote{
+  color:#15803d;
+  background:var(--central-green-soft);
+}
+
+.ai-decision.review{
+  color:#1d4ed8;
+  background:var(--central-blue-soft);
+}
+
+.ai-reason{
+  margin:12px 0;
+  min-height:38px;
+  color:#354250;
+  font-size:13px;
+  line-height:1.45;
+}
+
+.ai-meta{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+  margin-top:10px;
+}
+
+.ai-meta-box{
+  background:#f7f9fb;
+  border-radius:9px;
+  padding:8px;
+}
+
+.ai-meta-label{
+  display:block;
+  color:#85909b;
+  font-size:10px;
+  margin-bottom:4px;
+}
+
+.ai-meta-value{
+  display:block;
+  color:#26313d;
+  font-size:12px;
+  font-weight:600;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.ai-actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+.ai-btn-primary{
+  flex:1;
+  background:var(--central-green);
+  color:#fff;
+  font-weight:700;
+}
+
+.ai-btn-secondary{
+  background:var(--central-blue-soft);
+  color:var(--central-blue);
+  font-weight:600;
+}
+
+.ai-empty{
+  padding:28px 12px;
+  text-align:center;
+  color:#7b8794;
+  font-size:13px;
+}
+
+@media(max-width:900px){
+  .ai-summary{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .ai-products{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:600px){
+  .ai-products{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+
+
+<style id="ai-card-alignment">
+.ai-products{
+  align-items:stretch;
+}
+
+.ai-card{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  box-sizing:border-box;
+}
+
+.ai-channel-area{
+  margin-top:auto;
+  padding-top:14px !important;
+}
+</style>
+
+
+<style id="ai-channel-menu-style">
+
+.ai-channel-menu{
+  border:1px solid #dce5ec;
+  border-radius:10px;
+  background:#f8fafc;
+  overflow:hidden;
+}
+
+.ai-channel-menu summary{
+  list-style:none;
+  cursor:pointer;
+  padding:10px 12px;
+  font-size:12px;
+  font-weight:700;
+  color:#2563eb;
+  user-select:none;
+}
+
+.ai-channel-menu summary::-webkit-details-marker{
+  display:none;
+}
+
+.ai-channel-menu summary::after{
+  content:"▾";
+  float:right;
+  color:#6b7785;
+}
+
+.ai-channel-menu[open] summary::after{
+  content:"▴";
+}
+
+.ai-channel-options{
+  border-top:1px solid #e6edf3;
+  background:#fff;
+  padding:8px;
+}
+
+.ai-channel-option{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 8px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:12px;
+  color:#354250;
+}
+
+.ai-channel-option:hover{
+  background:#f4f7fa;
+}
+
+.ai-channel-option input{
+  accent-color:#16a34a;
+}
+
+.ai-channel-option strong{
+  color:#15803d;
+  font-size:11px;
+}
+
+</style>
+
+</head>
+
+<body>
+<main>
+
+<header>
+  <div>
+    <h1>Central de Produtos e Mídias</h1>
+    <small>Catálogo e inteligência comercial</small>
+  </div>
+
+  <strong id="total">Carregando...</strong>
+</header>
+
+<section class="toolbar">
+
+  <div class="tabs">
+    <button id="tabTodos" class="active">
+      Todos os Produtos
+    </button>
+
+    <button id="tabIa">
+      Avaliados pela IA
+    </button>
+  </div>
+
+  <form id="formBusca" class="search">
+    <input
+      id="busca"
+      placeholder="Buscar produto, item ou loja..."
+    >
+    <button>Buscar</button>
+  </form>
+
+</section>
+
+<div id="status">
+  Carregando produtos...
+</div>
+
+
+<div id="grid"></div>
+
+<section id="iaView" class="ai-view">
+
+  <div class="ai-summary">
+
+    <div class="ai-summary-card blue">
+      <span class="ai-summary-label">Analisados pela IA</span>
+      <strong id="iaTotal" class="ai-summary-value">—</strong>
+    </div>
+
+    <div class="ai-summary-card green">
+      <span class="ai-summary-label">Alta oportunidade</span>
+      <strong id="iaPromover" class="ai-summary-value">—</strong>
+    </div>
+
+    <div class="ai-summary-card blue">
+      <span class="ai-summary-label">Em revisão</span>
+      <strong id="iaRevisao" class="ai-summary-value">—</strong>
+    </div>
+
+    <div class="ai-summary-card green">
+      <span class="ai-summary-label">Conteúdos prontos</span>
+      <strong id="iaConteudos" class="ai-summary-value">—</strong>
+    </div>
+
+  </div>
+
+  <section class="ai-section">
+
+    <div class="ai-section-head">
+      <div>
+        <h2 class="ai-section-title">
+          Produtos avaliados
+        </h2>
+
+        <div class="ai-section-sub">
+          Decisões comerciais preparadas pela inteligência do sistema
+        </div>
+      </div>
+    </div>
+
+    <div id="iaProdutos" class="ai-products">
+      <div class="ai-empty">
+        Carregando avaliações...
+      </div>
+    </div>
+
+  </section>
+
+  <section class="ai-section">
+
+    <div class="ai-section-head">
+      <div>
+        <h2 class="ai-section-title">
+          Conteúdos aguardando aprovação
+        </h2>
+
+        <div class="ai-section-sub">
+          Materiais preparados pela IA antes de qualquer publicação
+        </div>
+      </div>
+    </div>
+
+    <div id="iaFila" class="ai-products">
+      <div class="ai-empty">
+        Nenhum conteúdo preparado ainda.
+      </div>
+    </div>
+
+  </section>
+
+</section>
+
+
+<style>
+.card{
+  background:white;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(0,0,0,.06);
+  cursor:pointer;
+}
+.card img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  background:#eee;
+}
+.card-body{
+  padding:12px;
+}
+.card-title{
+  font-size:14px;
+  font-weight:bold;
+  line-height:1.4;
+  height:40px;
+  overflow:hidden;
+}
+.price{
+  color:#ee4d2d;
+  font-size:19px;
+  font-weight:bold;
+  margin-top:10px;
+}
+.old{
+  color:#999;
+  text-decoration:line-through;
+  font-size:12px;
+}
+.meta{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:8px;
+  color:#687582;
+  font-size:12px;
+}
+.badge{
+  position:absolute;
+  top:8px;
+  left:8px;
+  background:#ee4d2d;
+  color:white;
+  padding:5px 7px;
+  border-radius:7px;
+  font-size:12px;
+  font-weight:bold;
+}
+.imgbox{
+  position:relative;
+}
+</style>
+
+<script>
+const grid = document.getElementById('grid');
+const statusEl = document.getElementById('status');
+const totalEl = document.getElementById('total');
+
+let offset = 0;
+let buscaAtual = '';
+let totalProdutos = 0;
+
+function moeda(v){
+  if(v === null || v === undefined) return '—';
+
+  return Number(v).toLocaleString(
+    'pt-BR',
+    {
+      style:'currency',
+      currency:'BRL'
+    }
+  );
+}
+
+function esc(v){
+  return String(v ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;');
+}
+
+function criarCard(p){
+  const desconto =
+    Number(p.offer?.discountPercentage || 0);
+
+  const preco =
+    p.offer?.currentPrice;
+
+  const antigo =
+    p.offer?.price;
+
+  return `
+    <article
+      class="card"
+      data-item="${esc(p.itemId)}"
+      data-shop="${esc(p.shopId)}"
+    >
+      <div class="imgbox">
+        <img src="${esc(p.image || '')}" alt="">
+
+        ${
+          desconto > 0
+            ? `<span class="badge">-${desconto}%</span>`
+            : ''
+        }
+      </div>
+
+      <div class="card-body">
+        <div class="card-title">
+          ${esc(p.title)}
+        </div>
+
+        <div class="price">
+          ${moeda(preco)}
+        </div>
+
+        ${
+          Number(antigo) > Number(preco)
+            ? `<div class="old">${moeda(antigo)}</div>`
+            : ''
+        }
+
+        <div class="meta">
+          <span>⭐ ${p.ratings?.product ?? '—'}</span>
+          <span>Loja ⭐ ${p.ratings?.shop ?? '—'}</span>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+async function carregarProdutos(){
+  statusEl.textContent = 'Carregando produtos...';
+  grid.innerHTML = '';
+
+  const params =
+    new URLSearchParams({
+      limit:24,
+      offset
+    });
+
+  if(buscaAtual){
+    params.set('search', buscaAtual);
+  }
+
+  try{
+    const r =
+      await fetch(
+        '/api/products-media?' +
+        params.toString()
+      );
+
+    const data =
+      await r.json();
+
+    if(!r.ok || !data.success){
+      throw new Error(
+        data.error ||
+        'Erro ao carregar produtos'
+      );
+    }
+
+    totalProdutos = Number(data.total || 0);
+
+    totalEl.textContent =
+      totalProdutos
+        .toLocaleString('pt-BR') +
+      ' produtos';
+
+    const paginaAtual =
+      Math.floor(offset / 24) + 1;
+
+    const totalPaginas =
+      Math.max(
+        1,
+        Math.ceil(totalProdutos / 24)
+      );
+
+    const info =
+      document.getElementById('paginaInfo');
+
+    if(info){
+      info.textContent =
+        `Página ${paginaAtual} de ${totalPaginas.toLocaleString('pt-BR')}`;
+    }
+
+    const anterior =
+      document.getElementById('anterior');
+
+    const proxima =
+      document.getElementById('proxima');
+
+    if(anterior){
+      anterior.disabled = offset === 0;
+    }
+
+    if(proxima){
+      proxima.disabled =
+        offset + 24 >= totalProdutos;
+    }
+
+    statusEl.textContent = '';
+
+    if(!data.products.length){
+      statusEl.textContent =
+        'Nenhum produto encontrado.';
+      return;
+    }
+
+    grid.innerHTML =
+      data.products
+        .map(criarCard)
+        .join('');
+
+  }catch(err){
+    statusEl.textContent =
+      err.message;
+  }
+}
+
+document
+  .getElementById('formBusca')
+  .addEventListener(
+    'submit',
+    e => {
+      e.preventDefault();
+
+      buscaAtual =
+        document
+          .getElementById('busca')
+          .value
+          .trim();
+
+      offset = 0;
+
+      
+carregarProdutos();
+    }
+  );
+
+
+function mostrarDetalhes(p){
+  const c = p.commercial || {};
+  const m = p.market?.exact || {};
+  const pub = p.publications || {};
+
+  document.getElementById('painelConteudo').innerHTML = `
+    <div class="report-header">
+      <div class="report-kicker">Produto</div>
+
+      <h2 class="report-title">
+        ${esc(p.title)}
+      </h2>
+
+      <div class="report-sub">
+        ${esc(p.shop?.name || 'Loja não informada')}
+      </div>
+
+      <div class="report-price">
+        ${moeda(p.offer?.currentPrice)}
+      </div>
+    </div>
+
+    <section class="report-section">
+      <h3 class="report-section-title">
+        Resumo comercial
+      </h3>
+
+      <div class="report-grid">
+        <div class="info-card">
+          <span class="info-label">Vendas</span>
+          <span class="info-value">${c.sales ?? '—'}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-label">Comissão</span>
+          <span class="info-value">${c.commissionPercent ?? '—'}%</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-label">Ganho estimado</span>
+          <span class="info-value">${moeda(c.estimatedCommission)}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-label">Avaliação do produto</span>
+          <span class="info-value">${c.rating ?? p.ratings?.product ?? '—'}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="report-section">
+      <h3 class="report-section-title">
+        Loja e mercado
+      </h3>
+
+      <div class="report-grid">
+        <div class="info-card">
+          <span class="info-label">Loja</span>
+          <span class="info-value soft">${esc(p.shop?.name || '—')}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-label">Avaliação da loja</span>
+          <span class="info-value">${p.shop?.rating ?? '—'}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-label">Ofertas exatas</span>
+          <span class="info-value">${m.offerCount ?? '—'}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-label">Lojas exatas</span>
+          <span class="info-value">${m.storeCount ?? '—'}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="report-section">
+      <h3 class="report-section-title">
+        Mídias e histórico
+      </h3>
+
+      <div class="report-grid">
+        <div class="info-card">
+          <span class="info-label">Fotos</span>
+          <span class="info-value">${p.media?.imageCount ?? 0}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-label">Vídeos</span>
+          <span class="info-value">${p.media?.videoCount ?? 0}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-label">Publicações</span>
+          <span class="info-value">${pub.total ?? 0}</span>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+async function abrirProduto(itemId, shopId){
+  const painel = document.getElementById('produtoPainel');
+  const conteudo = document.getElementById('painelConteudo');
+
+  painel.classList.add('aberto');
+  conteudo.innerHTML = 'Carregando dados completos...';
+
+  try{
+    const q = new URLSearchParams();
+
+    if(shopId){
+      q.set('shopId', shopId);
+    }
+
+    const r = await fetch(
+      `/api/products-media/${encodeURIComponent(itemId)}?${q}`
+    );
+
+    const data = await r.json();
+
+    if(!r.ok || !data.success){
+      throw new Error(
+        data.error || 'Erro ao carregar produto'
+      );
+    }
+
+    mostrarDetalhes(data.product);
+
+  }catch(err){
+    conteudo.textContent = err.message;
+  }
+}
+
+
+async function abrirTapToPost(itemId, shopId){
+  const painel =
+    document.getElementById('produtoPainel');
+
+  const conteudo =
+    document.getElementById('painelConteudo');
+
+  const topo =
+    document.querySelector(
+      '#produtoPainel .painel-topo strong'
+    );
+
+  painel.classList.add('aberto');
+
+  if(topo){
+    topo.textContent = 'Pronto para postar';
+  }
+
+  conteudo.innerHTML =
+    'Carregando conteúdo preparado...';
+
+  try{
+    const q =
+      new URLSearchParams();
+
+    if(shopId){
+      q.set('shopId', shopId);
+    }
+
+    const [produtoResp, filaResp] =
+      await Promise.all([
+        fetch(
+          `/api/products-media/${
+            encodeURIComponent(itemId)
+          }?${q}`
+        ),
+
+        fetch(
+          `/api/ai/content-queue?itemId=${
+            encodeURIComponent(itemId)
+          }&channel=facebook`
+        )
+      ]);
+
+    const produtoData =
+      await produtoResp.json();
+
+    const filaData =
+      await filaResp.json();
+
+    if(
+      !produtoResp.ok ||
+      !produtoData.success
+    ){
+      throw new Error(
+        produtoData.error ||
+        'Erro ao carregar produto.'
+      );
+    }
+
+    if(
+      !filaResp.ok ||
+      !filaData.success
+    ){
+      throw new Error(
+        filaData.error ||
+        'Erro ao carregar conteúdo.'
+      );
+    }
+
+    const produto =
+      produtoData.product || {};
+
+    const items =
+      Array.isArray(filaData.items)
+        ? filaData.items
+        : [];
+
+    const pronto =
+      items
+        .slice()
+        .reverse()
+        .find(
+          item =>
+            item.status ===
+              'APPROVED'
+        ) ||
+      null;
+
+    if(!pronto){
+      throw new Error(
+        'Aprove o conteúdo antes de continuar para o Facebook.'
+      );
+    }
+
+    const final =
+      pronto?.content?.content ||
+      pronto?.content ||
+      {};
+
+    const linkShopee =
+      produto.links?.short ||
+      produto.links?.product ||
+      '';
+
+    const tituloProduto =
+      produto.title ||
+      final.headline ||
+      'Produto';
+
+    const tituloCurto =
+      tituloProduto
+        .split(/\s+/)
+        .slice(0, 5)
+        .join(' ');
+
+    const textoPreparado =
+      String(
+        final.body ||
+        tituloProduto ||
+        ''
+      ).trim();
+
+    const hashtags =
+      Array.isArray(final.hashtags)
+        ? final.hashtags
+            .filter(Boolean)
+            .slice(0, 5)
+            .join(' ')
+        : '';
+
+    const partesLegenda = [
+      textoPreparado,
+      '',
+      '🛒 Quer comprar ou ver mais detalhes?',
+        'Acesse o produto na Shopee pelo link abaixo 👇',
+      linkShopee
+    ];
+
+    if(hashtags){
+      partesLegenda.push(
+        '',
+        hashtags
+      );
+    }
+
+    const legenda =
+      partesLegenda.join('\n');
+
+    window.tapFacebookShare = {
+      itemId,
+      queueItemId:
+        pronto.id,
+      linkShopee,
+      legenda
+    };
+
+    const imagens =
+      [
+        ...(Array.isArray(produto.media?.images)
+          ? produto.media.images
+          : []),
+
+        ...(Array.isArray(produto.images)
+          ? produto.images
+          : []),
+
+        produto.image,
+        produto.media?.image
+      ]
+      .filter(Boolean)
+      .filter(
+        (url, index, array) =>
+          array.indexOf(url) === index
+      );
+
+    const imagem =
+      imagens[0] || '';
+
+    window.tapToPostState = {
+      itemId,
+      coverUrl: imagem,
+      images: imagens
+    };
+
+    conteudo.innerHTML = `
+
+      <div class="report-header"
+        style="border-top:4px solid #16a34a">
+
+        <div class="report-kicker">
+          Facebook · conteúdo pronto
+        </div>
+
+        <h2 class="report-title">
+          ${esc(
+            produto.title ||
+            final.headline ||
+            'Produto'
+          )}
+        </h2>
+
+        <div class="report-sub">
+          Toque, copie e publique
+        </div>
+
+      </div>
+
+
+      ${
+        imagem
+          ? `
+            <div style="
+              margin:14px 0;
+            ">
+
+              <div
+                id="tapCoverPreview"
+                style="
+                  text-align:center;
+                  margin-bottom:12px;
+                "
+              >
+                <img
+                  id="tapCoverImage"
+                  src="${esc(imagem)}"
+                  alt=""
+                  style="
+                    width:100%;
+                    max-height:280px;
+                    object-fit:contain;
+                    border-radius:14px;
+                    background:#f6f7f9;
+                  "
+                >
+              </div>
+
+              <div style="
+                font-size:13px;
+                font-weight:700;
+                margin-bottom:8px;
+              ">
+                Escolha a foto de capa
+              </div>
+
+              <div
+                id="tapCoverGallery"
+                style="
+                  display:grid;
+                  grid-template-columns:
+                    repeat(4, minmax(0,1fr));
+                  gap:8px;
+                "
+              >
+                ${imagens.map((url, index) => `
+                  <button
+                    type="button"
+                    class="tap-cover-option"
+                    data-cover-index="${index}"
+                    style="
+                      position:relative;
+                      border:${
+                        index === 0
+                          ? '3px solid #16a34a'
+                          : '2px solid #e5e7eb'
+                      };
+                      border-radius:10px;
+                      padding:3px;
+                      background:#fff;
+                      overflow:hidden;
+                    "
+                  >
+                    <img
+                      src="${esc(url)}"
+                      alt=""
+                      style="
+                        width:100%;
+                        aspect-ratio:1/1;
+                        object-fit:cover;
+                        border-radius:7px;
+                        display:block;
+                      "
+                    >
+
+                    <span
+                      class="tap-cover-label"
+                      style="
+                        position:absolute;
+                        left:4px;
+                        right:4px;
+                        bottom:4px;
+                        padding:3px 4px;
+                        border-radius:6px;
+                        background:${
+                          index === 0
+                            ? '#16a34a'
+                            : 'rgba(0,0,0,.65)'
+                        };
+                        color:#fff;
+                        font-size:10px;
+                        font-weight:700;
+                      "
+                    >
+                      ${
+                        index === 0
+                          ? 'CAPA ✓'
+                          : 'Escolher'
+                      }
+                    </span>
+                  </button>
+                `).join('')}
+              </div>
+
+            </div>
+          `
+          : ''
+      }
+
+
+      <section class="report-section">
+
+        <div style="
+          display:flex;
+          gap:8px;
+          margin-bottom:14px;
+        ">
+
+          <button
+            type="button"
+            style="
+              flex:1;
+              padding:11px;
+              border:0;
+              border-radius:10px;
+              background:#2563eb;
+              color:white;
+              font-weight:700;
+            "
+          >
+            Foto
+          </button>
+
+          <button
+            type="button"
+            disabled
+            style="
+              flex:1;
+              padding:11px;
+              border:1px solid #ddd;
+              border-radius:10px;
+              background:#f5f5f5;
+            "
+          >
+            Reel
+          </button>
+
+          <button
+            type="button"
+            disabled
+            style="
+              flex:1;
+              padding:11px;
+              border:1px solid #ddd;
+              border-radius:10px;
+              background:#f5f5f5;
+            "
+          >
+            Vídeo
+          </button>
+
+        </div>
+
+
+        <div class="info-card">
+
+          <span class="info-label">
+            Legenda pronta
+          </span>
+
+          <div
+            id="tapLegenda"
+            style="
+              white-space:pre-wrap;
+              margin-top:8px;
+              line-height:1.55;
+            "
+          >${esc(legenda)}</div>
+
+        </div>
+
+
+        <button
+          type="button"
+          id="copiarTapLegenda"
+          style="
+            width:100%;
+            margin-top:12px;
+            padding:13px;
+            border:1px solid #16a34a;
+            border-radius:12px;
+            background:#fff;
+            color:#15803d;
+            font-size:15px;
+            font-weight:700;
+          "
+        >
+          Copiar legenda
+        </button>
+
+        <button
+          type="button"
+          id="abrirFacebookTap"
+          style="
+            width:100%;
+            margin-top:10px;
+            padding:14px;
+            border:0;
+            border-radius:12px;
+            background:#1877f2;
+            color:#fff;
+            font-size:16px;
+            font-weight:800;
+          "
+        >
+          Publicar na Página do Facebook
+        </button>
+
+      </section>
+    `;
+
+  }catch(err){
+    conteudo.textContent =
+      err.message;
+  }
+}
+
+
+document.addEventListener('click', e => {
+  const card = e.target.closest('.card');
+
+  if(card){
+    const mobile =
+      window.matchMedia(
+        '(max-width: 700px)'
+      ).matches;
+
+    if(mobile){
+      abrirTapToPost(
+        card.dataset.item,
+        card.dataset.shop
+      );
+    }else{
+      abrirProduto(
+        card.dataset.item,
+        card.dataset.shop
+      );
+    }
+  }
+
+  if(
+    e.target.id === 'fecharPainel' ||
+    e.target.id === 'produtoPainel'
+  ){
+    document
+      .getElementById('produtoPainel')
+      .classList.remove('aberto');
+  }
+});
+
+
+
+
+document.addEventListener('click', e => {
+  const option =
+    e.target.closest('.tap-cover-option');
+
+  if(!option){
+    return;
+  }
+
+  const index =
+    Number(option.dataset.coverIndex);
+
+  const state =
+    window.tapToPostState;
+
+  if(
+    !state ||
+    !Array.isArray(state.images) ||
+    !state.images[index]
+  ){
+    return;
+  }
+
+  state.coverUrl =
+    state.images[index];
+
+  const preview =
+    document.getElementById(
+      'tapCoverImage'
+    );
+
+  if(preview){
+    preview.src =
+      state.coverUrl;
+  }
+
+  document
+    .querySelectorAll(
+      '.tap-cover-option'
+    )
+    .forEach((button, i) => {
+      const selected =
+        i === index;
+
+      button.style.border =
+        selected
+          ? '3px solid #16a34a'
+          : '2px solid #e5e7eb';
+
+      const label =
+        button.querySelector(
+          '.tap-cover-label'
+        );
+
+      if(label){
+        label.textContent =
+          selected
+            ? 'CAPA ✓'
+            : 'Escolher';
+
+        label.style.background =
+          selected
+            ? '#16a34a'
+            : 'rgba(0,0,0,.65)';
+      }
+    });
+});
+
+
+
+document.addEventListener('click', async e => {
+  if(e.target.id !== 'abrirFacebookTap'){
+    return;
+  }
+
+  const button = e.target;
+
+  const share =
+    window.tapFacebookShare;
+
+  const media =
+    window.tapToPostState;
+
+  if(
+    !share ||
+    !share.itemId ||
+    !share.legenda
+  ){
+    alert(
+      'Dados da publicação não encontrados.'
+    );
+    return;
+  }
+
+  if(
+    !media ||
+    !media.coverUrl
+  ){
+    alert(
+      'Escolha uma foto de capa.'
+    );
+    return;
+  }
+
+  const originalText =
+    button.textContent;
+
+  button.disabled = true;
+  button.textContent =
+    'Publicando...';
+
+  try{
+    const response =
+      await fetch(
+        '/admin/vitrine2/marketing/meta/publish',
+        {
+          method:'POST',
+
+          headers:{
+            'Content-Type':
+              'application/json'
+          },
+
+          body:JSON.stringify({
+            marketplace:
+              'shopee',
+
+            itemId:
+              String(share.itemId),
+
+            channels:[
+              'facebook'
+            ],
+
+            format:
+              'photo',
+
+            imageUrl:
+              media.coverUrl,
+
+            caption:
+              share.legenda
+          })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if(
+      !response.ok ||
+      !data.success
+    ){
+      throw new Error(
+        data?.channels?.facebook?.error?.message ||
+        data?.error?.message ||
+        'Não foi possível publicar no Facebook.'
+      );
+    }
+
+    let statusLocalOk =
+      true;
+
+    if(share.queueItemId){
+      try{
+        const statusResponse =
+          await fetch(
+            `/api/ai/content/${
+              encodeURIComponent(
+                share.queueItemId
+              )
+            }/published`,
+            {
+              method:'POST',
+
+              headers:{
+                'Content-Type':
+                  'application/json'
+              },
+
+              body:JSON.stringify({
+                channel:
+                  'facebook'
+              })
+            }
+          );
+
+        const statusData =
+          await statusResponse.json();
+
+        if(
+          !statusResponse.ok ||
+          !statusData.success
+        ){
+          throw new Error(
+            statusData.error ||
+            'Falha ao registrar publicação.'
+          );
+        }
+
+        await carregarIa();
+
+      }catch(statusError){
+        statusLocalOk =
+          false;
+
+        console.error(
+          '[ai-published-status]',
+          statusError
+        );
+      }
+    }
+
+    button.textContent =
+      statusLocalOk
+        ? 'Publicado no Facebook ✓'
+        : 'Publicado ✓ · status pendente';
+
+    alert(
+      statusLocalOk
+        ? 'Publicação enviada para a Página do Facebook.'
+        : 'A publicação foi enviada ao Facebook, mas o status local não pôde ser atualizado.'
+    );
+
+  }catch(error){
+    button.disabled = false;
+    button.textContent =
+      originalText;
+
+    alert(
+      error.message
+    );
+  }
+});
+
+
+document.addEventListener('click', async e => {
+  if(e.target.id !== 'copiarTapLegenda'){
+    return;
+  }
+
+  const elemento =
+    document.getElementById(
+      'tapLegenda'
+    );
+
+  if(!elemento){
+    return;
+  }
+
+  try{
+    await navigator.clipboard.writeText(
+      elemento.innerText
+    );
+
+    const botao = e.target;
+
+    botao.textContent =
+      'Legenda copiada ✓';
+
+    setTimeout(() => {
+      botao.textContent =
+        'Copiar legenda';
+    }, 1800);
+
+  }catch(error){
+    alert(
+      'Não foi possível copiar a legenda.'
+    );
+  }
+});
+
+
+document.addEventListener('click', e => {
+  if(e.target.id === 'anterior'){
+    offset = Math.max(0, offset - 24);
+    carregarProdutos();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  if(e.target.id === 'proxima'){
+    if(offset + 24 < totalProdutos){
+      offset += 24;
+      carregarProdutos();
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+  }
+});
+
+
+
+carregarProdutos();
+
+</script>
+
+
+<script id="ai-tab-controller">
+
+function ativarTodos(){
+  document.getElementById('tabTodos')
+    .classList.add('active');
+
+  document.getElementById('tabIa')
+    .classList.remove('active');
+
+  document.getElementById('iaView')
+    .classList.remove('ativo');
+
+  grid.style.display = 'grid';
+
+  document.getElementById('formBusca')
+    .style.display = 'flex';
+
+  document.getElementById('paginacao')
+    .style.display = 'flex';
+
+  carregarProdutos();
+}
+
+
+function ativarIa(){
+  document.getElementById('tabIa')
+    .classList.add('active');
+
+  document.getElementById('tabTodos')
+    .classList.remove('active');
+
+  grid.style.display = 'none';
+
+  document.getElementById('iaView')
+    .classList.add('ativo');
+
+  document.getElementById('formBusca')
+    .style.display = 'none';
+
+  document.getElementById('paginacao')
+    .style.display = 'none';
+}
+
+
+document.getElementById('tabTodos')
+  .addEventListener('click', ativarTodos);
+
+document.getElementById('tabIa')
+  .addEventListener('click', ativarIa);
+
+
+function valorIa(v){
+  if(
+    v === null ||
+    v === undefined ||
+    v === '' ||
+    v === 'null'
+  ){
+    return null;
+  }
+
+  return v;
+}
+
+
+function criarCardIa(item){
+  const a = item.analysis || {};
+
+  const promover =
+    a.promover === true;
+
+  const canal =
+    valorIa(a.canal);
+
+  const formato =
+    valorIa(a.formato);
+
+  const status =
+    item.effectiveStatus ||
+    item.status ||
+    '—';
+
+  return `
+    <article class="ai-card">
+
+      <div class="ai-card-top">
+
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:10px;
+          min-width:0;
+          flex:1;
+        ">
+
+          <img
+            src="${esc(item.image || '')}"
+            alt=""
+            style="
+              width:54px;
+              height:54px;
+              object-fit:cover;
+              border-radius:10px;
+              background:#f1f3f5;
+              flex:none;
+            "
+          >
+
+          <div
+            class="card-title"
+            style="
+              height:auto;
+              min-width:0;
+            "
+          >
+            ${esc(item.title || 'Produto')}
+          </div>
+
+        </div>
+
+        <span class="ai-decision ${
+          item.score?.level === 'HIGH'
+            ? 'promote'
+            : 'review'
+        }">
+          ${
+            item.score?.level === 'HIGH'
+              ? 'Alta oportunidade'
+              : item.score?.level === 'LOW'
+                ? 'Baixa oportunidade'
+                : 'Média oportunidade'
+          }
+        </span>
+
+      </div>
+
+
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:8px;
+        margin-top:12px;
+      ">
+
+        <strong style="
+          font-size:22px;
+          color:#17202a;
+        ">
+          ${item.score?.score ?? '—'}/100
+        </strong>
+
+        <span style="
+          padding:4px 8px;
+          border-radius:999px;
+          background:${
+            item.score?.level === 'HIGH'
+              ? '#f0fdf4'
+              : item.score?.level === 'LOW'
+                ? '#fff7ed'
+                : '#eff6ff'
+          };
+          color:${
+            item.score?.level === 'HIGH'
+              ? '#15803d'
+              : item.score?.level === 'LOW'
+                ? '#c2410c'
+                : '#1d4ed8'
+          };
+          font-size:11px;
+          font-weight:700;
+        ">
+          ${
+            item.score?.level === 'HIGH'
+              ? 'Alta'
+              : item.score?.level === 'LOW'
+                ? 'Baixa'
+                : 'Média'
+          }
+        </span>
+
+      </div>
+
+
+      <div class="ai-reason">
+
+        ${
+          item.score?.negativeSignals?.length
+            ? `
+              <strong>Por que merece atenção:</strong><br>
+              ${item.score.negativeSignals
+                .map(v => `• ${esc(v)}`)
+                .join('<br>')}
+            `
+            : `
+              <strong>Análise:</strong><br>
+              ${esc(
+                a.motivo ||
+                'Sem observações negativas relevantes.'
+              )}
+            `
+        }
+
+      </div>
+
+
+      ${
+        item.score?.positiveSignals?.length
+          ? `
+            <div class="ai-reason"
+              style="
+                background:#f0fdf4;
+                padding:10px;
+                border-radius:10px;
+                color:#166534;
+              "
+            >
+              <strong>Pontos positivos:</strong><br>
+              ${item.score.positiveSignals
+                .map(v => `• ${esc(v)}`)
+                .join('<br>')}
+            </div>
+          `
+          : ''
+      }
+
+      <div class="ai-meta">
+
+        <div class="ai-meta-box">
+          <span class="ai-meta-label">
+            Prioridade
+          </span>
+          <span class="ai-meta-value">
+            ${esc(a.prioridade || '—')}
+          </span>
+        </div>
+
+        <div class="ai-meta-box">
+          <span class="ai-meta-label">
+            Canal
+          </span>
+          <span class="ai-meta-value">
+            ${esc(canal || '—')}
+          </span>
+        </div>
+
+        <div class="ai-meta-box">
+          <span class="ai-meta-label">
+            Formato
+          </span>
+          <span class="ai-meta-value">
+            ${esc(formato || '—')}
+          </span>
+        </div>
+
+      </div>
+
+      <div style="
+        margin-top:10px;
+        font-size:11px;
+        color:#7b8794;
+      ">
+        Sugestão IA:
+        <strong>
+          ${promover ? 'Promover' : 'Não promover'}
+        </strong>
+        &nbsp;·&nbsp;
+        ${
+          status === 'VALIDATED'
+            ? 'Validado'
+            : status === 'NEEDS_REVIEW'
+              ? 'Revisar'
+              : status === 'FAILED'
+                ? 'Falhou'
+                : esc(status)
+        }
+      </div>
+
+      <div class="ai-channel-area" style="
+        padding-top:12px;
+        border-top:1px solid #edf1f4;
+      ">
+
+        <div style="
+          font-size:11px;
+          color:#7b8794;
+          margin-bottom:8px;
+          text-transform:uppercase;
+          letter-spacing:.04em;
+        ">
+          Canais para conteúdo
+        </div>
+
+        <details
+          class="ai-channel-menu"
+          data-ai-channel-group="${esc(item.itemId)}"
+        >
+          <summary>
+            Escolher canais
+            ${
+              canal
+                ? ` · ${esc(canal)} sugerido`
+                : ''
+            }
+          </summary>
+
+          <div class="ai-channel-options">
+
+            ${[
+              ['instagram', 'Instagram'],
+              ['facebook', 'Facebook'],
+              ['pinterest', 'Pinterest']
+            ]
+            .sort(([a], [b]) => {
+              if(a === canal) return -1;
+              if(b === canal) return 1;
+              return 0;
+            })
+            .map(([value, label]) => `
+              <label class="ai-channel-option">
+
+                <input
+                  type="checkbox"
+                  data-ai-channel-choice="${value}"
+                  data-ai-item="${esc(item.itemId)}"
+                  ${canal === value ? 'checked' : ''}
+                >
+
+                <span>
+                  ${label}
+                  ${
+                    canal === value
+                      ? '<strong> · Sugerido pela IA</strong>'
+                      : ''
+                  }
+                </span>
+
+              </label>
+            `).join('')}
+
+          </div>
+        </details>
+
+        <div class="ai-actions">
+
+          <button
+            class="ai-btn-primary"
+            data-ai-prepare="${esc(item.itemId)}"
+            data-ai-recommended-format="${esc(formato || '')}"
+            data-ai-recommended-channel="${esc(canal || '')}"
+            ${canal ? '' : 'disabled'}
+          >
+            Preparar conteúdo
+          </button>
+
+        </div>
+
+      </div>
+
+    </article>
+  `;
+}
+
+</script>
+
+
+
+<script id="ai-queue-render">
+
+function criarCardFila(item){
+  const c =
+    item.content?.content || {};
+
+  const pronto =
+    item.status === 'READY_FOR_APPROVAL';
+
+  const aprovado =
+    item.status === 'APPROVED';
+
+  return `
+    <article class="ai-card">
+
+      <div class="ai-card-top">
+
+        <div class="ai-item">
+          Item ${esc(item.itemId)}
+        </div>
+
+        <span class="ai-decision ${
+          pronto || aprovado
+            ? 'promote'
+            : 'review'
+        }">
+          ${
+            pronto
+              ? 'Aguardando aprovação'
+              : aprovado
+                ? 'Aprovado'
+                : esc(item.status)
+          }
+        </span>
+
+      </div>
+
+      <div
+        class="card-title"
+        style="height:auto;margin-top:10px"
+      >
+        ${esc(
+          c.headline ||
+          c.hook ||
+          'Conteúdo preparado'
+        )}
+      </div>
+
+      <div class="ai-reason">
+        ${esc(
+          c.body ||
+          c.hook ||
+          'Conteúdo aguardando revisão.'
+        )}
+      </div>
+
+      <div class="ai-meta">
+
+        <div class="ai-meta-box">
+          <span class="ai-meta-label">
+            Canal
+          </span>
+
+          <span class="ai-meta-value">
+            ${esc(item.channel || '—')}
+          </span>
+        </div>
+
+        <div class="ai-meta-box">
+          <span class="ai-meta-label">
+            Formato
+          </span>
+
+          <span class="ai-meta-value">
+            ${esc(item.format || '—')}
+          </span>
+        </div>
+
+        <div class="ai-meta-box">
+          <span class="ai-meta-label">
+            Situação
+          </span>
+
+          <span class="ai-meta-value">
+            ${
+              pronto
+                ? 'Revisar'
+                : aprovado
+                  ? 'Aprovado'
+                  : esc(item.status)
+            }
+          </span>
+        </div>
+
+      </div>
+
+      <div class="ai-actions">
+
+        <button
+          class="ai-btn-secondary"
+          data-ai-view="${esc(item.id)}"
+        >
+          Ver conteúdo
+        </button>
+
+        ${
+          pronto
+            ? `
+              <button
+                class="ai-btn-primary"
+                data-ai-approve="${esc(item.id)}"
+              >
+                Aprovar
+              </button>
+
+              <button
+                class="ai-btn-secondary"
+                data-ai-reject="${esc(item.id)}"
+              >
+                Rejeitar
+              </button>
+            `
+            : ''
+        }
+
+      </div>
+
+    </article>
+  `;
+}
+
+</script>
+
+<script id="ai-data-loader">
+
+async function carregarIa(){
+  const produtosEl =
+    document.getElementById('iaProdutos');
+
+  const filaEl =
+    document.getElementById('iaFila');
+
+  produtosEl.innerHTML =
+    '<div class="ai-empty">Carregando avaliações...</div>';
+
+  filaEl.innerHTML =
+    '<div class="ai-empty">Carregando conteúdos...</div>';
+
+  try{
+    const [rResumo, rAnalises, rFila] =
+      await Promise.all([
+        fetch('/api/ai/summary'),
+        fetch('/api/ai/analyses?limit=100&offset=0'),
+        fetch('/api/ai/content-queue')
+      ]);
+
+    const resumo =
+      await rResumo.json();
+
+    const analises =
+      await rAnalises.json();
+
+    const fila =
+      await rFila.json();
+
+    if(!rResumo.ok || !resumo.success){
+      throw new Error(
+        resumo.error || 'Erro no resumo da IA.'
+      );
+    }
+
+    if(!rAnalises.ok || !analises.success){
+      throw new Error(
+        analises.error || 'Erro nas análises.'
+      );
+    }
+
+    if(!rFila.ok || !fila.success){
+      throw new Error(
+        fila.error || 'Erro na fila de conteúdos.'
+      );
+    }
+
+    document.getElementById('iaTotal').textContent =
+      resumo.analysis?.total ?? 0;
+
+    document.getElementById('iaPromover').textContent =
+      resumo.score?.high ?? 0;
+
+    document.getElementById('iaRevisao').textContent =
+      resumo.analysis?.needsReview ?? 0;
+
+    document.getElementById('iaConteudos').textContent =
+      resumo.queue?.readyForApproval ?? 0;
+
+    produtosEl.innerHTML =
+      analises.items.length
+        ? analises.items.map(criarCardIa).join('')
+        : '<div class="ai-empty">Nenhum produto avaliado ainda.</div>';
+
+    window.aiQueueItems =
+      fila.items || [];
+
+    filaEl.innerHTML =
+      fila.items.length
+        ? fila.items.map(criarCardFila).join('')
+        : '<div class="ai-empty">Nenhum conteúdo preparado ainda.</div>';
+
+  }catch(err){
+    produtosEl.innerHTML =
+      `<div class="ai-empty">${esc(err.message)}</div>`;
+  }
+}
+
+document.getElementById('tabIa')
+  .addEventListener('click', carregarIa);
+
+</script>
+
+
+<script id="ai-prepare-handler">
+
+function esperar(ms){
+  return new Promise(
+    resolve => setTimeout(resolve, ms)
+  );
+}
+
+
+async function acompanharJob(
+  jobId,
+  painelConteudo
+){
+  const inicio =
+    Date.now();
+
+  const LIMITE_TOTAL =
+    180000;
+
+  const LIMITE_FILA =
+    30000;
+
+  while(
+    Date.now() - inicio <
+    LIMITE_TOTAL
+  ){
+    const response =
+      await fetch(
+        `/api/ai/jobs/${
+          encodeURIComponent(jobId)
+        }`
+      );
+
+    const data =
+      await response.json();
+
+    if(!response.ok || !data.success){
+      throw new Error(
+        data.error ||
+        'Erro ao acompanhar a geração.'
+      );
+    }
+
+    const job =
+      data.job;
+
+    if(job.status === 'DONE'){
+      if(!data.queueItem){
+        throw new Error(
+          'Conteúdo concluído, mas não encontrado na fila.'
+        );
+      }
+
+      await carregarIa();
+
+      mostrarConteudoIa(
+        data.queueItem
+      );
+
+      return;
+    }
+
+    if(job.status === 'FAILED'){
+      throw new Error(
+        job.error ||
+        'A geração do conteúdo falhou.'
+      );
+    }
+
+    if(
+      job.status === 'QUEUED' &&
+      Date.now() - inicio >
+        LIMITE_FILA
+    ){
+      throw new Error(
+        'O processamento não foi iniciado em 30 segundos. A tarefa foi interrompida para evitar espera indefinida.'
+      );
+    }
+
+    painelConteudo.innerHTML = `
+      <div class="report-header"
+        style="border-top:4px solid #2563eb">
+
+        <div class="report-kicker">
+          Inteligência de conteúdo
+        </div>
+
+        <h2 class="report-title">
+          ${
+            job.status === 'QUEUED'
+              ? 'Iniciando processamento...'
+              : job.status === 'PROCESSING'
+                ? 'Criando seu conteúdo...'
+                : 'Finalizando...'
+          }
+        </h2>
+
+        <div class="report-sub">
+          ${esc(job.progress || '')}
+        </div>
+
+        <div style="
+          margin-top:18px;
+          padding:14px;
+          border-radius:12px;
+          background:#eff6ff;
+          color:#1d4ed8;
+          line-height:1.5;
+        ">
+          Canal:
+          <strong>
+            ${esc(job.channel || '—')}
+          </strong>
+          <br><br>
+          O sistema está processando
+          somente este produto.
+        </div>
+
+      </div>
+    `;
+
+    await esperar(3000);
+  }
+
+  throw new Error(
+    'O processamento excedeu 3 minutos e foi encerrado na tela. Verifique o estado da tarefa antes de tentar novamente.'
+  );
+}
+
+
+document.addEventListener(
+  'change',
+  e => {
+    const checkbox =
+      e.target.closest(
+        '[data-ai-channel-choice]'
+      );
+
+    if(!checkbox){
+      return;
+    }
+
+    const card =
+      checkbox.closest('.ai-card');
+
+    const prepare =
+      card.querySelector(
+        '[data-ai-prepare]'
+      );
+
+    const selected =
+      card.querySelectorAll(
+        '[data-ai-channel-choice]:checked'
+      );
+
+    prepare.disabled =
+      selected.length === 0;
+  }
+);
+
+
+document.addEventListener(
+  'click',
+  async e => {
+
+    const button =
+      e.target.closest(
+        '[data-ai-prepare]'
+      );
+
+    if(!button){
+      return;
+    }
+
+    const card =
+      button.closest('.ai-card');
+
+    const selected =
+      [
+        ...card.querySelectorAll(
+          '[data-ai-channel-choice]:checked'
+        )
+      ];
+
+    if(!selected.length){
+      alert(
+        'Escolha pelo menos um canal.'
+      );
+      return;
+    }
+
+    const channels =
+      selected.map(
+        item =>
+          item.dataset.aiChannelChoice
+      );
+
+    const painel =
+      document.getElementById(
+        'produtoPainel'
+      );
+
+    const conteudo =
+      document.getElementById(
+        'painelConteudo'
+      );
+
+    const topo =
+      document.querySelector(
+        '#produtoPainel .painel-topo strong'
+      );
+
+    if(topo){
+      topo.textContent =
+        'Preparando conteúdo';
+    }
+
+    painel.classList.add('aberto');
+
+    button.disabled = true;
+
+    try{
+      for(const channel of channels){
+        conteudo.innerHTML = `
+          <div class="report-header"
+            style="border-top:4px solid #2563eb">
+
+            <div class="report-kicker">
+              Inteligência de conteúdo
+            </div>
+
+            <h2 class="report-title">
+              Enviando para preparação...
+            </h2>
+
+            <div class="report-sub">
+              Canal:
+              <strong>
+                ${esc(channel)}
+              </strong>
+            </div>
+
+          </div>
+        `;
+
+        const params =
+          new URLSearchParams();
+
+        params.set(
+          'channel',
+          channel
+        );
+
+        const response =
+          await fetch(
+            `/api/ai/prepare/${
+              encodeURIComponent(
+                button.dataset.aiPrepare
+              )
+            }?${params.toString()}`,
+            {
+              method:'POST'
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if(!response.ok || !data.success){
+          throw new Error(
+            data.error ||
+            'Não foi possível preparar o conteúdo.'
+          );
+        }
+
+        /*
+         * Conteúdo já preparado:
+         * abre imediatamente.
+         */
+        if(data.queueItem){
+          await carregarIa();
+
+          mostrarConteudoIa(
+            data.queueItem
+          );
+
+          continue;
+        }
+
+        /*
+         * Sem conteúdo pronto:
+         * o backend iniciou ou retomou
+         * somente o job deste produto.
+         */
+        if(!data.job?.id){
+          throw new Error(
+            'O servidor não retornou conteúdo nem tarefa de processamento.'
+          );
+        }
+
+        await acompanharJob(
+          data.job.id,
+          conteudo
+        );
+      }
+
+    }catch(error){
+      conteudo.innerHTML = `
+        <div class="report-header"
+          style="border-top:4px solid #dc2626">
+
+          <div class="report-kicker">
+            Falha no processamento
+          </div>
+
+          <h2 class="report-title">
+            Não foi possível gerar o conteúdo.
+          </h2>
+
+          <div class="report-sub">
+            ${esc(error.message)}
+          </div>
+
+        </div>
+      `;
+
+      button.disabled = false;
+      button.textContent =
+        'Preparar conteúdo';
+    }
+  }
+);
+
+</script>
+
+
+<script id="ai-approval-handler">
+
+document.addEventListener(
+  'click',
+  async e => {
+
+    const approve =
+      e.target.closest(
+        '[data-ai-approve]'
+      );
+
+    const reject =
+      e.target.closest(
+        '[data-ai-reject]'
+      );
+
+    if(!approve && !reject){
+      return;
+    }
+
+    const button =
+      approve || reject;
+
+    const id =
+      approve
+        ? approve.dataset.aiApprove
+        : reject.dataset.aiReject;
+
+    const action =
+      approve
+        ? 'approve'
+        : 'reject';
+
+    const originalText =
+      button.textContent;
+
+    button.disabled = true;
+
+    button.textContent =
+      approve
+        ? 'Aprovando...'
+        : 'Rejeitando...';
+
+    try{
+      const response =
+        await fetch(
+          `/api/ai/content/${
+            encodeURIComponent(id)
+          }/${action}`,
+          {
+            method:'POST'
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if(!response.ok || !data.success){
+        throw new Error(
+          data.error ||
+          'Não foi possível atualizar o conteúdo.'
+        );
+      }
+
+      await carregarIa();
+
+    }catch(error){
+      button.disabled = false;
+      button.textContent =
+        originalText;
+
+      alert(error.message);
+    }
+  }
+);
+
+</script>
+
+
+<script id="ai-content-preview">
+
+function listaIa(values){
+  if(!Array.isArray(values) || !values.length){
+    return '—';
+  }
+
+  return values
+    .map(v => esc(v))
+    .join('<br>');
+}
+
+
+function mostrarConteudoIa(item){
+  const painel =
+    document.getElementById('produtoPainel');
+
+  const conteudo =
+    document.getElementById('painelConteudo');
+
+  const topo =
+    document.querySelector(
+      '#produtoPainel .painel-topo strong'
+    );
+
+  const plano =
+    item.plan?.plan || {};
+
+  const final =
+    item.content?.content ||
+    item.content ||
+    {};
+
+  const fallbackAtivo =
+    Boolean(
+      item.content?.fallback?.used ||
+      item.content?.content?.fallback?.used ||
+      item.plan?.fallback?.used
+    );
+
+  if(topo){
+    topo.textContent =
+      fallbackAtivo
+        ? 'Conteúdo preparado em modo reserva'
+        : 'Conteúdo preparado pela IA';
+  }
+
+  conteudo.innerHTML = `
+
+    <div class="report-header"
+      style="border-top:4px solid #2563eb">
+
+      <div class="report-kicker">
+        Estratégia de conteúdo
+      </div>
+
+      <h2 class="report-title">
+        ${esc(final.headline || final.hook || 'Conteúdo preparado')}
+      </h2>
+
+      <div class="report-sub">
+        ${esc(item.channel || '—')}
+        ·
+        ${esc(item.format || '—')}
+      </div>
+
+    </div>
+
+
+    <section class="report-section">
+
+      <h3 class="report-section-title">
+        Chamada e necessidade do cliente
+      </h3>
+
+      <div class="info-card"
+        style="margin-bottom:10px">
+
+        <span class="info-label">
+          Gancho
+        </span>
+
+        <span class="info-value">
+          ${esc(plano.hook || final.hook || '—')}
+        </span>
+
+      </div>
+
+
+      <div class="info-card">
+
+        <span class="info-label">
+          Dor ou desejo
+        </span>
+
+        <span class="info-value soft">
+          ${esc(plano.painOrDesire || '—')}
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <section class="report-section">
+
+      <h3 class="report-section-title">
+        Como apresentar o produto
+      </h3>
+
+      <div class="info-card"
+        style="margin-bottom:10px">
+
+        <span class="info-label">
+          Solução
+        </span>
+
+        <span class="info-value soft">
+          ${esc(plano.solution || '—')}
+        </span>
+
+      </div>
+
+
+      <div class="report-grid">
+
+        <div class="info-card">
+
+          <span class="info-label">
+            Ângulo
+          </span>
+
+          <span class="info-value soft">
+            ${esc(plano.angle || '—')}
+          </span>
+
+        </div>
+
+        <div class="info-card">
+
+          <span class="info-label">
+            Objetivo
+          </span>
+
+          <span class="info-value soft">
+            ${esc(plano.objective || '—')}
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="report-section">
+
+      <h3 class="report-section-title">
+        Benefícios sustentados pelos dados
+      </h3>
+
+      <div class="info-card">
+
+        <span class="info-value soft">
+          ${listaIa(plano.benefits)}
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <section class="report-section">
+
+      <h3 class="report-section-title">
+        Texto final
+      </h3>
+
+      <div class="info-card"
+        style="
+          border-left:4px solid #16a34a;
+          line-height:1.6;
+        ">
+
+        <span class="info-value soft">
+          ${esc(final.body || '—')}
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <section class="report-section">
+
+      <div class="report-grid">
+
+        <div class="info-card">
+
+          <span class="info-label">
+            Chamada para ação
+          </span>
+
+          <span class="info-value soft">
+            ${esc(final.cta || plano.cta || '—')}
+          </span>
+
+        </div>
+
+        <div class="info-card">
+
+          <span class="info-label">
+            Texto sobre a mídia
+          </span>
+
+          <span class="info-value soft">
+            ${esc(final.overlayText || '—')}
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="report-section">
+
+      <h3 class="report-section-title">
+        Orientação da mídia
+      </h3>
+
+      <div class="info-card">
+
+        <span class="info-value soft">
+          ${esc(
+            final.mediaInstruction ||
+            plano.mediaDirection ||
+            '—'
+          )}
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <section class="report-section">
+
+      <div style="
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+      ">
+
+        ${
+          item.status === 'READY_FOR_APPROVAL'
+            ? `
+                <button
+                  type="button"
+                  class="ai-btn-primary"
+                  data-ai-approve-facebook="${esc(item.id)}"
+                  data-item-id="${esc(item.itemId)}"
+                  style="
+                    width:100%;
+                    padding:14px;
+                    font-size:16px;
+                    font-weight:800;
+                  "
+                >
+                  Aprovar e continuar para Facebook
+                </button>
+              `
+            : ''
+        }
+
+        ${
+          item.status === 'APPROVED'
+            ? `
+                <button
+                  type="button"
+                  class="ai-btn-primary"
+                  data-ai-continue-facebook="${esc(item.id)}"
+                  data-item-id="${esc(item.itemId)}"
+                  style="
+                    width:100%;
+                    padding:14px;
+                    font-size:16px;
+                    font-weight:800;
+                    background:#1877f2;
+                  "
+                >
+                  Continuar para Facebook
+                </button>
+              `
+            : ''
+        }
+
+        ${
+          item.status === 'PUBLISHED'
+            ? `
+                <div style="
+                  padding:14px;
+                  border-radius:12px;
+                  background:#ecfdf5;
+                  color:#15803d;
+                  font-weight:800;
+                  text-align:center;
+                ">
+                  Publicado no Facebook ✓
+                </div>
+              `
+            : ''
+        }
+
+      </div>
+
+    </section>
+
+  `;
+
+  painel.classList.add('aberto');
+}
+
+
+document.addEventListener(
+  'click',
+  e => {
+
+    const button =
+      e.target.closest(
+        '[data-ai-view]'
+      );
+
+    if(!button){
+      return;
+    }
+
+    const item =
+      (window.aiQueueItems || [])
+        .find(
+          value =>
+            value.id ===
+            button.dataset.aiView
+        );
+
+    if(!item){
+      alert(
+        'Conteúdo não encontrado na fila.'
+      );
+      return;
+    }
+
+    mostrarConteudoIa(item);
+  }
+);
+
+
+document.addEventListener(
+  'click',
+  async e => {
+
+    const approveFacebook =
+      e.target.closest(
+        '[data-ai-approve-facebook]'
+      );
+
+    const continueFacebook =
+      e.target.closest(
+        '[data-ai-continue-facebook]'
+      );
+
+    if(
+      !approveFacebook &&
+      !continueFacebook
+    ){
+      return;
+    }
+
+    const button =
+      approveFacebook ||
+      continueFacebook;
+
+    const itemId =
+      button.dataset.itemId;
+
+    const queueId =
+      approveFacebook
+        ? approveFacebook.dataset.aiApproveFacebook
+        : continueFacebook.dataset.aiContinueFacebook;
+
+    const originalText =
+      button.textContent;
+
+    button.disabled = true;
+
+    try{
+
+      if(approveFacebook){
+
+        button.textContent =
+          'Aprovando...';
+
+        const response =
+          await fetch(
+            `/api/ai/content/${
+              encodeURIComponent(queueId)
+            }/approve`,
+            {
+              method:'POST'
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if(
+          !response.ok ||
+          !data.success
+        ){
+          throw new Error(
+            data.error ||
+            'Não foi possível aprovar o conteúdo.'
+          );
+        }
+
+        await carregarIa();
+      }
+
+      button.textContent =
+        'Abrindo Facebook...';
+
+      await abrirTapToPost(
+        itemId,
+        null
+      );
+
+    }catch(error){
+
+      button.disabled = false;
+
+      button.textContent =
+        originalText;
+
+      alert(
+        error.message
+      );
+    }
+  }
+);
+
+
+</script>
+
+<div id="paginacao" style="
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  margin:24px 0;
+">
+  <button id="anterior">Anterior</button>
+  <span id="paginaInfo"></span>
+  <button id="proxima">Próxima</button>
+</div>
+
+</main>
+
+<div id="produtoPainel">
+  <div class="painel-box">
+    <div class="painel-topo">
+      <strong>Detalhes do produto</strong>
+      <button id="fecharPainel">×</button>
+    </div>
+
+    <div id="painelConteudo" class="painel-conteudo">
+      Carregando...
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+
+<style>
+.badge,
+.old{
+  display:none !important;
+}
+</style>

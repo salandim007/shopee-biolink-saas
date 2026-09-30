@@ -18,6 +18,29 @@ const {
 const marketingRoutes =
     require('./marketing-routes');
 
+const productMediaService =
+    require('./product-media-service');
+
+
+const productAnalysisStore =
+    require('./ai/product-analysis-store');
+
+const productScoreStore =
+    require('./ai/product-score-store');
+
+const contentQueueStore =
+    require('./ai/content-queue-store');
+
+
+const contentJobStore =
+    require('./ai/content-job-store');
+
+const onDemandProductPipeline =
+    require('./ai/on-demand-product-pipeline');
+
+const contentOrchestrator =
+    require('./ai/content-orchestrator');
+
 const {
     metaMediaPublicRouter
 } = require('./meta-media-public');
@@ -225,6 +248,858 @@ app.use(
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+/*
+ * CENTRAL DE PRODUTOS E MÍDIAS
+ * Consulta somente leitura.
+ */
+app.get(
+    '/api/products-media',
+    requireAdminAuth,
+    async (req, res) => {
+        try {
+            const result =
+                await productMediaService.listProducts({
+                    search:
+                        req.query.search || '',
+
+                    limit:
+                        req.query.limit || 24,
+
+                    offset:
+                        req.query.offset || 0
+                });
+
+            return res.json({
+                success: true,
+                ...result
+            });
+        } catch (error) {
+            console.error(
+                '[products-media-list]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    'Erro ao listar produtos.'
+            });
+        }
+    }
+);
+
+app.get(
+    '/api/products-media/:itemId',
+    requireAdminAuth,
+    async (req, res) => {
+        try {
+            const product =
+                await productMediaService.getProductByItemId(
+                    req.params.itemId,
+                    {
+                        shopId: req.query.shopId
+                    }
+                );
+
+            /*
+             * Para Tap-to-Post, prefere o offerLink curto oficial
+             * da Shopee Affiliate API.
+             *
+             * Falha da API não impede a abertura do produto:
+             * mantém os links vindos do catálogo como fallback.
+             */
+            if (product) {
+                try {
+                    const {
+                        fetchProductOfferByItemId
+                    } = require('./shopee-product-url');
+
+                    const offer =
+                        await fetchProductOfferByItemId(
+                            req.params.itemId
+                        );
+
+                    const affiliateLink =
+                        offer?.product?.offerLink ||
+                        null;
+
+                    if (affiliateLink) {
+                        product.links = {
+                            ...(product.links || {}),
+                            affiliate:
+                                affiliateLink,
+                            short:
+                                affiliateLink
+                        };
+                    }
+                } catch (error) {
+                    console.warn(
+                        '[products-media-affiliate-link]',
+                        req.params.itemId,
+                        error?.message || error
+                    );
+                }
+            }
+
+            if (!product) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Produto não encontrado.'
+                });
+            }
+
+            return res.json({
+                success: true,
+                product
+            });
+        } catch (error) {
+            console.error(
+                '[products-media]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error: 'Erro ao consultar produto.'
+            });
+        }
+    }
+);
+
+
+/*
+ * ============================================================
+ * IA - ANÁLISE E CONTEÚDO
+ * ============================================================
+ * Não publica automaticamente.
+ * Conteúdo gerado fica aguardando aprovação.
+ * ============================================================
+ */
+
+app.get(
+    '/api/ai/summary',
+    requireAdminAuth,
+    (req, res) => {
+        try {
+            const analysis =
+                productAnalysisStore.getSummary();
+
+            const score =
+                productScoreStore.getSummary();
+
+            const queue =
+                contentQueueStore.readQueue();
+
+            const queueSummary = {
+                total: queue.length,
+                preparing: 0,
+                readyForApproval: 0,
+                approved: 0,
+                rejected: 0,
+                published: 0,
+                failed: 0
+            };
+
+            for (const item of queue) {
+                if (item.status === 'PREPARING') {
+                    queueSummary.preparing += 1;
+                }
+
+                if (item.status === 'READY_FOR_APPROVAL') {
+                    queueSummary.readyForApproval += 1;
+                }
+
+                if (item.status === 'APPROVED') {
+                    queueSummary.approved += 1;
+                }
+
+                if (item.status === 'REJECTED') {
+                    queueSummary.rejected += 1;
+                }
+
+                if (item.status === 'PUBLISHED') {
+                    queueSummary.published += 1;
+                }
+
+                if (item.status === 'FAILED') {
+                    queueSummary.failed += 1;
+                }
+            }
+
+            return res.json({
+                success: true,
+                analysis,
+                score,
+                queue: queueSummary
+            });
+        } catch (error) {
+            console.error(
+                '[ai-summary]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    'Erro ao consultar resumo da IA.'
+            });
+        }
+    }
+);
+
+
+app.get(
+    '/api/ai/analyses',
+    requireAdminAuth,
+    async (req, res) => {
+        try {
+            let items =
+                productAnalysisStore.readAll();
+
+            const existingProductIds =
+                await productMediaService.getExistingProductIds(
+                    items.map(
+                        item => item.itemId
+                    )
+                );
+
+            items =
+                items.filter(
+                    item =>
+                        existingProductIds.has(
+                            String(item.itemId)
+                        )
+                );
+
+            const scores =
+                productScoreStore.readAll();
+
+            const scoreMap =
+                new Map(
+                    scores.map(
+                        item => [
+                            String(item.itemId),
+                            item
+                        ]
+                    )
+                );
+
+            items =
+                items.map(
+                    item => {
+                        const scoreRecord =
+                            scoreMap.get(
+                                String(item.itemId)
+                            ) || null;
+
+                        return {
+                            ...item,
+
+                            image:
+                                scoreRecord?.image || null,
+
+                            score:
+                                scoreRecord?.score || null
+                        };
+                    }
+                );
+
+            if (req.query.status) {
+                items =
+                    items.filter(
+                        item =>
+                            item.status ===
+                            req.query.status
+                    );
+            }
+
+            if (req.query.priority) {
+                items =
+                    items.filter(
+                        item =>
+                            item.analysis?.prioridade ===
+                            req.query.priority
+                    );
+            }
+
+            if (req.query.channel) {
+                items =
+                    items.filter(
+                        item =>
+                            item.analysis?.canal ===
+                            req.query.channel
+                    );
+            }
+
+            if (req.query.promote === 'true') {
+                items =
+                    items.filter(
+                        item =>
+                            item.analysis?.promover === true
+                    );
+            }
+
+            if (req.query.promote === 'false') {
+                items =
+                    items.filter(
+                        item =>
+                            item.analysis?.promover === false
+                    );
+            }
+
+            const total =
+                items.length;
+
+            const offset =
+                Math.max(
+                    0,
+                    Number(req.query.offset || 0)
+                );
+
+            const limit =
+                Math.min(
+                    100,
+                    Math.max(
+                        1,
+                        Number(req.query.limit || 24)
+                    )
+                );
+
+            items =
+                items.slice(
+                    offset,
+                    offset + limit
+                );
+
+            return res.json({
+                success: true,
+                total,
+                offset,
+                limit,
+                items
+            });
+        } catch (error) {
+            console.error(
+                '[ai-analyses]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    'Erro ao listar análises da IA.'
+            });
+        }
+    }
+);
+
+
+app.get(
+    '/api/ai/content-queue',
+    requireAdminAuth,
+    (req, res) => {
+        try {
+            const items =
+                contentQueueStore.listQueue({
+                    status:
+                        req.query.status || undefined,
+
+                    channel:
+                        req.query.channel || undefined,
+
+                    itemId:
+                        req.query.itemId || undefined
+                });
+
+            return res.json({
+                success: true,
+                total: items.length,
+                items
+            });
+        } catch (error) {
+            console.error(
+                '[ai-content-queue]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    'Erro ao consultar fila de conteúdo.'
+            });
+        }
+    }
+);
+
+
+app.post(
+    '/api/ai/prepare/:itemId',
+    requireAdminAuth,
+    async (req, res) => {
+        try {
+            const itemId =
+                String(req.params.itemId);
+
+            const channel =
+                req.query.channel || null;
+
+            const requestedFormat =
+                req.query.format || null;
+
+            if (!channel) {
+                return res.status(400).json({
+                    success: false,
+                    error:
+                        'Escolha um canal para preparar o conteúdo.'
+                });
+            }
+
+            /*
+             * SHOPEE_AI_PIPELINE
+             *
+             * Falha rápida:
+             * produto inexistente nunca cria job.
+             */
+            const productExists =
+                await productMediaService.hasProductByItemId(
+                    itemId
+                );
+
+            if (!productExists) {
+                return res.status(404).json({
+                    success: false,
+                    error:
+                        `Produto ${itemId} não está disponível no catálogo atual.`
+                });
+            }
+
+            /*
+             * Primeiro reaproveita conteúdo já pronto.
+             */
+            const readyItem =
+                contentQueueStore
+                    .listQueue({
+                        itemId,
+                        channel
+                    })
+                    .slice()
+                    .reverse()
+                    .find(
+                        item =>
+                            (
+                                item.status ===
+                                    'READY_FOR_APPROVAL' ||
+                                item.status ===
+                                    'APPROVED'
+                            ) &&
+                            (
+                                !requestedFormat ||
+                                item.format ===
+                                    requestedFormat
+                            )
+                    );
+
+            if (readyItem) {
+                return res.status(200).json({
+                    success: true,
+                    reused: true,
+                    queueItem:
+                        readyItem
+                });
+            }
+
+            /*
+             * Não cria job duplicado.
+             */
+            const activeJob =
+                contentJobStore
+                    .readAll()
+                    .slice()
+                    .reverse()
+                    .find(
+                        job =>
+                            String(job.itemId) ===
+                                itemId &&
+                            job.channel ===
+                                channel &&
+                            (
+                                job.status ===
+                                    'QUEUED' ||
+                                job.status ===
+                                    'PROCESSING'
+                            ) &&
+                            (
+                                !requestedFormat ||
+                                job.format ===
+                                    requestedFormat
+                            )
+                    );
+
+            if (activeJob) {
+                /*
+                 * Job QUEUED antigo também deve continuar.
+                 * Nunca deixa tarefa parada esperando execução manual.
+                 */
+                if (activeJob.status === 'QUEUED') {
+                    setImmediate(() => {
+                        onDemandProductPipeline
+                            .processJob(activeJob)
+                            .catch(error => {
+                                console.error(
+                                    '[ai-on-demand-resume]',
+                                    itemId,
+                                    channel,
+                                    error
+                                );
+
+                                try {
+                                    contentJobStore.updateJob(
+                                        activeJob.id,
+                                        {
+                                            status:
+                                                'FAILED',
+
+                                            progress:
+                                                'Falha no processamento',
+
+                                            error:
+                                                error.message ||
+                                                'Erro inesperado no processamento.',
+
+                                            finishedAt:
+                                                new Date().toISOString()
+                                        }
+                                    );
+                                } catch (updateError) {
+                                    console.error(
+                                        '[ai-on-demand-resume-update]',
+                                        updateError
+                                    );
+                                }
+                            });
+                    });
+                }
+
+                return res.status(202).json({
+                    success: true,
+                    reusedJob: true,
+                    job:
+                        activeJob
+                });
+            }
+
+            /*
+             * Produto novo / sem material:
+             * cria SOMENTE um job para ele.
+             */
+            const job =
+                contentJobStore.createJob({
+                    itemId,
+
+                    shopId:
+                        req.query.shopId || null,
+
+                    channel,
+
+                    format:
+                        requestedFormat
+                });
+
+            /*
+             * Inicia imediatamente.
+             *
+             * Não depende mais de executar
+             * run-content-jobs.js manualmente.
+             */
+            setImmediate(() => {
+                onDemandProductPipeline
+                    .processJob(job)
+                    .catch(error => {
+                        console.error(
+                            '[ai-on-demand-unhandled]',
+                            itemId,
+                            channel,
+                            error
+                        );
+
+                        /*
+                         * Última barreira de segurança:
+                         * nunca deixa job eternamente PROCESSING.
+                         */
+                        try {
+                            contentJobStore.updateJob(
+                                job.id,
+                                {
+                                    status:
+                                        'FAILED',
+
+                                    progress:
+                                        'Falha no processamento',
+
+                                    error:
+                                        error.message ||
+                                        'Erro inesperado no processamento.',
+
+                                    finishedAt:
+                                        new Date().toISOString()
+                                }
+                            );
+                        } catch (updateError) {
+                            console.error(
+                                '[ai-on-demand-fail-update]',
+                                updateError
+                            );
+                        }
+                    });
+            });
+
+            return res.status(202).json({
+                success: true,
+                job
+            });
+
+        } catch (error) {
+            console.error(
+                '[ai-prepare-content]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    error.message ||
+                    'Erro ao preparar conteúdo.'
+            });
+        }
+    }
+);
+
+
+app.get(
+    '/api/ai/jobs/:id',
+    requireAdminAuth,
+    (req, res) => {
+        try {
+            const job =
+                contentJobStore.getJob(
+                    req.params.id
+                );
+
+            if (!job) {
+                return res.status(404).json({
+                    success: false,
+                    error:
+                        'Tarefa não encontrada.'
+                });
+            }
+
+            const queueItem =
+                job.queueItemId
+                    ? contentQueueStore.getQueueItem(
+                        job.queueItemId
+                    )
+                    : null;
+
+            return res.json({
+                success: true,
+                job,
+                queueItem
+            });
+
+        } catch (error) {
+            console.error(
+                '[ai-job-status]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    'Erro ao consultar tarefa.'
+            });
+        }
+    }
+);
+
+
+app.post(
+    '/api/ai/content/:id/approve',
+    requireAdminAuth,
+    (req, res) => {
+        try {
+            const item =
+                contentQueueStore.updateQueueItem(
+                    req.params.id,
+                    {
+                        status: 'APPROVED'
+                    }
+                );
+
+            return res.json({
+                success: true,
+                item
+            });
+        } catch (error) {
+            console.error(
+                '[ai-content-approve]',
+                error
+            );
+
+            return res.status(400).json({
+                success: false,
+                error:
+                    error.message ||
+                    'Erro ao aprovar conteúdo.'
+            });
+        }
+    }
+);
+
+
+app.post(
+    '/api/ai/content/:id/published',
+    requireAdminAuth,
+    (req, res) => {
+        try {
+            const publishedAt =
+                new Date().toISOString();
+
+            const item =
+                contentQueueStore.updateQueueItem(
+                    req.params.id,
+                    {
+                        status:
+                            'PUBLISHED',
+
+                        publishedAt,
+
+                        publication: {
+                            channel:
+                                req.body?.channel ||
+                                'facebook',
+
+                            confirmedAt:
+                                publishedAt
+                        }
+                    }
+                );
+
+            return res.json({
+                success: true,
+                item
+            });
+
+        } catch (error) {
+            console.error(
+                '[ai-content-published]',
+                error
+            );
+
+            return res.status(400).json({
+                success: false,
+                error:
+                    error.message ||
+                    'Erro ao registrar publicação.'
+            });
+        }
+    }
+);
+
+
+app.post(
+    '/api/ai/content/:id/reject',
+    requireAdminAuth,
+    (req, res) => {
+        try {
+            const item =
+                contentQueueStore.updateQueueItem(
+                    req.params.id,
+                    {
+                        status: 'REJECTED'
+                    }
+                );
+
+            return res.json({
+                success: true,
+                item
+            });
+        } catch (error) {
+            console.error(
+                '[ai-content-reject]',
+                error
+            );
+
+            return res.status(400).json({
+                success: false,
+                error:
+                    error.message ||
+                    'Erro ao rejeitar conteúdo.'
+            });
+        }
+    }
+);
+
+
+
+app.post(
+    '/api/ai/content/:id/regenerate',
+    requireAdminAuth,
+    (req, res) => {
+        try {
+            const current =
+                contentQueueStore.getQueueItem(
+                    req.params.id
+                );
+
+            if (!current) {
+                return res.status(404).json({
+                    success: false,
+                    error:
+                        'Conteúdo não encontrado.'
+                });
+            }
+
+            const job =
+                contentJobStore.createJob({
+                    itemId:
+                        current.itemId,
+
+                    channel:
+                        current.channel,
+
+                    format:
+                        current.format,
+
+                    replaceQueueItemId:
+                        current.id,
+
+                    instruction:
+                        req.body?.instruction ||
+                        null
+                });
+
+            return res.status(202).json({
+                success: true,
+                job
+            });
+
+        } catch (error) {
+            console.error(
+                '[ai-content-regenerate]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    error.message ||
+                    'Erro ao solicitar nova versão.'
+            });
+        }
+    }
+);
+
+
 app.get('/vitrine2', (req, res) => {
     res.render('vitrine2');
 });
@@ -235,6 +1110,10 @@ app.get('/privacidade', (req, res) => {
 
 app.get('/termos', (req, res) => {
     res.render('termos');
+});
+
+app.get('/admin/products-media', (req, res) => {
+    res.render('products-media');
 });
 
 app.get('/admin/vitrine2', (req, res) => {
@@ -341,6 +1220,114 @@ function cleanPrice(value) {
     const number = parseFloat(str);
     return Number.isFinite(number) ? number.toString() : '';
 }
+
+app.get('/go/:itemId', async (req, res) => {
+    const itemId =
+        String(req.params.itemId || '').trim();
+
+    if (!itemId) {
+        return res
+            .status(400)
+            .send('Produto inválido.');
+    }
+
+    try {
+        const product =
+            await productMediaService
+                .getProductByItemId(itemId);
+
+        if (!product) {
+            return res
+                .status(404)
+                .send('Produto não encontrado.');
+        }
+
+        const target =
+            product?.links?.short ||
+            product?.links?.product ||
+            null;
+
+        if (!target) {
+            return res
+                .status(404)
+                .send('Link do produto não encontrado.');
+        }
+
+        const fs = require('fs');
+        const path = require('path');
+
+        const metricsFile =
+            path.join(
+                __dirname,
+                'data',
+                'ai',
+                'outbound-clicks.json'
+            );
+
+        let metrics = [];
+
+        try {
+            if (fs.existsSync(metricsFile)) {
+                metrics =
+                    JSON.parse(
+                        fs.readFileSync(
+                            metricsFile,
+                            'utf8'
+                        )
+                    );
+            }
+        } catch (error) {
+            console.error(
+                '[go-metrics-read]',
+                error
+            );
+            metrics = [];
+        }
+
+        metrics.push({
+            itemId,
+            source:
+                req.query.source || 'direct',
+            channel:
+                req.query.channel || null,
+            group:
+                req.query.group || null,
+            createdAt:
+                new Date().toISOString()
+        });
+
+        try {
+            fs.writeFileSync(
+                metricsFile,
+                JSON.stringify(
+                    metrics,
+                    null,
+                    2
+                ) + '\n'
+            );
+        } catch (error) {
+            console.error(
+                '[go-metrics-write]',
+                error
+            );
+        }
+
+        return res.redirect(target);
+
+    } catch (error) {
+        console.error(
+            '[go-product]',
+            error
+        );
+
+        return res
+            .status(500)
+            .send(
+                'Erro ao abrir produto.'
+            );
+    }
+});
+
 // ============================================================
 // RECEBE O JSON REAL CAPTURADO NO NAVEGADOR
 // ============================================================
