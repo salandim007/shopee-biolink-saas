@@ -148,19 +148,56 @@ function createMetaPublisher(options = {}) {
                 }
             }
 
+            const metaError =
+                metaPayload?.error || null;
+
             console.error(
                 `[META ${channel}] RESPOSTA DE ERRO`,
                 {
                     status,
                     error:
-                        metaPayload?.error || null
+                        metaError
                 }
             );
 
-            throw new MetaPublisherError(
+            let safeMessage =
                 status
                     ? `Falha do ${channel}: HTTP ${status}.`
-                    : `Resposta HTTP inválida do ${channel}.`,
+                    : `Resposta HTTP inválida do ${channel}.`;
+
+            /*
+             * Mensagens seguras e úteis para erros Meta conhecidos.
+             * Não devolvemos a mensagem bruta da API para o navegador.
+             */
+            if (
+                channel === 'Facebook' &&
+                Number(metaError?.code) === 190 &&
+                Number(metaError?.error_subcode) === 463
+            ) {
+                safeMessage =
+                    'O token de acesso do Facebook expirou.';
+            } else if (
+                channel === 'Facebook' &&
+                Number(metaError?.code) === 200 &&
+                typeof metaError?.message === 'string' &&
+                metaError.message.includes('publish_actions')
+            ) {
+                safeMessage =
+                    'O Facebook recusou a publicação: verifique se o SaaS está usando o Page Access Token e a permissão pages_manage_posts.';
+            } else if (
+                metaError?.code
+            ) {
+                const subcode =
+                    metaError?.error_subcode
+                        ? `/${metaError.error_subcode}`
+                        : '';
+
+                safeMessage =
+                    `Falha do ${channel}: HTTP ${status || 'desconhecido'} · Meta ${metaError.code}${subcode}.`;
+            }
+
+            throw new MetaPublisherError(
+                safeMessage,
                 'META_HTTP_ERROR',
                 { status }
             );
