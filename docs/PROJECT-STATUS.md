@@ -284,3 +284,135 @@ Estado confirmado em 2026-09-29:
 - Antes de qualquer nova investigação de mídia, ler `docs/MEDIA-PIPELINE.md`.
 
 Marcador: `SHOPEE_MEDIA_PIPELINE`
+
+---
+
+## Facebook — publicação real validada pela API Meta
+
+Data: 29/09/2026
+
+Status: CONCLUÍDO E VALIDADO
+
+A primeira publicação real do SaaS na Página Facebook "Mix de Produtos"
+foi concluída com sucesso.
+
+Fluxo validado:
+
+Central de Produtos e Mídias
+→ produto avaliado/preparado
+→ aprovação manual
+→ Tap-to-Post
+→ foto selecionada
+→ legenda preparada
+→ link curto oficial Shopee Affiliate
+→ Meta Graph API
+→ Página Facebook Mix de Produtos
+
+Formato validado nesta etapa:
+
+- publicação com foto;
+- legenda gerada/preparada pelo SaaS;
+- CTA:
+  "Quer comprar ou ver mais detalhes?
+   Acesse o produto na Shopee pelo link abaixo";
+- link curto oficial Shopee Affiliate (`https://s.shopee.com.br/...`);
+- publicação diretamente na Página pelo SaaS.
+
+### Arquitetura correta dos tokens Meta
+
+IMPORTANTE: não confundir System User Access Token com Page Access Token.
+
+Fluxo validado:
+
+Meta Business Settings
+→ Usuários
+→ Usuários do sistema
+→ usuário dedicado do SaaS
+→ Página Mix de Produtos atribuída
+→ App Mix de Produtos atribuído
+→ gerar System User Access Token
+→ expiração: Nunca
+→ permissões:
+   - pages_manage_posts
+   - pages_read_engagement
+   - pages_show_list
+   - read_insights
+→ consultar `/me/accounts`
+→ obter Page Access Token da Página Mix de Produtos
+→ salvar esse token em `FACEBOOK_PAGE_ACCESS_TOKEN`
+→ preservar o System User Token separadamente em
+  `FACEBOOK_SYSTEM_USER_ACCESS_TOKEN`
+→ recriar container
+→ validar Graph API
+→ publicar.
+
+### Caminho na interface Meta para gerar o token
+
+Business Settings
+→ Usuários
+→ Usuários do sistema
+→ selecionar usuário do sistema do SaaS
+→ Gerar token
+→ selecionar app Mix de Produtos
+→ expiração Nunca
+→ atribuir permissões da API
+→ gerar token
+
+Antes disso, o usuário do sistema precisa ter:
+
+Página Mix de Produtos:
+- Conteúdo
+- Insights
+
+App Mix de Produtos:
+- Acesso total / Gerenciar app
+
+### Erros encontrados e solução
+
+Erro antigo:
+
+`OAuthException code 190 / subcode 463`
+
+Motivo:
+token antigo expirado.
+
+Depois de criar System User Token, ocorreu:
+
+`(#200) The permission(s) publish_actions are not available`
+
+Causa real:
+o SaaS estava tentando publicar diretamente usando o System User Token.
+
+Solução validada:
+
+System User Token
+→ `/me/accounts`
+→ Page Access Token
+→ publicação via `/{PAGE_ID}/photos`
+
+### Regra permanente
+
+Para publicação Facebook no SaaS:
+
+`FACEBOOK_SYSTEM_USER_ACCESS_TOKEN`
+é a credencial permanente de servidor usada para obter acesso à Página.
+
+`FACEBOOK_PAGE_ACCESS_TOKEN`
+é o token efetivamente utilizado pelo Meta Publisher para publicar na Página.
+
+Nunca registrar valores de tokens, App Secret ou outras credenciais no Git,
+na documentação ou em logs públicos.
+
+### Marco
+
+Primeira publicação real realizada com sucesso na Página:
+
+Mix de Produtos
+
+A publicação exibiu corretamente:
+
+- foto do produto;
+- texto comercial;
+- CTA;
+- link curto clicável da Shopee.
+
