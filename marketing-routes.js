@@ -387,6 +387,11 @@ const pages = {
     pinterest: {
         view: 'marketing-outros',
         title: 'Pinterest'
+    },
+
+    publisher: {
+        view: 'marketing-publisher',
+        title: 'Publicar Produto'
     }
 };
 
@@ -1827,6 +1832,182 @@ router.post(
         }
     }
 );
+
+
+
+/*
+ * Biblioteca de vídeos externos.
+ * Arquivos enviados pelo Termux/PC.
+ */
+
+router.get(
+    '/media-library/videos/:fileName',
+    async (req, res) => {
+        const fileName =
+            path.basename(
+                String(
+                    req.params.fileName ||
+                    ''
+                )
+            );
+
+        const extension =
+            path
+                .extname(fileName)
+                .toLowerCase();
+
+        const allowedExtensions =
+            new Set([
+                '.mp4',
+                '.mov',
+                '.webm',
+                '.m4v'
+            ]);
+
+        if (
+            !fileName ||
+            !allowedExtensions.has(extension)
+        ) {
+            return res.status(400).send(
+                'Arquivo de vídeo inválido.'
+            );
+        }
+
+        const fullPath =
+            path.join(
+                process.cwd(),
+                'data',
+                'media-library',
+                'inbox',
+                fileName
+            );
+
+        try {
+            await fs.promises.access(
+                fullPath,
+                fs.constants.R_OK
+            );
+
+            return res.sendFile(
+                fullPath
+            );
+        }
+        catch {
+            return res.status(404).send(
+                'Vídeo não encontrado.'
+            );
+        }
+    }
+);
+
+
+router.get(
+    '/media-library/videos',
+    async (req, res) => {
+        const inbox =
+            path.join(
+                process.cwd(),
+                'data',
+                'media-library',
+                'inbox'
+            );
+
+        const allowedExtensions =
+            new Set([
+                '.mp4',
+                '.mov',
+                '.webm',
+                '.m4v'
+            ]);
+
+        try {
+            await fs.promises.mkdir(
+                inbox,
+                {
+                    recursive: true
+                }
+            );
+
+            const entries =
+                await fs.promises.readdir(
+                    inbox,
+                    {
+                        withFileTypes: true
+                    }
+                );
+
+            const videos =
+                [];
+
+            for (const entry of entries) {
+                if (!entry.isFile()) {
+                    continue;
+                }
+
+                const extension =
+                    path
+                        .extname(entry.name)
+                        .toLowerCase();
+
+                if (
+                    !allowedExtensions
+                        .has(extension)
+                ) {
+                    continue;
+                }
+
+                const fullPath =
+                    path.join(
+                        inbox,
+                        entry.name
+                    );
+
+                const stat =
+                    await fs.promises.stat(
+                        fullPath
+                    );
+
+                videos.push({
+                    name: entry.name,
+                    size: stat.size,
+                    modifiedAt:
+                        stat.mtime.toISOString()
+                });
+            }
+
+            videos.sort(
+                (a, b) =>
+                    String(b.modifiedAt)
+                        .localeCompare(
+                            String(a.modifiedAt)
+                        )
+            );
+
+            return res.json({
+                success: true,
+                count: videos.length,
+                videos
+            });
+        }
+        catch (error) {
+            console.error(
+                '[VIDEO LIBRARY]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error: {
+                    code:
+                        'VIDEO_LIBRARY_READ_FAILED',
+                    message:
+                        'Não foi possível carregar a biblioteca de vídeos.'
+                }
+            });
+        }
+    }
+);
+
 
 const facebookGroupRadarRoutes = require("./facebook-group-radar-routes");
 router.use("/facebook/groups", facebookGroupRadarRoutes);

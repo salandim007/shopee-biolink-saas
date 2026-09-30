@@ -9,6 +9,7 @@ const CHROME_EXECUTABLE_PATH =
     'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
 const MIN_IMAGES = 5;
+const MAX_IMAGES = 15;
 const MAX_CAPTURE_MS = 6500;
 const SETTLE_MS = 500;
 const POLL_MS = 150;
@@ -277,6 +278,9 @@ async function captureShopeeMedia(
             }
         );
 
+        let lastImageCount =
+            images.size;
+
         captureStartedAt =
             Date.now();
 
@@ -318,22 +322,41 @@ async function captureShopeeMedia(
             } catch {
             }
 
+            const currentImageCount =
+                images.size;
+
             if (
-                images.size >=
-                MIN_IMAGES
+                currentImageCount !==
+                lastImageCount
             ) {
-                if (!enoughAt) {
+                lastImageCount =
+                    currentImageCount;
+
+                if (
+                    currentImageCount >=
+                    MIN_IMAGES
+                ) {
                     enoughAt =
                         Date.now();
                 }
+            }
 
-                if (
-                    Date.now() -
+            if (
+                currentImageCount >=
+                MAX_IMAGES
+            ) {
+                break;
+            }
+
+            if (
+                currentImageCount >=
+                    MIN_IMAGES &&
+                enoughAt &&
+                Date.now() -
                     enoughAt >=
                     SETTLE_MS
-                ) {
-                    break;
-                }
+            ) {
+                break;
             }
 
             await sleep(
@@ -372,7 +395,7 @@ async function captureShopeeMedia(
             ...images
         ].slice(
             0,
-            MIN_IMAGES
+            MAX_IMAGES
         );
 
     const report = {
@@ -411,6 +434,9 @@ async function captureShopeeMedia(
 
             minImages:
                 MIN_IMAGES,
+
+            maxImages:
+                MAX_IMAGES,
 
             maxCaptureMs:
                 MAX_CAPTURE_MS,

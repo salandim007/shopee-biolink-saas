@@ -720,10 +720,371 @@
         }
 
 
+        function normalizeFacebookDraftImages(
+            product
+        ) {
+            const values = [
+                product?.image,
+                ...(
+                    Array.isArray(
+                        product?.images
+                    )
+                        ? product.images
+                        : []
+                )
+            ];
+
+            return [
+                ...new Set(
+                    values
+                        .map(value =>
+                            String(
+                                value || ''
+                            ).trim()
+                        )
+                        .filter(Boolean)
+                )
+            ];
+        }
+
+
+        async function fetchFacebookProductGallery(
+            product
+        ) {
+            const currentImages =
+                normalizeFacebookDraftImages(
+                    product
+                );
+
+            const shopId =
+                String(
+                    product?.shopId || ''
+                ).trim();
+
+            const itemId =
+                String(
+                    product?.itemId || ''
+                ).trim();
+
+            if (
+                !shopId ||
+                !itemId ||
+                currentImages.length >= 3
+            ) {
+                return currentImages;
+            }
+
+            try {
+                const response =
+                    await fetch(
+                        '/admin/vitrine2/marketing/media/gallery',
+                        {
+                            method:
+                                'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    shopId,
+                                    itemId
+                                })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data?.error?.message ||
+                        data?.error ||
+                        'Falha ao buscar galeria.'
+                    );
+                }
+
+                return [
+                    ...new Set([
+                        ...currentImages,
+                        ...(
+                            Array.isArray(
+                                data.images
+                            )
+                                ? data.images
+                                : []
+                        )
+                    ])
+                ]
+                    .map(value =>
+                        String(
+                            value || ''
+                        ).trim()
+                    )
+                    .filter(Boolean);
+            }
+            catch (error) {
+                console.warn(
+                    '[FACEBOOK] Galeria adicional indisponível:',
+                    error
+                );
+
+                return currentImages;
+            }
+        }
+
+
+        function applyFacebookDraftGallery(
+            images,
+            title
+        ) {
+            const normalized =
+                Array.isArray(images)
+                    ? [
+                        ...new Set(
+                            images
+                                .map(value =>
+                                    String(
+                                        value || ''
+                                    ).trim()
+                                )
+                                .filter(Boolean)
+                        )
+                    ]
+                    : [];
+
+            const mainImage =
+                document.getElementById(
+                    'facebookDraftMainImage'
+                );
+
+            const status =
+                document.getElementById(
+                    'facebookDraftGalleryStatus'
+                );
+
+            if (
+                mainImage &&
+                normalized[0]
+            ) {
+                mainImage.src =
+                    normalized[0];
+
+                mainImage.alt =
+                    title || 'Produto';
+            }
+
+            for (
+                let index = 0;
+                index < 2;
+                index += 1
+            ) {
+                const button =
+                    document.getElementById(
+                        `facebookDraftThumb${index + 1}`
+                    );
+
+                const image =
+                    document.getElementById(
+                        `facebookDraftThumbImage${index + 1}`
+                    );
+
+                const placeholder =
+                    document.getElementById(
+                        `facebookDraftThumbPlaceholder${index + 1}`
+                    );
+
+                const imageUrl =
+                    normalized[index + 1] ||
+                    '';
+
+                if (!button) {
+                    continue;
+                }
+
+                if (imageUrl) {
+                    button.disabled =
+                        false;
+
+                    button.dataset.fullImage =
+                        imageUrl;
+
+                    if (image) {
+                        image.src =
+                            imageUrl;
+
+                        image.alt =
+                            `${title || 'Produto'} - imagem ${index + 2}`;
+
+                        image.classList.remove(
+                            'hidden'
+                        );
+                    }
+
+                    if (placeholder) {
+                        placeholder.classList.add(
+                            'hidden'
+                        );
+                    }
+                }
+                else {
+                    button.disabled =
+                        true;
+
+                    button.dataset.fullImage =
+                        '';
+
+                    if (image) {
+                        image.classList.add(
+                            'hidden'
+                        );
+                    }
+
+                    if (placeholder) {
+                        placeholder.classList.remove(
+                            'hidden'
+                        );
+
+                        placeholder.textContent =
+                            'Sem imagem extra';
+                    }
+                }
+            }
+
+            if (status) {
+                if (
+                    normalized.length >= 3
+                ) {
+                    status.textContent =
+                        `${normalized.length} imagens encontradas. As 3 primeiras estão prontas para revisão.`;
+                }
+                else if (
+                    normalized.length === 2
+                ) {
+                    status.textContent =
+                        '2 imagens disponíveis para este produto.';
+                }
+                else {
+                    status.textContent =
+                        'Somente a imagem principal está disponível.';
+                }
+            }
+        }
+
+
+        function swapFacebookDraftImage(
+            button
+        ) {
+            if (
+                !button ||
+                button.disabled
+            ) {
+                return;
+            }
+
+            const nextImage =
+                String(
+                    button.dataset.fullImage ||
+                    ''
+                ).trim();
+
+            const mainImage =
+                document.getElementById(
+                    'facebookDraftMainImage'
+                );
+
+            const thumbImage =
+                button.querySelector(
+                    'img'
+                );
+
+            if (
+                !nextImage ||
+                !mainImage ||
+                !thumbImage
+            ) {
+                return;
+            }
+
+            const currentMain =
+                mainImage.src;
+
+            const currentAlt =
+                mainImage.alt;
+
+            mainImage.src =
+                nextImage;
+
+            mainImage.alt =
+                thumbImage.alt;
+
+            thumbImage.src =
+                currentMain;
+
+            thumbImage.alt =
+                currentAlt;
+
+            button.dataset.fullImage =
+                currentMain;
+        }
+
+
+        function formatFacebookDraftPrice(
+            value
+        ) {
+            const number =
+                Number(value);
+
+            if (
+                !Number.isFinite(number)
+            ) {
+                return '';
+            }
+
+            return number.toLocaleString(
+                'pt-BR',
+                {
+                    style:
+                        'currency',
+
+                    currency:
+                        'BRL'
+                }
+            );
+        }
+
+
         async function prepareFacebookContentForProduct(
             marketplace,
             itemId
         ) {
+
+            const params =
+                new URLSearchParams({
+                    channel: 'facebook',
+                    marketplace:
+                        String(
+                            marketplace ||
+                            'shopee'
+                        ),
+                    itemId:
+                        String(
+                            itemId ||
+                            ''
+                        )
+                });
+
+            window.location.href =
+                '/admin/vitrine2/marketing/publisher?' +
+                params.toString();
+
+            return;
+
             try {
                 const items =
                     await fetchCatalogProducts();
@@ -755,6 +1116,128 @@
                 const product =
                     selectedItem.product || {};
 
+                const facebookShopUrl =
+                    'https://www.facebook.com/mixxdeproduto/shop/?ref_code=share_shop&ref_surface=share_shop';
+
+                const shopeeStorefrontUrl =
+                    'https://collshp.com/mix_de_produtos?view=storefront';
+
+                const mainProductUrl =
+                    productLink(
+                        product
+                    );
+
+                const initialImages =
+                    normalizeFacebookDraftImages(
+                        product
+                    );
+
+                const priceLabel =
+                    formatFacebookDraftPrice(
+                        product.price
+                    );
+
+                const originalPrice =
+                    Number(
+                        product.originalPrice
+                    );
+
+                const currentPrice =
+                    Number(
+                        product.price
+                    );
+
+                const showOriginalPrice =
+                    Number.isFinite(
+                        originalPrice
+                    ) &&
+                    Number.isFinite(
+                        currentPrice
+                    ) &&
+                    originalPrice >
+                        currentPrice;
+
+                let discount =
+                    Number(
+                        product.priceDiscountRate
+                    );
+
+                if (
+                    Number.isFinite(discount) &&
+                    discount > 0 &&
+                    discount <= 1
+                ) {
+                    discount *= 100;
+                }
+
+                discount =
+                    Number.isFinite(discount) &&
+                    discount > 0
+                        ? Math.round(
+                            discount
+                        )
+                        : null;
+
+                const rating =
+                    Number(
+                        product.ratingStar
+                    );
+
+                const sales =
+                    Number(
+                        product.sales
+                    );
+
+                const ratingLabel =
+                    Number.isFinite(rating) &&
+                    rating > 0
+                        ? rating
+                            .toFixed(1)
+                            .replace(
+                                '.',
+                                ','
+                            )
+                        : '';
+
+                const salesLabel =
+                    Number.isFinite(sales) &&
+                    sales > 0
+                        ? `${sales} vendidos`
+                        : '';
+
+                const draftLines = [
+                    '✨ Confira este achado!',
+                    '',
+                    product.title ||
+                        'Produto selecionado',
+                    '',
+                    priceLabel
+                        ? `💰 ${priceLabel}`
+                        : '',
+                    ratingLabel
+                        ? `⭐ ${ratingLabel}${salesLabel ? ` · ${salesLabel}` : ''}`
+                        : (
+                            salesLabel
+                                ? `🛍️ ${salesLabel}`
+                                : ''
+                        ),
+                    '',
+                    '👉 Ver oferta do produto:',
+                    mainProductUrl,
+                    '',
+                    '🔎 Explore mais:',
+                    `Loja Mix de Produtos no Facebook: ${facebookShopUrl}`,
+                    `Vitrine Oficial na Shopee: ${shopeeStorefrontUrl}`
+                ]
+                    .filter(
+                        line =>
+                            line !==
+                            null &&
+                            line !==
+                            undefined
+                    )
+                    .join('\n');
+
                 const modal =
                     document.createElement(
                         'div'
@@ -764,16 +1247,53 @@
                     'facebookContentDraftModal';
 
                 modal.className =
-                    'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
+                    'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3 md:p-5';
 
                 modal.innerHTML = `
-                    <div class="bg-white w-full max-w-xl rounded-2xl shadow-xl overflow-hidden">
-                        <div class="px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+                    <div
+                        class="
+                            bg-white
+                            w-full
+                            max-w-6xl
+                            rounded-2xl
+                            shadow-xl
+                            overflow-hidden
+                        "
+                    >
+                        <div
+                            class="
+                                px-4
+                                md:px-5
+                                py-3
+                                border-b
+                                border-slate-200
+                                flex
+                                items-center
+                                justify-between
+                                gap-3
+                            "
+                        >
                             <div>
-                                <div class="text-xs uppercase tracking-wide font-bold text-blue-700">
-                                    Facebook
+                                <div
+                                    class="
+                                        text-xs
+                                        uppercase
+                                        tracking-wide
+                                        font-bold
+                                        text-blue-700
+                                    "
+                                >
+                                    Facebook · Feed
                                 </div>
-                                <h2 class="mt-1 text-lg font-extrabold">
+
+                                <h2
+                                    class="
+                                        mt-1
+                                        text-lg
+                                        md:text-xl
+                                        font-extrabold
+                                    "
+                                >
                                     Preparar conteúdo
                                 </h2>
                             </div>
@@ -781,83 +1301,558 @@
                             <button
                                 type="button"
                                 onclick="closeFacebookContentDraft()"
-                                class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600"
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-full
+                                    bg-slate-100
+                                    hover:bg-slate-200
+                                    text-slate-600
+                                    shrink-0
+                                "
                                 aria-label="Fechar"
                             >
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
 
-                        <div class="p-4 max-h-[70vh] overflow-y-auto">
-                            <div class="flex gap-4 items-start">
-                                <img
-                                    src="${escapeHtml(product.image || '')}"
-                                    alt=""
-                                    class="w-20 h-20 rounded-2xl object-cover bg-slate-100 shrink-0"
+                        <div
+                            class="
+                                p-4
+                                md:p-5
+                                max-h-[78vh]
+                                overflow-y-auto
+                            "
+                        >
+                            <div
+                                class="
+                                    grid
+                                    grid-cols-1
+                                    lg:grid-cols-[minmax(0,1.05fr)_minmax(0,.95fr)]
+                                    gap-5
+                                "
+                            >
+
+                                <section
+                                    class="
+                                        rounded-2xl
+                                        border
+                                        border-slate-200
+                                        bg-slate-50
+                                        p-3
+                                    "
                                 >
+                                    <div
+                                        class="
+                                            grid
+                                            grid-cols-2
+                                            lg:grid-cols-[minmax(0,1fr)_140px]
+                                            gap-3
+                                        "
+                                    >
+                                        <div
+                                            class="
+                                                col-span-2
+                                                lg:col-span-1
+                                            "
+                                        >
+                                            <img
+                                                id="facebookDraftMainImage"
+                                                src="${escapeHtml(initialImages[0] || product.image || '')}"
+                                                alt="${escapeHtml(product.title || 'Produto')}"
+                                                class="
+                                                    w-full
+                                                    aspect-square
+                                                    lg:aspect-[4/3]
+                                                    object-cover
+                                                    rounded-2xl
+                                                    bg-white
+                                                    border
+                                                    border-slate-200
+                                                "
+                                            >
+                                        </div>
 
-                                <div class="min-w-0">
-                                    <div class="text-xs font-bold uppercase tracking-wide text-slate-400">
-                                        Produto
+                                        <div
+                                            class="
+                                                col-span-2
+                                                lg:col-span-1
+                                                grid
+                                                grid-cols-2
+                                                lg:grid-cols-1
+                                                gap-3
+                                            "
+                                        >
+                                            <button
+                                                id="facebookDraftThumb1"
+                                                type="button"
+                                                onclick="swapFacebookDraftImage(this)"
+                                                class="
+                                                    aspect-square
+                                                    rounded-2xl
+                                                    overflow-hidden
+                                                    border
+                                                    border-slate-200
+                                                    bg-white
+                                                    disabled:bg-slate-100
+                                                    disabled:text-slate-400
+                                                    transition
+                                                "
+                                                disabled
+                                            >
+                                                <img
+                                                    id="facebookDraftThumbImage1"
+                                                    src=""
+                                                    alt=""
+                                                    class="
+                                                        hidden
+                                                        w-full
+                                                        h-full
+                                                        object-cover
+                                                    "
+                                                >
+
+                                                <span
+                                                    id="facebookDraftThumbPlaceholder1"
+                                                    class="
+                                                        flex
+                                                        w-full
+                                                        h-full
+                                                        items-center
+                                                        justify-center
+                                                        px-2
+                                                        text-xs
+                                                        text-slate-400
+                                                        text-center
+                                                    "
+                                                >
+                                                    Buscando imagem...
+                                                </span>
+                                            </button>
+
+                                            <button
+                                                id="facebookDraftThumb2"
+                                                type="button"
+                                                onclick="swapFacebookDraftImage(this)"
+                                                class="
+                                                    aspect-square
+                                                    rounded-2xl
+                                                    overflow-hidden
+                                                    border
+                                                    border-slate-200
+                                                    bg-white
+                                                    disabled:bg-slate-100
+                                                    disabled:text-slate-400
+                                                    transition
+                                                "
+                                                disabled
+                                            >
+                                                <img
+                                                    id="facebookDraftThumbImage2"
+                                                    src=""
+                                                    alt=""
+                                                    class="
+                                                        hidden
+                                                        w-full
+                                                        h-full
+                                                        object-cover
+                                                    "
+                                                >
+
+                                                <span
+                                                    id="facebookDraftThumbPlaceholder2"
+                                                    class="
+                                                        flex
+                                                        w-full
+                                                        h-full
+                                                        items-center
+                                                        justify-center
+                                                        px-2
+                                                        text-xs
+                                                        text-slate-400
+                                                        text-center
+                                                    "
+                                                >
+                                                    Buscando imagem...
+                                                </span>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="mt-1 font-extrabold text-slate-900">
+
+                                    <div
+                                        id="facebookDraftGalleryStatus"
+                                        class="
+                                            mt-3
+                                            text-xs
+                                            text-slate-500
+                                        "
+                                    >
+                                        Buscando imagens adicionais da Shopee...
+                                    </div>
+                                </section>
+
+
+                                <section
+                                    class="
+                                        min-w-0
+                                        rounded-2xl
+                                        border
+                                        border-slate-200
+                                        bg-white
+                                        p-4
+                                        md:p-5
+                                    "
+                                >
+                                    <div
+                                        class="
+                                            inline-flex
+                                            items-center
+                                            rounded-full
+                                            bg-blue-50
+                                            px-3
+                                            py-1.5
+                                            text-xs
+                                            font-bold
+                                            text-blue-700
+                                        "
+                                    >
+                                        Feed · Manual assistido
+                                    </div>
+
+                                    <h3
+                                        class="
+                                            mt-3
+                                            text-lg
+                                            font-extrabold
+                                            text-slate-900
+                                            leading-snug
+                                        "
+                                    >
                                         ${escapeHtml(product.title || 'Produto selecionado')}
+                                    </h3>
+
+                                    <div
+                                        class="
+                                            mt-3
+                                            flex
+                                            flex-wrap
+                                            items-end
+                                            gap-2
+                                        "
+                                    >
+                                        ${
+                                            priceLabel
+                                                ? `
+                                                    <span
+                                                        class="
+                                                            text-2xl
+                                                            font-extrabold
+                                                            text-slate-950
+                                                        "
+                                                    >
+                                                        ${escapeHtml(priceLabel)}
+                                                    </span>
+                                                `
+                                                : ''
+                                        }
+
+                                        ${
+                                            showOriginalPrice
+                                                ? `
+                                                    <span
+                                                        class="
+                                                            text-sm
+                                                            text-slate-400
+                                                            line-through
+                                                        "
+                                                    >
+                                                        ${escapeHtml(formatFacebookDraftPrice(originalPrice))}
+                                                    </span>
+                                                `
+                                                : ''
+                                        }
+
+                                        ${
+                                            discount
+                                                ? `
+                                                    <span
+                                                        class="
+                                                            rounded-full
+                                                            bg-red-50
+                                                            px-2.5
+                                                            py-1
+                                                            text-xs
+                                                            font-bold
+                                                            text-red-600
+                                                        "
+                                                    >
+                                                        -${discount}%
+                                                    </span>
+                                                `
+                                                : ''
+                                        }
                                     </div>
-                                </div>
-                            </div>
 
-                            <div class="mt-4 grid grid-cols-3 gap-2">
-                                <div class="rounded-xl border border-slate-200 p-2.5">
-                                    <div class="font-bold text-sm">Feed</div>
-                                    <div class="text-xs text-slate-500 mt-1">Imagem/carrossel.</div>
-                                </div>
+                                    <div
+                                        class="
+                                            mt-3
+                                            flex
+                                            flex-wrap
+                                            gap-2
+                                        "
+                                    >
+                                        ${
+                                            ratingLabel
+                                                ? `
+                                                    <span
+                                                        class="
+                                                            rounded-full
+                                                            bg-amber-50
+                                                            px-3
+                                                            py-1.5
+                                                            text-sm
+                                                            font-medium
+                                                            text-amber-700
+                                                        "
+                                                    >
+                                                        ⭐ ${escapeHtml(ratingLabel)}
+                                                    </span>
+                                                `
+                                                : ''
+                                        }
 
-                                <div class="rounded-xl border border-slate-200 p-2.5">
-                                    <div class="font-bold text-sm">Reels</div>
-                                    <div class="text-xs text-slate-500 mt-1">Vídeo vertical.</div>
-                                </div>
+                                        ${
+                                            salesLabel
+                                                ? `
+                                                    <span
+                                                        class="
+                                                            rounded-full
+                                                            bg-slate-100
+                                                            px-3
+                                                            py-1.5
+                                                            text-sm
+                                                            font-medium
+                                                            text-slate-600
+                                                        "
+                                                    >
+                                                        ${escapeHtml(salesLabel)}
+                                                    </span>
+                                                `
+                                                : ''
+                                        }
+                                    </div>
 
-                                <div class="rounded-xl border border-slate-200 p-2.5">
-                                    <div class="font-bold text-sm">Campanha</div>
-                                    <div class="text-xs text-slate-500 mt-1">Anúncio.</div>
-                                </div>
-                            </div>
+                                    <div class="mt-5">
+                                        <label
+                                            class="
+                                                block
+                                                text-sm
+                                                font-bold
+                                                text-slate-700
+                                                mb-2
+                                            "
+                                        >
+                                            Rascunho da publicação
+                                        </label>
 
-                            <div class="mt-5">
-                                <label class="block text-sm font-bold text-slate-700 mb-2">
-                                    Rascunho inicial
-                                </label>
+                                        <textarea
+                                            id="facebookDraftText"
+                                            rows="10"
+                                            class="
+                                                w-full
+                                                rounded-xl
+                                                border
+                                                border-slate-200
+                                                px-4
+                                                py-3
+                                                text-sm
+                                                resize-y
+                                                leading-relaxed
+                                            "
+                                        >${escapeHtml(draftLines)}</textarea>
+                                    </div>
 
-                                <textarea
-                                    rows="6"
-                                    class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm resize-y"
-                                >✨ Confira este achado!
 
-${escapeHtml(product.title || 'Produto selecionado')}
+                                    <div
+                                        class="
+                                            mt-4
+                                            rounded-xl
+                                            border
+                                            border-blue-100
+                                            bg-blue-50/50
+                                            p-4
+                                        "
+                                    >
+                                        <div
+                                            class="
+                                                text-sm
+                                                font-extrabold
+                                                text-slate-800
+                                            "
+                                        >
+                                            Links
+                                        </div>
 
-Veja os detalhes, preço atual e disponibilidade na nossa vitrine.
+                                        <div class="mt-3 space-y-3">
+                                            <div>
+                                                <div
+                                                    class="
+                                                        text-xs
+                                                        font-bold
+                                                        uppercase
+                                                        tracking-wide
+                                                        text-slate-400
+                                                    "
+                                                >
+                                                    Oferta do produto
+                                                </div>
 
-👉 Acesse pelo link da bio.</textarea>
-                            </div>
+                                                <a
+                                                    href="${escapeHtml(mainProductUrl)}"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    class="
+                                                        mt-1
+                                                        inline-block
+                                                        text-sm
+                                                        font-semibold
+                                                        text-blue-600
+                                                        hover:text-blue-800
+                                                        underline
+                                                        underline-offset-2
+                                                        break-all
+                                                    "
+                                                >
+                                                    Ver oferta do produto
+                                                </a>
+                                            </div>
 
-                            <div class="mt-3 rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm text-amber-800">
-                                Publicação automática ainda não ativa. Fluxo: preparar → revisar → aprovar → agendar/publicar.
+                                            <div
+                                                class="
+                                                    border-t
+                                                    border-blue-100
+                                                    pt-3
+                                                "
+                                            >
+                                                <div
+                                                    class="
+                                                        text-xs
+                                                        font-bold
+                                                        uppercase
+                                                        tracking-wide
+                                                        text-slate-400
+                                                    "
+                                                >
+                                                    Explore mais
+                                                </div>
+
+                                                <div
+                                                    class="
+                                                        mt-2
+                                                        flex
+                                                        flex-col
+                                                        gap-2
+                                                    "
+                                                >
+                                                    <a
+                                                        href="${escapeHtml(facebookShopUrl)}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="
+                                                            text-sm
+                                                            font-semibold
+                                                            text-blue-600
+                                                            hover:text-blue-800
+                                                            underline
+                                                            underline-offset-2
+                                                        "
+                                                    >
+                                                        <i class="fa-brands fa-facebook mr-1"></i>
+                                                        Loja Mix de Produtos no Facebook
+                                                    </a>
+
+                                                    <a
+                                                        href="${escapeHtml(shopeeStorefrontUrl)}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="
+                                                            text-sm
+                                                            font-semibold
+                                                            text-blue-600
+                                                            hover:text-blue-800
+                                                            underline
+                                                            underline-offset-2
+                                                        "
+                                                    >
+                                                        <i class="fa-solid fa-store mr-1"></i>
+                                                        Vitrine Oficial na Shopee
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="
+                                            mt-4
+                                            rounded-xl
+                                            bg-slate-50
+                                            border
+                                            border-slate-200
+                                            px-4
+                                            py-3
+                                            text-sm
+                                            text-slate-600
+                                        "
+                                    >
+                                        Modo atual: manual assistido. Revise o conteúdo antes de aprovar.
+                                    </div>
+                                </section>
                             </div>
                         </div>
 
-                        <div class="px-4 py-3 border-t border-slate-200 flex flex-wrap justify-end gap-2">
+                        <div
+                            class="
+                                px-4
+                                md:px-5
+                                py-3
+                                border-t
+                                border-slate-200
+                                flex
+                                flex-wrap
+                                justify-end
+                                gap-2
+                            "
+                        >
                             <button
                                 type="button"
                                 onclick="closeFacebookContentDraft()"
-                                class="rounded-xl bg-slate-100 hover:bg-slate-200 px-4 py-2.5 text-sm font-bold"
+                                class="
+                                    rounded-xl
+                                    bg-slate-100
+                                    hover:bg-slate-200
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    font-bold
+                                "
                             >
                                 Fechar
                             </button>
 
                             <button
                                 type="button"
-                                onclick="window.alert('Rascunho aprovado. Salvar/agendar/publicar será implementado na próxima etapa do Facebook.')"
-                                class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-bold"
+                                onclick="window.alert('Rascunho aprovado. O próximo passo será ligar esta aprovação ao fluxo de publicação do Facebook.')"
+                                class="
+                                    rounded-xl
+                                    bg-blue-600
+                                    hover:bg-blue-700
+                                    text-white
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    font-bold
+                                "
                             >
                                 Aprovar rascunho
                             </button>
@@ -868,6 +1863,29 @@ Veja os detalhes, preço atual e disponibilidade na nossa vitrine.
                 document.body.appendChild(
                     modal
                 );
+
+                applyFacebookDraftGallery(
+                    initialImages,
+                    product.title ||
+                        'Produto'
+                );
+
+                fetchFacebookProductGallery(
+                    product
+                )
+                    .then(images => {
+                        applyFacebookDraftGallery(
+                            images,
+                            product.title ||
+                                'Produto'
+                        );
+                    })
+                    .catch(error => {
+                        console.warn(
+                            '[FACEBOOK] Não foi possível atualizar galeria:',
+                            error
+                        );
+                    });
             }
             catch (error) {
                 console.error(

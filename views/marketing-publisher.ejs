@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Publicar Produto</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6f8;font-family:Arial,sans-serif;color:#1f2937}
+.page{max-width:1350px;margin:auto;padding:24px}
+h1{margin:0 0 5px;font-size:28px}
+.sub{color:#667085;margin-bottom:22px}
+.layout{display:grid;grid-template-columns:420px 1fr;gap:22px}
+.card{background:#fff;border:1px solid #ddd;border-radius:16px;padding:20px}
+.main-img{width:100%;aspect-ratio:1;background:#eee;border-radius:12px;overflow:hidden}
+.main-img img{width:100%;height:100%;object-fit:cover}
+.thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.thumb{border:2px solid transparent;border-radius:8px;padding:0;overflow:hidden;background:#eee}
+.thumb.active{border-color:#1877f2}
+.thumb img{width:100%;display:block}
+.thumb{position:relative}
+.cover-badge{
+position:absolute;
+left:4px;
+bottom:4px;
+background:#1877f2;
+color:#fff;
+font-size:10px;
+font-weight:bold;
+padding:3px 5px;
+border-radius:5px
+}
+.channels{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.channel,.media-tab,.format{border:1px solid #ccc;background:#fff;border-radius:9px;padding:10px 14px;cursor:pointer}
+.channel.active,.media-tab.active,.format.active{border-color:#1877f2;background:#eef5ff;color:#0b5ed7}
+.formats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+label{font-weight:bold;display:block;margin:14px 0 6px}
+textarea,input,select{width:100%;padding:11px;border:1px solid #ccc;border-radius:9px;font:inherit}
+textarea{min-height:135px}
+.preview{margin-top:20px;border:1px solid #ddd;border-radius:12px;padding:16px;background:#fafafa}
+.publish{margin-top:20px;width:100%;padding:14px;border:0;border-radius:10px;background:#1877f2;color:white;font-size:16px;font-weight:bold}
+@media(max-width:1100px){
+.layout{grid-template-columns:1fr}
+.page{padding:14px}
+.channels,.formats{gap:7px}
+.channel,.media-tab,.format{
+    flex:1 1 calc(50% - 7px);
+    min-height:44px;
+}
+.thumbs{
+    grid-template-columns:repeat(4,1fr);
+}
+.thumb{
+    min-height:64px;
+}
+.preview{
+    overflow:hidden;
+}
+textarea,input,select{
+    font-size:16px;
+}
+.publish{
+    min-height:48px;
+}
+}
+
+@media(max-width:480px){
+.thumbs{
+    grid-template-columns:repeat(3,1fr);
+}
+}
+</style>
+
+<style>
+#previewMediaArea{
+    max-height:280px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#f4f6f8;
+}
+
+#previewMediaArea img,
+#previewMediaArea video{
+    width:100% !important;
+    max-height:280px;
+    object-fit:contain;
+    display:block;
+}
+
+@media(max-width:1100px){
+    #previewMediaArea{
+        max-height:220px;
+    }
+
+    #previewMediaArea img,
+    #previewMediaArea video{
+        max-height:220px;
+    }
+}
+</style>
+
+
+<style>
+@media(max-width:1100px){
+
+    .layout{
+        gap:14px;
+    }
+
+    .layout > .card:first-child{
+        padding:14px;
+    }
+
+    .main-img{
+        height:280px;
+        aspect-ratio:auto;
+        background:#fff;
+    }
+
+    .main-img img{
+        object-fit:contain;
+    }
+
+    .thumbs{
+        grid-template-columns:repeat(5,minmax(0,1fr));
+        gap:6px;
+    }
+
+    .thumb{
+        min-height:0;
+        aspect-ratio:1/1;
+    }
+}
+
+@media(max-width:480px){
+
+    .main-img{
+        height:240px;
+    }
+
+    .thumbs{
+        grid-template-columns:repeat(5,minmax(0,1fr));
+    }
+}
+</style>
+
+
+<!-- PREVIEW_COMPACT_V1 -->
+<style>
+#previewMediaArea{
+    max-height:280px;
+    overflow:hidden;
+}
+#previewMediaArea img,
+#previewMediaArea video{
+    width:100% !important;
+    max-height:280px;
+    object-fit:contain;
+}
+@media(max-width:1100px){
+    #previewMediaArea,
+    #previewMediaArea img,
+    #previewMediaArea video{
+        max-height:220px;
+    }
+}
+</style>
+
+
+<style>
+.facebook-single-photo{
+    width:100%;
+    height:280px;
+    object-fit:cover;
+    display:block;
+}
+
+@media(max-width:1100px){
+    .facebook-single-photo{
+        height:220px;
+    }
+}
+</style>
+
+</head>
+<body>
+
+<div class="page">
+
+<div style="margin-bottom:14px">
+<a
+href="/admin/vitrine2/marketing/overview"
+style="display:inline-block;text-decoration:none;color:#1877f2;font-weight:bold">
+← Central de Marketing
+</a>
+</div>
+
+
+
+<div class="layout">
+
+<section class="card">
+
+<div style="font-size:12px;font-weight:bold;color:#ee4d2d;margin-bottom:8px">
+SHOPEE
+</div>
+
+<h2 id="productTitle" style="font-size:19px;margin-top:0">
+Produto selecionado
+</h2>
+
+<div style="display:flex;gap:8px;margin-bottom:14px">
+<button
+    type="button"
+    id="mediaTabPhotos"
+    class="media-tab active">
+    Fotos
+</button>
+
+<button
+    type="button"
+    id="mediaTabVideos"
+    class="media-tab">
+    Vídeos
+</button>
+
+<button
+    type="button"
+    id="mediaTabPreview"
+    class="media-tab">
+    Prévia
+</button>
+</div>
+
+<div
+    id="videoLibraryInfo"
+    style="display:none;margin-bottom:14px;padding:12px;border:1px solid #ddd;border-radius:10px;background:#fafafa;color:#667085;font-size:13px">
+    Biblioteca de vídeos:
+    data/media-library/inbox/
+</div>
+
+<div id="previewHost" style="display:none"></div>
+
+<div class="main-img">
+<img
+id="mainImage"
+src="https://placehold.co/700x700?text=Produto"
+alt="Produto">
+</div>
+
+<div class="thumbs" id="photoThumbs"></div>
+
+<p id="photoStatus" style="font-size:13px;color:#667085">
+Aqui aparecerão até 15 imagens disponíveis do produto.
+</p>
+
+</section>
+
+<section class="card">
+
+<div style="font-size:13px;font-weight:bold;color:#667085;margin-bottom:10px">
+CANAL DE PUBLICAÇÃO
+</div>
+
+<div class="channels">
+
+<button class="channel active">
+Facebook
+</button>
+
+<button class="channel">
+Instagram
+</button>
+
+<button class="channel">
+TikTok
+</button>
+
+<button class="channel">
+YouTube
+</button>
+
+<button class="channel">
+Kwai
+</button>
+
+<button class="channel">
+Pinterest
+</button>
+
+</div>
+
+<div style="font-size:13px;font-weight:bold;color:#667085;margin-bottom:10px">
+FORMATO
+</div>
+
+<div class="formats">
+
+<button class="format active">
+Oferta clicável
+</button>
+
+<button class="format">
+Foto única
+</button>
+
+<button class="format">
+Galeria
+</button>
+
+<button class="format">
+Reel
+</button>
+
+</div>
+
+<label for="caption">
+Texto da publicação
+</label>
+
+<textarea id="caption">🔥 Confira este achado!
+
+Produto selecionado com ótimo custo-benefício.
+
+👉 Clique em Comprar agora para ver a oferta.</textarea>
+
+<label for="cta">
+Chamada para ação
+</label>
+
+<select id="cta">
+<option>Comprar agora</option>
+<option>Ver oferta</option>
+<option>Saiba mais</option>
+</select>
+
+<label for="affiliateLink">
+Link afiliado
+</label>
+
+<div style="display:flex;gap:8px;align-items:center">
+<input
+id="affiliateLink"
+value="https://s.shopee.com.br/exemplo"
+readonly
+style="background:#f5f5f5;cursor:default">
+
+<button
+type="button"
+id="copyAffiliateLink"
+class="channel">
+Copiar
+</button>
+
+<button
+type="button"
+id="testAffiliateLink"
+class="channel">
+Testar
+</button>
+</div>
+
+<div class="preview">
+<strong>Prévia da publicação</strong>
+
+<div
+id="previewMeta"
+style="font-size:12px;color:#667085;margin:8px 0 12px">
+Facebook · Oferta clicável
+</div>
+
+<div
+id="facebookPreviewCard"
+style="border:1px solid #d0d7de;border-radius:14px;background:#fff;overflow:hidden">
+
+<div style="padding:12px 12px 8px">
+<div style="font-weight:bold;font-size:14px">
+Mix de Produtos
+</div>
+
+<div style="font-size:12px;color:#667085;margin-top:2px">
+Agora mesmo · Público
+</div>
+
+<div
+id="previewCaption"
+style="margin-top:10px;font-size:14px;line-height:1.45;white-space:pre-wrap;color:#182230">
+🔥 Confira este achado!
+</div>
+</div>
+
+<div
+id="previewMediaArea"
+style="background:#f4f6f8">
+<img
+id="previewMediaImage"
+src="https://placehold.co/700x700?text=Produto"
+alt="Prévia do produto"
+style="width:100%;display:block">
+</div>
+
+<div style="padding:10px 12px;border-top:1px solid #eef1f4">
+<div
+id="previewLinkDomain"
+style="font-size:11px;color:#667085;text-transform:uppercase">
+s.shopee.com.br
+</div>
+
+<div
+id="previewProductTitle"
+style="font-size:14px;font-weight:bold;color:#182230;margin-top:4px">
+Produto selecionado
+</div>
+
+<div
+id="previewCTA"
+style="margin-top:10px;display:inline-block;background:#1877f2;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:bold">
+Comprar agora
+</div>
+</div>
+</div>
+
+<p
+id="previewHint"
+style="color:#667085;margin-top:10px">
+Prévia adaptada para o canal escolhido.
+</p>
+</div>
+
+<button
+type="button"
+class="publish">
+Publicar
+</button>
+
+</section>
+
+</div>
+</div>
+
+<script>
+const channelFormats = {
+    Facebook: ['Oferta clicável','Foto única','Galeria','Reel'],
+    Instagram: ['Foto','Carrossel','Reel'],
+    TikTok: ['Vídeo'],
+    YouTube: ['Short'],
+    Kwai: ['Vídeo'],
+    Pinterest: ['Pin','Vídeo Pin']
+};
+
+const channels =
+    document.querySelectorAll('.channels .channel');
+
+const formatsBox =
+    document.querySelector('.formats');
+
+const previewText =
+    document.getElementById('previewHint');
+
+function syncPublisherPreview() {
+    const activeChannel =
+        document
+            .querySelector('.channels .channel.active')
+            ?.textContent.trim() ||
+        'Facebook';
+
+    const activeFormat =
+        document
+            .querySelector('.format.active')
+            ?.textContent.trim() ||
+        'Oferta clicável';
+
+    const caption =
+        document.getElementById('caption')
+            ?.value ||
+        '';
+
+    const cta =
+        document.getElementById('cta')
+            ?.value ||
+        'Comprar agora';
+
+    const title =
+        document.getElementById('productTitle')
+            ?.textContent
+            ?.trim() ||
+        'Produto selecionado';
+
+    const link =
+        document.getElementById('affiliateLink')
+            ?.value ||
+        '';
+
+    const mainImage =
+        document.getElementById('mainImage')
+            ?.src ||
+        'https://placehold.co/700x700?text=Produto';
+
+    const previewMeta =
+        document.getElementById('previewMeta');
+
+    const previewCaption =
+        document.getElementById('previewCaption');
+
+    const previewProductTitle =
+        document.getElementById('previewProductTitle');
+
+    const previewCTA =
+        document.getElementById('previewCTA');
+
+    const previewLinkDomain =
+        document.getElementById('previewLinkDomain');
+
+    const previewMediaArea =
+        document.getElementById('previewMediaArea');
+
+    previewMeta.textContent =
+        `${activeChannel} · ${activeFormat}`;
+
+    previewCaption.textContent =
+        caption ||
+        'Sem texto informado.';
+
+    previewProductTitle.textContent =
+        title;
+
+    previewCTA.textContent =
+        cta;
+
+    try {
+        previewLinkDomain.textContent =
+            link
+                ? new URL(link).hostname
+                    .replace(/^www\./, '')
+                : 'link indisponível';
+    } catch {
+        previewLinkDomain.textContent =
+            'link indisponível';
+    }
+
+    /*
+     * A prévia mostra a mesma mídia escolhida acima.
+     * A adaptação técnica de formato acontece somente
+     * no adaptador do canal durante a publicação.
+     */
+    previewMediaArea.className = '';
+
+    previewMediaArea.style.cssText =
+        'background:#f4f6f8;' +
+        'display:flex;' +
+        'align-items:center;' +
+        'justify-content:center;' +
+        'overflow:hidden;';
+
+    const videoSelected =
+        document
+            .getElementById('mediaTabVideos')
+            ?.classList.contains('active') &&
+        selectedVideoUrl;
+
+    if (videoSelected) {
+        previewMediaArea.innerHTML =
+            `<video
+                src="${selectedVideoUrl}"
+                controls
+                playsinline
+                style="
+                    width:100%;
+                    max-height:280px;
+                    object-fit:contain;
+                    display:block;
+                    background:#000
+                ">
+            </video>`;
+    } else {
+        previewMediaArea.innerHTML =
+            `<img
+                src="${mainImage}"
+                alt="Mídia selecionada"
+                style="
+                    width:100%;
+                    max-height:280px;
+                    object-fit:contain;
+                    display:block
+                ">`;
+    }
+
+    /*
+     * CTA sempre visível na revisão.
+     */
+    previewCTA.style.display =
+        'inline-block';
+
+    previewCTA.textContent =
+        cta;
+
+    /*
+     * O cartão de link só aparece
+     * quando o formato é Oferta clicável.
+     */
+    const isLinkFormat =
+        activeFormat ===
+        'Oferta clicável';
+
+    previewLinkDomain.style.display =
+        isLinkFormat
+            ? 'block'
+            : 'none';
+
+    previewProductTitle.style.display =
+        isLinkFormat
+            ? 'block'
+            : 'none';
+
+    previewText.textContent =
+        `${activeChannel} · ${activeFormat}`;
+}
+
+
+
+function showFormats(channel) {
+    const formats =
+        channelFormats[channel] || [];
+
+    formatsBox.innerHTML =
+        formats.map((format,index) =>
+            `<button
+                type="button"
+                class="format ${index === 0 ? 'active' : ''}">
+                ${format}
+            </button>`
+        ).join('');
+
+    previewText.textContent =
+        `Prévia adaptada para ${channel}.`;
+
+    document
+        .querySelectorAll('.format')
+        .forEach(button => {
+            button.addEventListener(
+                'click',
+                () => {
+                    document
+                        .querySelectorAll('.format')
+                        .forEach(item =>
+                            item.classList.remove('active')
+                        );
+
+                    button.classList.add('active');
+                }
+            );
+        });
+}
+
+channels.forEach(button => {
+    button.addEventListener('click', () => {
+        channels.forEach(item =>
+            item.classList.remove('active')
+        );
+
+        button.classList.add('active');
+
+        showFormats(
+            button.textContent.trim()
+        );
+    });
+});
+
+document
+    .querySelector('.publish')
+    .addEventListener('click', () => {
+        const channel =
+            document
+                .querySelector('.channel.active')
+                .textContent.trim();
+
+        const format =
+            document
+                .querySelector('.format.active')
+                ?.textContent.trim();
+
+        alert(
+            `Teste da nova tela\n\nCanal: ${channel}\nFormato: ${format}\n\nAinda não publica de verdade.`
+        );
+    });
+
+
+const mediaPhotos =
+    document.getElementById('mediaTabPhotos');
+
+const mediaVideos =
+    document.getElementById('mediaTabVideos');
+
+const mediaPreview =
+    document.getElementById('mediaTabPreview');
+
+const previewHost =
+    document.getElementById('previewHost');
+
+const photoStatus =
+    document.getElementById('photoStatus');
+
+const previewElement =
+    document.querySelector('.preview');
+
+if (
+    previewElement &&
+    previewHost
+) {
+    previewHost.appendChild(
+        previewElement
+    );
+}
+
+const mainImageBox =
+    document.querySelector('.main-img');
+
+const photoThumbs =
+    document.querySelector('.thumbs');
+
+const videoLibraryInfo =
+    document.getElementById('videoLibraryInfo');
+
+let selectedVideoUrl = '';
+let selectedVideoName = '';
+
+async function loadVideoLibrary() {
+
+    videoLibraryInfo.innerHTML =
+        'Carregando biblioteca de vídeos...';
+
+    try {
+        const response =
+            await fetch(
+                '/admin/vitrine2/marketing/media-library/videos'
+            );
+
+        const data =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+            throw new Error(
+                'Falha ao carregar vídeos.'
+            );
+        }
+
+        videoLibraryInfo.innerHTML = '';
+
+        if (
+            !Array.isArray(data.videos) ||
+            data.videos.length === 0
+        ) {
+            videoLibraryInfo.textContent =
+                'Nenhum vídeo disponível. Envie um vídeo pelo Termux para data/media-library/inbox/.';
+
+            return;
+        }
+
+        const title =
+            document.createElement('div');
+
+        title.style.fontWeight = 'bold';
+        title.style.marginBottom = '10px';
+        title.textContent =
+            `${data.videos.length} vídeo(s) disponível(is)`;
+
+        videoLibraryInfo.appendChild(title);
+
+        data.videos.forEach(video => {
+
+            const button =
+                document.createElement('button');
+
+            button.type = 'button';
+
+            button.style.cssText =
+                'width:100%;text-align:left;margin:5px 0;padding:10px;border:1px solid #ddd;border-radius:9px;background:white;cursor:pointer';
+
+            const sizeMb =
+                (
+                    Number(video.size || 0) /
+                    1024 /
+                    1024
+                ).toFixed(1);
+
+            button.textContent =
+                `${video.name} · ${sizeMb} MB`;
+
+            button.addEventListener(
+                'click',
+                () => {
+                    document
+                        .querySelectorAll(
+                            '#videoLibraryInfo button'
+                        )
+                        .forEach(item => {
+                            item.style.borderColor =
+                                '#ddd';
+
+                            item.style.background =
+                                'white';
+                        });
+
+                    button.style.borderColor =
+                        '#1877f2';
+
+                    button.style.background =
+                        '#eef5ff';
+
+                    selectedVideoName =
+                        video.name;
+
+                    selectedVideoUrl =
+                        '/admin/vitrine2/marketing/media-library/videos/' +
+                        encodeURIComponent(
+                            video.name
+                        );
+
+                    let player =
+                        document.getElementById(
+                            'selectedVideoPreview'
+                        );
+
+                    if (!player) {
+                        player =
+                            document.createElement(
+                                'video'
+                            );
+
+                        player.id =
+                            'selectedVideoPreview';
+
+                        player.controls = true;
+                        player.playsInline = true;
+
+                        player.style.cssText =
+                            'width:100%;margin-top:12px;border-radius:10px;background:#000';
+
+                        videoLibraryInfo.appendChild(
+                            player
+                        );
+                    }
+
+                    player.src =
+                        selectedVideoUrl;
+
+                    player.load();
+                    syncPublisherPreview();
+                }
+            );
+
+            videoLibraryInfo.appendChild(
+                button
+            );
+        });
+    }
+    catch (error) {
+        videoLibraryInfo.textContent =
+            'Não foi possível carregar a biblioteca de vídeos.';
+    }
+}
+
+
+async function selectMediaType(type) {
+
+    const isPhotos =
+        type === 'photos';
+
+    mediaPreview.classList.remove(
+        'active'
+    );
+
+    previewHost.style.display =
+        'none';
+
+    photoStatus.style.display =
+        isPhotos
+            ? 'block'
+            : 'none';
+
+    mediaPhotos.classList.toggle(
+        'active',
+        isPhotos
+    );
+
+    mediaVideos.classList.toggle(
+        'active',
+        !isPhotos
+    );
+
+    mainImageBox.style.display =
+        isPhotos
+            ? 'block'
+            : 'none';
+
+    photoThumbs.style.display =
+        isPhotos
+            ? 'grid'
+            : 'none';
+
+    videoLibraryInfo.style.display =
+        isPhotos
+            ? 'none'
+            : 'block';
+
+    if (!isPhotos) {
+        await loadVideoLibrary();
+    }
+
+    syncPublisherPreview();
+}
+
+mediaPhotos.addEventListener(
+    'click',
+    () => selectMediaType('photos')
+);
+
+mediaVideos.addEventListener(
+    'click',
+    () => selectMediaType('videos')
+);
+
+mediaPreview.addEventListener(
+    'click',
+    () => {
+        mediaPhotos.classList.remove(
+            'active'
+        );
+
+        mediaVideos.classList.remove(
+            'active'
+        );
+
+        mediaPreview.classList.add(
+            'active'
+        );
+
+        mainImageBox.style.display =
+            'none';
+
+        photoThumbs.style.display =
+            'none';
+
+        videoLibraryInfo.style.display =
+            'none';
+
+        photoStatus.style.display =
+            'none';
+
+        previewHost.style.display =
+            'block';
+
+        syncPublisherPreview();
+    }
+);
+
+
+function renderProductImages(images) {
+    const clean = [...new Set(
+        (images || [])
+            .map(value => String(value || '').trim())
+            .filter(Boolean)
+    )].slice(0, 15);
+
+    const box = document.getElementById('photoThumbs');
+    const status = document.getElementById('photoStatus');
+
+    box.innerHTML = '';
+
+    if (!clean.length) {
+        status.textContent = 'Nenhuma imagem encontrada para este produto.';
+        return;
+    }
+
+    document.getElementById('mainImage').src = clean[0];
+    syncPublisherPreview();
+
+    clean.forEach((url, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'thumb' + (index === 0 ? ' active' : '');
+
+        button.innerHTML =
+            `<img src="${url}" alt="">` +
+            (index === 0
+                ? '<span class="cover-badge">★ CAPA</span>'
+                : '');
+
+        button.addEventListener('click', () => {
+            document
+                .querySelectorAll('#photoThumbs .thumb')
+                .forEach(item => {
+                    item.classList.remove('active');
+
+                    const badge =
+                        item.querySelector('.cover-badge');
+
+                    if (badge) {
+                        badge.remove();
+                    }
+                });
+
+            button.classList.add('active');
+
+            button.insertAdjacentHTML(
+                'beforeend',
+                '<span class="cover-badge">★ CAPA</span>'
+            );
+
+            document.getElementById('mainImage').src = url;
+            syncPublisherPreview();
+        });
+
+        box.appendChild(button);
+    });
+
+    status.textContent =
+        `${clean.length} imagem(ns) disponível(is). Clique para escolher a capa.`;
+}
+
+
+async function loadSelectedProduct() {
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const channel =
+        params.get('channel') ||
+        'facebook';
+
+    const itemId =
+        params.get('itemId');
+
+    if (!itemId) {
+        document.getElementById('photoStatus').textContent =
+            'Abra esta tela a partir de um produto do Facebook.';
+        return;
+    }
+
+    try {
+        const response =
+            await fetch(
+                '/api/vitrine2/marketing/channel/' +
+                encodeURIComponent(channel)
+            );
+
+        const data =
+            await response.json();
+
+        const entries =
+            Array.isArray(data.products)
+                ? data.products
+                : [];
+
+        const selected =
+            entries.find(entry =>
+                String(entry?.product?.itemId || '') ===
+                String(itemId)
+            );
+
+        if (!selected) {
+            throw new Error(
+                'Produto não encontrado.'
+            );
+        }
+
+        const product =
+            selected.product || {};
+
+        document.getElementById('productTitle').textContent =
+            product.title ||
+            'Produto selecionado';
+
+        document.getElementById('affiliateLink').value =
+            product.affiliateLink ||
+            product.offerLink ||
+            product.productLink ||
+            product?.metadata?.productLink ||
+            '';
+
+        const initialImages = [
+            product.image,
+            ...(Array.isArray(product.images)
+                ? product.images
+                : [])
+        ];
+
+        renderProductImages(initialImages);
+        syncPublisherPreview();
+
+        const shopId =
+            String(product.shopId || '');
+
+        if (
+            /^\d+$/.test(shopId) &&
+            /^\d+$/.test(String(itemId))
+        ) {
+            document.getElementById('photoStatus').textContent =
+                'Carregando galeria completa da Shopee...';
+
+            const galleryResponse =
+                await fetch(
+                    '/admin/vitrine2/marketing/media/gallery',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
+                        body: JSON.stringify({
+                            shopId,
+                            itemId
+                        })
+                    }
+                );
+
+            const gallery =
+                await galleryResponse.json();
+
+            if (
+                galleryResponse.ok &&
+                gallery.success
+            ) {
+                renderProductImages([
+                    ...initialImages,
+                    ...(Array.isArray(gallery.images)
+                        ? gallery.images
+                        : [])
+                ]);
+            }
+        }
+    }
+    catch (error) {
+        document.getElementById('photoStatus').textContent =
+            error.message ||
+            'Não foi possível carregar o produto.';
+    }
+}
+
+
+selectMediaType('photos');
+loadSelectedProduct();
+
+
+document
+    .getElementById('copyAffiliateLink')
+    .addEventListener(
+        'click',
+        async () => {
+            const link =
+                document
+                    .getElementById('affiliateLink')
+                    .value;
+
+            await navigator.clipboard.writeText(
+                link
+            );
+
+            alert('Link copiado.');
+        }
+    );
+
+document
+    .getElementById('testAffiliateLink')
+    .addEventListener(
+        'click',
+        () => {
+            const link =
+                document
+                    .getElementById('affiliateLink')
+                    .value;
+
+            if (link) {
+                window.open(
+                    link,
+                    '_blank',
+                    'noopener'
+                );
+            }
+        }
+    );
+
+document
+    .getElementById('caption')
+    .addEventListener(
+        'input',
+        syncPublisherPreview
+    );
+
+document
+    .getElementById('cta')
+    .addEventListener(
+        'change',
+        syncPublisherPreview
+    );
+
+showFormats('Facebook');
+syncPublisherPreview();
+
+</script>
+
+</body>
+</html>
+
+<style>
+/* FOTO ÚNICA FACEBOOK — preencher todo o quadro */
+#previewMediaArea .facebook-single-photo{
+    width:100% !important;
+    height:280px !important;
+    max-height:280px !important;
+    object-fit:cover !important;
+    object-position:center !important;
+    display:block !important;
+}
+
+@media(max-width:1100px){
+    #previewMediaArea .facebook-single-photo{
+        height:220px !important;
+        max-height:220px !important;
+    }
+}
+</style>
+
+<style>
+/* FORMATOS REAIS DO FACEBOOK */
+
+/* Oferta clicável: cartão horizontal */
+#previewMediaArea.fb-link-preview{
+    aspect-ratio:1.91/1;
+    width:100%;
+    max-height:none !important;
+    overflow:hidden;
+}
+#previewMediaArea.fb-link-preview img{
+    width:100% !important;
+    height:100% !important;
+    max-height:none !important;
+    object-fit:cover !important;
+}
+
+/* Foto única: formato Feed 4:5 */
+#previewMediaArea.fb-photo-preview{
+    aspect-ratio:4/5;
+    width:100%;
+    max-height:none !important;
+    overflow:hidden;
+}
+#previewMediaArea.fb-photo-preview img{
+    width:100% !important;
+    height:100% !important;
+    max-height:none !important;
+    object-fit:cover !important;
+}
+
+/* Reel: vertical */
+#previewMediaArea.fb-reel-preview{
+    aspect-ratio:9/16;
+    width:min(100%,360px);
+    margin:auto;
+    max-height:none !important;
+    overflow:hidden;
+}
+#previewMediaArea.fb-reel-preview video{
+    width:100% !important;
+    height:100% !important;
+    max-height:none !important;
+    object-fit:cover !important;
+}
+</style>
