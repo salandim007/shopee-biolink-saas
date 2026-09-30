@@ -262,3 +262,25 @@ Ordem recomendada:
 9. Corrigir métricas/resumo da aba IA.
 10. Retomar teste real de publicação Facebook.
 
+
+
+---
+
+## SHOPEE_MEDIA_PIPELINE — Mídias da Central
+
+Documento detalhado:
+
+`docs/MEDIA-PIPELINE.md`
+
+Estado confirmado em 2026-09-29:
+
+- A Central de Produtos NÃO usa atualmente Chrome como sua fonte principal de mídia.
+- O fluxo atual é Data Feed → catalog.sqlite → product-media-service → Central.
+- O catálogo possui somente `image_link` e `image_link_3`.
+- Por isso o fluxo atual entrega normalmente no máximo 2 imagens distintas.
+- A interface suporta várias imagens; o gargalo atual é a fonte de dados.
+- `product-media-library.js` suporta múltiplas imagens/vídeos e deve ser considerado na futura camada de enriquecimento.
+- `shopee-browser-media-capture.js` e `/media/gallery` continuam presentes como código histórico/compatibilidade, mas não representam a arquitetura principal atual.
+- Antes de qualquer nova investigação de mídia, ler `docs/MEDIA-PIPELINE.md`.
+
+Marcador: `SHOPEE_MEDIA_PIPELINE`

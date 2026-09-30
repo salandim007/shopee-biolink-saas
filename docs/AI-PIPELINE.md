@@ -396,3 +396,61 @@ Somente depois investigar código ou propor mudanças.
 A documentação do repositório é a fonte principal de continuidade
 do projeto.
 
+
+
+---
+
+## Processamento noturno automático — 2026-09-29
+
+Wrapper:
+
+`/opt/shopee-biolink-saas/run-nightly-ai.sh`
+
+Cron instalado:
+
+`20 * * * * /usr/bin/flock -n /tmp/shopee-ai-nightly.lock /opt/shopee-biolink-saas/run-nightly-ai.sh >> /opt/shopee-biolink-saas/tmp/ai-nightly.log 2>&1`
+
+O wrapper interpreta o horário usando:
+
+`America/Sao_Paulo`
+
+Regra:
+
+- antes das 02:00: não executa;
+- a primeira chamada elegível ocorre às 02:20;
+- executa no máximo uma preparação concluída por dia;
+- usa arquivo de controle:
+  `data/ai/nightly-last-success-date`;
+- em falha geral, não grava sucesso e poderá tentar novamente na hora seguinte;
+- usa `flock` para evitar duas execuções simultâneas.
+
+Preparação:
+
+HIGH primeiro.
+MEDIUM depois.
+LOW normalmente não recebe pré-geração.
+
+Regra de resiliência:
+
+Falha local, impacto local.
+
+Se uma etapa de IA falhar:
+- timeout por chamada configurado em 20 segundos;
+- entra fallback;
+- não continua tentando outras estações de IA naquele produto;
+- fallback TITLE_ONLY;
+- salva conteúdo mínimo;
+- segue o fluxo.
+
+Uma falha de produto/canal não deve interromper todo o processamento noturno.
+
+IMPORTANTE:
+
+Este processo noturno opera sobre os produtos já analisados/classificados
+disponíveis no score store atual.
+
+Ele NÃO representa a futura carga inicial dos aproximadamente 100 mil
+produtos.
+
+A carga inicial de grande volume continua sendo:
+uma única carga completa + processamento incremental posterior.
