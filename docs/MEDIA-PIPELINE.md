@@ -414,3 +414,29 @@ A quantidade de fotos varia por produto.
 Ainda podem aparecer algumas imagens promocionais/secundárias existentes
 na página da Shopee. Esse filtro poderá ser refinado posteriormente sem
 alterar a arquitetura validada.
+
+## Facebook Groups via compartilhamento nativo
+
+Validado em 2026-10-01 no Android.
+
+Fluxo adotado para publicação em grupos:
+
+1. O produto é aberto em `Pronto para postar`.
+2. O usuário escolhe a foto de capa.
+3. O botão `Compartilhar em Grupos` usa `navigator.share()`.
+4. Antes de abrir o compartilhamento nativo, o SaaS copia automaticamente
+   `window.tapFacebookShare.legenda` para a área de transferência.
+5. `share.legenda` já contém a chamada comercial e o link afiliado Shopee.
+6. O usuário escolhe Facebook e os grupos desejados.
+7. Na tela final de edição do Facebook, usa `Colar`.
+8. O Facebook publica a foto e a legenda; o link Shopee colado fica clicável.
+
+Observações importantes:
+
+- A foto compartilhada como arquivo não é, por si só, clicável para a Shopee.
+- O link clicável fica na legenda colada no editor do Facebook.
+- O Facebook pode ignorar `text` e `url` quando uma imagem é compartilhada
+  como arquivo; por isso o clipboard é o caminho validado.
+- O botão `Publicar na Página do Facebook` continua separado e usa a API Meta.
+- A automação completa da interface do Facebook fica como plano futuro.
+

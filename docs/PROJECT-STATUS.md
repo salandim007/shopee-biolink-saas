@@ -463,3 +463,14 @@ Documento:
 1. Central de Grupos do Facebook;
 2. fila e agendamento para grupos;
 3. depois retomar gerador de mídia / Reels.
+
+### Facebook Groups native share validado — 2026-10-01
+
+- `Compartilhar em Grupos` validado no Android.
+- Foto escolhida é enviada pelo compartilhamento nativo.
+- Legenda completa + link afiliado Shopee são copiados automaticamente.
+- Após selecionar os grupos, o usuário cola a legenda no editor do Facebook.
+- Link Shopee fica clicável após a publicação.
+- Publicação automática em grupos via Graph API não é usada neste fluxo.
+- Automação de cliques/UI permanece como plano B futuro.
+

@@ -1626,6 +1626,24 @@ async function abrirTapToPost(itemId, shopId){
           Publicar na Página do Facebook
         </button>
 
+        <button
+          type="button"
+          id="compartilharGruposTap"
+          style="
+            width:100%;
+            margin-top:10px;
+            padding:14px;
+            border:0;
+            border-radius:12px;
+            background:#16a34a;
+            color:#fff;
+            font-size:16px;
+            font-weight:800;
+          "
+        >
+          Compartilhar em Grupos
+        </button>
+
       </section>
     `;
 
@@ -1738,6 +1756,201 @@ document.addEventListener('click', e => {
     });
 });
 
+
+
+
+
+document.addEventListener('click', async e => {
+  if(
+    e.target.id !== 'compartilharGruposTap'
+  ){
+    return;
+  }
+
+  const button = e.target;
+
+  const share =
+    window.tapFacebookShare;
+
+  const media =
+    window.tapToPostState;
+
+  if(
+    !share ||
+    !share.linkShopee ||
+    !share.legenda
+  ){
+    alert(
+      'Legenda ou link da Shopee não encontrado.'
+    );
+    return;
+  }
+
+  if(!navigator.share){
+    alert(
+      'Este navegador não suporta o compartilhamento nativo.'
+    );
+    return;
+  }
+
+  const originalText =
+    button.textContent;
+
+  button.disabled = true;
+  button.textContent =
+    'Preparando compartilhamento...';
+
+  try{
+
+    const shareData = {
+      title:
+        'Oferta Shopee',
+
+      /*
+       * O link já está dentro da legenda.
+       * Também enviamos no campo URL separado.
+       */
+      text:
+        share.legenda,
+
+      url:
+        share.linkShopee
+    };
+
+
+    /*
+     * Tenta anexar a foto escolhida.
+     *
+     * Se a Shopee bloquear a leitura da imagem
+     * pelo navegador, o compartilhamento continua
+     * normalmente com legenda + link.
+     */
+    if(
+      media &&
+      media.coverUrl &&
+      navigator.canShare
+    ){
+      try{
+
+        const imageResponse =
+          await fetch(
+            media.coverUrl,
+            {
+              mode:'cors'
+            }
+          );
+
+        if(imageResponse.ok){
+
+          const blob =
+            await imageResponse.blob();
+
+          const mime =
+            blob.type ||
+            'image/jpeg';
+
+          const extension =
+            mime.includes('png')
+              ? 'png'
+              : 'jpg';
+
+          const file =
+            new File(
+              [blob],
+              `produto-${share.itemId}.${extension}`,
+              {
+                type:mime
+              }
+            );
+
+          if(
+            navigator.canShare({
+              files:[file]
+            })
+          ){
+            shareData.files =
+              [file];
+          }
+        }
+
+      }catch(imageError){
+
+        console.log(
+          '[groups-share] Foto não anexada. ' +
+          'Continuando com texto e link.',
+          imageError
+        );
+
+      }
+    }
+
+
+    let legendaCopiada = false;
+
+    try{
+
+      if(
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ){
+        await navigator.clipboard.writeText(
+          share.legenda
+        );
+
+        legendaCopiada = true;
+      }
+
+    }catch(copyError){
+
+      console.log(
+        '[groups-share] Legenda não copiada automaticamente.',
+        copyError
+      );
+
+    }
+
+    button.textContent =
+      legendaCopiada
+        ? 'Legenda copiada · Abrindo Facebook...'
+        : 'Abrindo Facebook...';
+
+    await navigator.share(
+      shareData
+    );
+
+    button.textContent =
+      'Compartilhamento enviado ✓';
+
+    setTimeout(() => {
+      button.disabled = false;
+      button.textContent =
+        originalText;
+    }, 2000);
+
+
+  }catch(error){
+
+    button.disabled = false;
+    button.textContent =
+      originalText;
+
+    if(
+      error &&
+      error.name === 'AbortError'
+    ){
+      return;
+    }
+
+    console.error(
+      '[groups-share]',
+      error
+    );
+
+    alert(
+      'Não foi possível abrir o compartilhamento.'
+    );
+  }
+});
 
 
 document.addEventListener('click', async e => {
