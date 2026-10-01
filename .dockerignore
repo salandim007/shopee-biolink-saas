@@ -14,3 +14,4 @@ tmp
 *.backup-*
 .vscode
 _lixo_temporario
+data/chrome-shopee-persistent-host/

@@ -454,3 +454,88 @@ produtos.
 
 A carga inicial de grande volume continua sendo:
 uma única carga completa + processamento incremental posterior.
+
+---
+
+## Atualização 2026-10-01 — janela noturna e continuidade da fila
+
+### Janela oficial
+
+`run-nightly-ai.sh` usa explicitamente:
+
+`America/Sao_Paulo`
+
+O cron continua acionando o wrapper no minuto 20 de cada hora:
+
+`20 * * * *`
+
+Porém o processamento só pode ocorrer entre:
+
+`02:00 e 06:59` no horário de São Paulo.
+
+Regras:
+
+- fora da janela: encerra sem processar;
+- primeira tentativa normal: 02:20;
+- em falha geral: nova tentativa na hora seguinte dentro da janela;
+- em sucesso: grava `data/ai/nightly-last-success-date`;
+- não repete uma preparação já concluída no mesmo dia;
+- `flock` impede execuções concorrentes.
+
+Isso evita depender do fuso horário da VPS.
+
+### Regra obrigatória de resiliência
+
+A IA não pode deixar a fila parada.
+
+Fluxo:
+
+IA disponível
+→ conteúdo normal
+
+IA indisponível ou timeout
+→ fallback local
+→ `TITLE_ONLY`
+→ conteúdo mínimo seguro
+→ `READY_FOR_APPROVAL`
+
+### Produto ausente do catálogo
+
+`ai/content-orchestrator.js` agora possui fallback adicional.
+
+Quando `product-media-service.getProductByItemId()` não encontra mais o
+produto, o sistema consulta `product-score-store`.
+
+Se houver score salvo, recupera dados mínimos como:
+
+- itemId;
+- shopId;
+- title;
+- image;
+- vendas;
+- avaliações;
+- contagem conhecida de mídias.
+
+O processamento continua usando esses dados.
+
+Fluxo validado:
+
+produto ausente do catálogo
+→ dados recuperados do scoreStore
+→ tentativa da IA
+→ timeout da IA
+→ fallback `TITLE_ONLY`
+→ `READY_FOR_APPROVAL`.
+
+Teste validado com o item:
+
+`58204541678`
+
+Mesmo com produto ausente do catálogo atual e timeout do provedor de IA,
+a preparação terminou com `success: true` e criou item
+`READY_FOR_APPROVAL`.
+
+Regra permanente:
+
+falha de IA ou ausência temporária do produto no catálogo não deve deixar
+o item preso em `PROCESSING`.

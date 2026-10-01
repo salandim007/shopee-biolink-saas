@@ -956,6 +956,184 @@ function mostrarDetalhes(p){
   `;
 }
 
+window.centralGalleryCache =
+  window.centralGalleryCache || {};
+
+async function carregarGaleriaShopee(itemId, shopId){
+  if(!itemId || !shopId){
+    return {
+      images: [],
+      videos: []
+    };
+  }
+
+  const cacheKey =
+    `${String(shopId)}:${String(itemId)}`;
+
+  const cached =
+    window.centralGalleryCache[
+      cacheKey
+    ];
+
+  if(
+    cached &&
+    Array.isArray(cached.images) &&
+    cached.images.length > 0
+  ){
+    console.log(
+      '[central-shopee-gallery] cache',
+      cacheKey,
+      cached.images.length
+    );
+
+    return cached;
+  }
+
+  try{
+    const response = await fetch(
+      '/admin/vitrine2/marketing/media/gallery',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type':
+            'application/json'
+        },
+        body: JSON.stringify({
+          itemId:
+            String(itemId),
+          shopId:
+            String(shopId)
+        })
+      }
+    );
+
+    const payload =
+      await response.json();
+
+    if(
+      !response.ok ||
+      !payload.success
+    ){
+      throw new Error(
+        payload?.error?.message ||
+        'Falha ao carregar galeria.'
+      );
+    }
+
+    const result = {
+      images:
+        Array.isArray(payload.images)
+          ? payload.images
+          : [],
+
+      videos:
+        Array.isArray(payload.videos)
+          ? payload.videos
+          : []
+    };
+
+    if(result.images.length > 0){
+      window.centralGalleryCache[
+        cacheKey
+      ] = result;
+    }
+
+    console.log(
+      '[central-shopee-gallery] capturado',
+      cacheKey,
+      result.images.length
+    );
+
+    return result;
+
+  }catch(error){
+    console.warn(
+      '[central-shopee-gallery]',
+      error
+    );
+
+    return {
+      images: [],
+      videos: []
+    };
+  }
+}
+
+
+function aplicarGaleriaProduto(
+  produto,
+  galeria
+){
+  produto =
+    produto || {};
+
+  galeria =
+    galeria || {};
+
+  const images = [
+    ...(Array.isArray(
+      produto.media?.images
+    )
+      ? produto.media.images
+      : []),
+
+    ...(Array.isArray(
+      produto.images
+    )
+      ? produto.images
+      : []),
+
+    ...(Array.isArray(
+      galeria.images
+    )
+      ? galeria.images
+      : []),
+
+    produto.image,
+    produto.media?.image
+  ]
+  .filter(Boolean)
+  .filter(
+    (url, index, array) =>
+      array.indexOf(url) === index
+  );
+
+  const videos = [
+    ...(Array.isArray(
+      produto.media?.videos
+    )
+      ? produto.media.videos
+      : []),
+
+    ...(Array.isArray(
+      galeria.videos
+    )
+      ? galeria.videos
+      : [])
+  ]
+  .filter(Boolean)
+  .filter(
+    (url, index, array) =>
+      array.indexOf(url) === index
+  );
+
+  produto.images =
+    images;
+
+  produto.media = {
+    ...(produto.media || {}),
+    images,
+    videos,
+    imageCount:
+      images.length,
+    videoCount:
+      videos.length
+  };
+
+  return produto;
+}
+
+
 async function abrirProduto(itemId, shopId){
   const painel = document.getElementById('produtoPainel');
   const conteudo = document.getElementById('painelConteudo');
@@ -982,7 +1160,19 @@ async function abrirProduto(itemId, shopId){
       );
     }
 
-    mostrarDetalhes(data.product);
+    const galeria =
+      await carregarGaleriaShopee(
+        itemId,
+        shopId
+      );
+
+    const produto =
+      aplicarGaleriaProduto(
+        data.product,
+        galeria
+      );
+
+    mostrarDetalhes(produto);
 
   }catch(err){
     conteudo.textContent = err.message;
@@ -1060,8 +1250,27 @@ async function abrirTapToPost(itemId, shopId){
       );
     }
 
-    const produto =
+    const produtoBase =
       produtoData.product || {};
+
+    const resolvedShopId =
+      String(
+        shopId ||
+        produtoBase.shopId ||
+        ''
+      ).trim();
+
+    const galeria =
+      await carregarGaleriaShopee(
+        itemId,
+        resolvedShopId
+      );
+
+    const produto =
+      aplicarGaleriaProduto(
+        produtoBase,
+        galeria
+      );
 
     const items =
       Array.isArray(filaData.items)

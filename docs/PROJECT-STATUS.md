@@ -416,3 +416,50 @@ A publicação exibiu corretamente:
 - CTA;
 - link curto clicável da Shopee.
 
+
+---
+
+## Marco 2026-10-01 — mídias e preparação noturna
+
+### Central de Produtos e Mídias
+
+Status: FUNCIONAL E VALIDADO.
+
+Concluído:
+
+- captura complementar de múltiplas fotos da Shopee;
+- Chromium persistente autenticado;
+- perfil persistido por volume;
+- cookies/perfil fora do Git e do Docker build;
+- merge das fotos capturadas com as imagens do catálogo;
+- reutilização da galeria no Tap-to-Post;
+- seleção manual de outra foto como capa.
+
+Documento:
+
+`docs/MEDIA-PIPELINE.md`
+
+### Pipeline de IA noturno
+
+Status: FUNCIONAL E VALIDADO.
+
+Concluído:
+
+- janela 02:00–06:59 em `America/Sao_Paulo`;
+- retry horário dentro da janela;
+- uma conclusão por dia;
+- proteção por `flock`;
+- fallback `TITLE_ONLY` quando a IA falha;
+- fallback pelo `product-score-store` quando o produto não é localizado no
+  catálogo atual;
+- continuidade até `READY_FOR_APPROVAL` sem deixar a fila presa.
+
+Documento:
+
+`docs/AI-PIPELINE.md`
+
+### Próxima prioridade
+
+1. Central de Grupos do Facebook;
+2. fila e agendamento para grupos;
+3. depois retomar gerador de mídia / Reels.

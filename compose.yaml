@@ -36,6 +36,7 @@ services:
       - ./data/music:/app/data/music:ro
       - ./data/meta:/app/data/meta
       - ./data/ai:/app/data/ai
+      - ./data/chrome-shopee-persistent-host:/app/data/chrome-shopee-persistent
 
     networks:
       - proxy

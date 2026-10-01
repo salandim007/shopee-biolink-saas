@@ -6,6 +6,9 @@ const products =
 const analysisStore =
     require('./product-analysis-store');
 
+const scoreStore =
+    require('./product-score-store');
+
 const {
     deepVerifyRecord
 } = require('./product-verifier');
@@ -270,7 +273,7 @@ async function prepareContent(
         );
     }
 
-    const product =
+    let product =
         await products.getProductByItemId(
             itemId,
             {
@@ -279,9 +282,131 @@ async function prepareContent(
             }
         );
 
+    /*
+     * O produto pode deixar de existir no catálogo
+     * atual entre a análise/score e a preparação.
+     *
+     * Isso não deve bloquear a fila.
+     * Quando houver score salvo, usamos os dados
+     * mínimos já conhecidos para permitir que o
+     * pipeline continue e os fallbacks de conteúdo
+     * assumam quando necessário.
+     */
     if (!product) {
-        throw new Error(
-            `Produto ${itemId} não encontrado.`
+        const scoredProduct =
+            scoreStore.getByItemId(
+                itemId
+            );
+
+        if (!scoredProduct) {
+            throw new Error(
+                `Produto ${itemId} não encontrado e sem dados de fallback.`
+            );
+        }
+
+        const fallbackTitle =
+            String(
+                scoredProduct.title ||
+                `Produto ${itemId}`
+            ).trim();
+
+        const fallbackImage =
+            scoredProduct.image ||
+            null;
+
+        product = {
+            itemId:
+                String(itemId),
+
+            shopId:
+                String(
+                    options.shopId ||
+                    scoredProduct.shopId ||
+                    ''
+                ),
+
+            title:
+                fallbackTitle,
+
+            productName:
+                fallbackTitle,
+
+            image:
+                fallbackImage,
+
+            images:
+                fallbackImage
+                    ? [fallbackImage]
+                    : [],
+
+            media: {
+                image:
+                    fallbackImage,
+
+                images:
+                    fallbackImage
+                        ? [fallbackImage]
+                        : [],
+
+                imageCount:
+                    Number(
+                        scoredProduct
+                            ?.score
+                            ?.facts
+                            ?.imageCount ||
+                        (fallbackImage ? 1 : 0)
+                    ),
+
+                videoCount:
+                    Number(
+                        scoredProduct
+                            ?.score
+                            ?.facts
+                            ?.videoCount ||
+                        0
+                    )
+            },
+
+            ratings: {
+                product:
+                    scoredProduct
+                        ?.score
+                        ?.facts
+                        ?.productRating ??
+                    null,
+
+                shop:
+                    scoredProduct
+                        ?.score
+                        ?.facts
+                        ?.shopRating ??
+                    null
+            },
+
+            sales:
+                scoredProduct
+                    ?.score
+                    ?.facts
+                    ?.sales ??
+                null,
+
+            scoreFallback: {
+                used:
+                    true,
+
+                reason:
+                    'Produto não encontrado no catálogo atual.',
+
+                createdAt:
+                    new Date().toISOString()
+            }
+        };
+
+        console.warn(
+            '[content-fallback][product]',
+            itemId,
+            'Usando dados salvos do score:',
+            fallbackTitle
         );
     }
 

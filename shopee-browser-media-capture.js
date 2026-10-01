@@ -10,7 +10,7 @@ const CHROME_EXECUTABLE_PATH =
 
 const MIN_IMAGES = 5;
 const MAX_IMAGES = 15;
-const MAX_CAPTURE_MS = 6500;
+const MAX_CAPTURE_MS = 15000;
 const SETTLE_MS = 500;
 const POLL_MS = 150;
 
@@ -214,28 +214,12 @@ async function captureShopeeMedia(
 
     try {
         browser =
-            await puppeteer.launch({
-                executablePath:
-                    CHROME_EXECUTABLE_PATH,
-
-                headless:
-                    false,
+            await puppeteer.connect({
+                browserURL:
+                    'http://127.0.0.1:9222',
 
                 defaultViewport:
-                    null,
-
-                userDataDir:
-                    path.join(
-                        __dirname,
-                        'chrome-shopee-profile-test'
-                    ),
-
-                args: [
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--start-maximized',
-                    '--lang=pt-BR'
-                ]
+                    null
             });
 
         page =
@@ -245,12 +229,6 @@ async function captureShopeeMedia(
             width: 1366,
             height: 900
         });
-
-        await page.setUserAgent(
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
-            'AppleWebKit/537.36 (KHTML, like Gecko) ' +
-            'Chrome/131.0.0.0 Safari/537.36'
-        );
 
         page.on(
             'response',
@@ -284,7 +262,7 @@ async function captureShopeeMedia(
         captureStartedAt =
             Date.now();
 
-        page.goto(
+        await page.goto(
             productUrl,
             {
                 waitUntil:
@@ -384,7 +362,7 @@ async function captureShopeeMedia(
 
         if (browser) {
             try {
-                await browser.close();
+                browser.disconnect();
             } catch {
             }
         }

@@ -347,3 +347,70 @@ ou integração da camada de enriquecimento de múltiplas mídias.
 Marcador:
 
 SHOPEE_MEDIA_ENRICHMENT_PENDING
+
+---
+
+## Atualização 2026-10-01 — captura complementar de múltiplas mídias
+
+O Data Feed e o `catalog.sqlite` continuam sendo a fonte base do produto.
+
+A Central agora possui também uma camada complementar de enriquecimento:
+
+Data Feed
+→ catalog.sqlite
+→ product-media-service
+→ produto base
+→ `/admin/vitrine2/marketing/media/gallery`
+→ `shopee-browser-media-capture.js`
+→ Chromium persistente autenticado
+→ merge/deduplicação
+→ Central / Tap-to-Post
+
+O Chromium NÃO substitui o catálogo principal. Ele complementa as mídias
+disponíveis para preparação e publicação.
+
+### Chromium persistente
+
+Inicialização:
+
+`scripts/start-app.sh`
+
+Configuração principal:
+
+- Xvfb em `DISPLAY=:99`;
+- Chromium com remote debugging em `127.0.0.1:9222`;
+- perfil no container:
+  `/app/data/chrome-shopee-persistent`;
+- perfil persistente no host:
+  `./data/chrome-shopee-persistent-host`.
+
+O perfil contém sessão/cookies da Shopee e deve permanecer protegido por:
+
+- `.gitignore`;
+- `.dockerignore`.
+
+Nunca versionar o perfil autenticado.
+
+`shopee-browser-media-capture.js` conecta ao navegador existente usando
+`puppeteer.connect()` e usa `browser.disconnect()` ao final, sem fechar o
+Chromium persistente.
+
+Não forçar User-Agent artificial. O teste de 2026-09-30 mostrou que isso
+interferia na captura correta da página da Shopee.
+
+### Resultado validado
+
+Em 2026-10-01 foi validado:
+
+produto com imagens básicas do catálogo
+→ captura adicional da página real da Shopee
+→ merge das imagens
+→ Central exibindo múltiplas fotos
+→ Tap-to-Post reutilizando a galeria
+→ escolha manual da foto de capa.
+
+A quantidade de fotos varia por produto.
+
+Ainda podem aparecer algumas imagens promocionais/secundárias existentes
+na página da Shopee. Esse filtro poderá ser refinado posteriormente sem
+alterar a arquitetura validada.
