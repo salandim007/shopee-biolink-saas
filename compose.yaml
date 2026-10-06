@@ -34,6 +34,7 @@ services:
       - ./data/shopee-feed-api:/app/data/shopee-feed-api
       - ./scripts:/app/scripts:ro
       - ./data/music:/app/data/music:ro
+      - ./data/video-production:/app/data/video-production
       - ./data/meta:/app/data/meta
       - ./data/ai:/app/data/ai
       - ./data/chrome-shopee-persistent-host:/app/data/chrome-shopee-persistent

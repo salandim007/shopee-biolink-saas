@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Central de Produção de Vídeo</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        .page {
+            max-width: 1450px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header {
+            background:
+                linear-gradient(
+                    135deg,
+                    #1769e0,
+                    #179d77
+                );
+            color: white;
+            border-radius: 18px;
+            padding: 22px 26px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0 0 6px;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: .92;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e4eaf2;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 18px;
+            box-shadow:
+                0 6px 20px rgba(20, 40, 80, .05);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .section-title h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .section-title span {
+            color: #687386;
+            font-size: 14px;
+        }
+
+        .product-link-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            min-height: 46px;
+            padding: 11px 14px;
+            border: 1px solid #ccd5e3;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        button {
+            cursor: pointer;
+            border: 0;
+            border-radius: 10px;
+            min-height: 42px;
+            padding: 10px 16px;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: #1769e0;
+            color: white;
+        }
+
+        .btn-success {
+            background: #15956f;
+            color: white;
+        }
+
+        .btn-light {
+            background: #eef3f9;
+            color: #24344d;
+        }
+
+        .btn-add {
+            background: #eef7f3;
+            color: #12805f;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fill,
+                    minmax(170px, 1fr)
+                );
+            gap: 14px;
+        }
+
+        .elements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .element-column {
+            border: 1px solid #e1e8f1;
+            border-radius: 14px;
+            padding: 14px;
+            background: #f9fbfd;
+            min-width: 0;
+        }
+
+        .element-column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .element-column-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .element-column .media-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .photos-help {
+            color: #687386;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .media-item {
+            border: 2px solid #e4eaf2;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fbfcfe;
+            position: relative;
+        }
+
+        .media-item.selected {
+            border-color: #15956f;
+            box-shadow:
+                0 0 0 3px
+                rgba(21,149,111,.12);
+        }
+
+        .media-preview {
+            height: 145px;
+            background: #10151d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .media-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .media-info {
+            padding: 10px;
+        }
+
+        .media-name {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .media-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .media-actions button {
+            min-height: 32px;
+            padding: 6px 9px;
+            font-size: 12px;
+        }
+
+        .empty {
+            padding: 24px;
+            border: 2px dashed #d4ddea;
+            border-radius: 12px;
+            color: #758195;
+            text-align: center;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fill,
+                    minmax(160px, 1fr)
+                );
+            gap: 12px;
+        }
+
+        .photo-placeholder {
+            min-height: 170px;
+            border: 2px dashed #d4ddea;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #78869b;
+            text-align: center;
+            padding: 12px;
+        }
+
+        .photo-placeholder strong {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .storyboard {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            overflow-x: auto;
+            padding: 6px 0;
+        }
+
+        .story-item {
+            min-width: 135px;
+            padding: 14px 12px;
+            border-radius: 12px;
+            background: #eef3f9;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .story-arrow {
+            color: #8995a7;
+            font-size: 22px;
+        }
+
+        .generate-wrap {
+            text-align: center;
+            padding: 6px 0 2px;
+        }
+
+        .generate-btn {
+            min-width: 280px;
+            min-height: 54px;
+            font-size: 17px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #1769e0,
+                    #15956f
+                );
+            color: white;
+        }
+
+        .channels {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(125px, 1fr)
+                );
+            gap: 10px;
+        }
+
+        .channel {
+            border: 1px solid #dde5ef;
+            border-radius: 12px;
+            padding: 16px 10px;
+            text-align: center;
+            background: #fff;
+        }
+
+        .channel-icon {
+            font-size: 30px;
+            margin-bottom: 7px;
+        }
+
+        .channel-name {
+            font-weight: 700;
+        }
+
+        .channel-status {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #7b8798;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #172033;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 10px;
+            display: none;
+            z-index: 9999;
+        }
+
+        @media (max-width: 700px) {
+            .page {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .product-link-row {
+                grid-template-columns: 1fr;
+            }
+
+            .media-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .elements-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .element-column .media-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .generate-btn {
+                width: 100%;
+                min-width: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="header">
+        <h1>🎬 Central de Produção de Vídeo</h1>
+
+        <p>
+            Monte vídeos para todos os canais
+            usando abertura, fotos, música e finalização.
+        </p>
+    </div>
+
+
+    <section class="card">
+        <div class="section-title">
+            <h2>🔗 Produto</h2>
+
+            <span>
+                Cole o link do produto
+            </span>
+        </div>
+
+        <div class="product-link-row">
+            <input
+                id="productUrl"
+                type="text"
+                placeholder="Cole aqui o link da Shopee..."
+            >
+
+            <button
+                class="btn-primary"
+                id="loadProductBtn"
+                type="button"
+            >
+                Buscar fotos
+            </button>
+        </div>
+    </section>
+
+
+
+    <section class="card">
+        <div class="section-title">
+            <div>
+                <h2>🎛️ Elementos do vídeo</h2>
+                <span>
+                    Escolha abertura, fechamento e música.
+                    Eles ficam salvos na biblioteca.
+                </span>
+            </div>
+        </div>
+
+        <div class="elements-grid">
+
+            <div class="element-column">
+                <div class="element-column-header">
+                    <h3>🎬 Abertura</h3>
+
+                    <button
+                        class="btn-add"
+                        type="button"
+                        onclick="chooseUpload('opening')"
+                    >
+                        + Adicionar
+                    </button>
+                </div>
+
+                <div
+                    id="openingGrid"
+                    class="media-grid"
+                ></div>
+            </div>
+
+
+            <div class="element-column">
+                <div class="element-column-header">
+                    <h3>🎬 Fechamento</h3>
+
+                    <button
+                        class="btn-add"
+                        type="button"
+                        onclick="chooseUpload('closing')"
+                    >
+                        + Adicionar
+                    </button>
+                </div>
+
+                <div
+                    id="closingGrid"
+                    class="media-grid"
+                ></div>
+            </div>
+
+
+            <div class="element-column">
+                <div class="element-column-header">
+                    <h3>🎵 Música</h3>
+
+                    <button
+                        class="btn-add"
+                        type="button"
+                        onclick="chooseUpload('music')"
+                    >
+                        + Adicionar
+                    </button>
+                </div>
+
+                <div
+                    id="musicGrid"
+                    class="media-grid"
+                ></div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <section class="card">
+        <div class="section-title">
+            <div>
+                <h2>🖼️ Fotos do produto</h2>
+                <span>
+                    Escolha as fotos que entrarão no vídeo
+                </span>
+            </div>
+        </div>
+
+        <div class="photos-help">
+            Todas as fotos encontradas para o produto aparecerão aqui.
+            Você poderá selecionar as melhores e escolher a ordem.
+        </div>
+
+        <div
+            id="photosGrid"
+            class="photos-grid"
+        >
+            <div class="photo-placeholder">
+                <strong>🖼️</strong>
+                Cole o link do produto e clique em
+                <b>Buscar fotos</b>.
+            </div>
+        </div>
+    </section>
+
+
+
+    <section class="card">
+        <div class="section-title">
+            <h2>🎞️ Storyboard</h2>
+
+            <span>
+                Ordem final do vídeo
+            </span>
+        </div>
+
+        <div class="storyboard">
+            <div class="story-item">
+                🎬 Abertura
+            </div>
+
+            <div class="story-arrow">
+                →
+            </div>
+
+            <div class="story-item">
+                🖼️ Foto 1
+            </div>
+
+            <div class="story-arrow">
+                →
+            </div>
+
+            <div class="story-item">
+                🖼️ Foto 2
+            </div>
+
+            <div class="story-arrow">
+                →
+            </div>
+
+            <div class="story-item">
+                🖼️ Foto 3
+            </div>
+
+            <div class="story-arrow">
+                →
+            </div>
+
+            <div class="story-item">
+                🎬 Finalização
+            </div>
+        </div>
+
+        <div class="generate-wrap">
+            <button
+                id="generateBtn"
+                class="generate-btn"
+                type="button"
+            >
+                ▶ GERAR VÍDEO
+            </button>
+        </div>
+    </section>
+
+
+    <section class="card">
+        <div class="section-title">
+            <h2>🚀 Destinos</h2>
+
+            <span>
+                Um vídeo, vários canais
+            </span>
+        </div>
+
+        <div class="channels">
+
+            <div class="channel">
+                <div class="channel-icon">🔵</div>
+                <div class="channel-name">Facebook</div>
+                <div class="channel-status">Preparado</div>
+            </div>
+
+            <div class="channel">
+                <div class="channel-icon">📸</div>
+                <div class="channel-name">Instagram</div>
+                <div class="channel-status">Preparado</div>
+            </div>
+
+            <div class="channel">
+                <div class="channel-icon">🎵</div>
+                <div class="channel-name">TikTok</div>
+                <div class="channel-status">Em breve</div>
+            </div>
+
+            <div class="channel">
+                <div class="channel-icon">🟠</div>
+                <div class="channel-name">Kwai</div>
+                <div class="channel-status">Em breve</div>
+            </div>
+
+            <div class="channel">
+                <div class="channel-icon">📌</div>
+                <div class="channel-name">Pinterest</div>
+                <div class="channel-status">Preparado</div>
+            </div>
+
+            <div class="channel">
+                <div class="channel-icon">💬</div>
+                <div class="channel-name">WhatsApp</div>
+                <div class="channel-status">Preparado</div>
+            </div>
+
+            <div class="channel">
+                <div class="channel-icon">➕</div>
+                <div class="channel-name">Outros</div>
+                <div class="channel-status">Preparado</div>
+            </div>
+
+        </div>
+    </section>
+
+</div>
+
+
+<input
+    class="hidden-input"
+    id="openingUpload"
+    type="file"
+    accept=".mp4,.mov,.webm"
+>
+
+<input
+    class="hidden-input"
+    id="closingUpload"
+    type="file"
+    accept=".mp4,.mov,.webm"
+>
+
+<input
+    class="hidden-input"
+    id="musicUpload"
+    type="file"
+    accept=".mp3,.wav,.m4a,.aac,.mp4,.mov,.webm"
+>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script>
+const BASE =
+    '/admin/vitrine2/marketing/video-production';
+
+const selected = {
+    opening: null,
+    closing: null,
+    music: null
+};
+
+
+function toast(message) {
+    const el =
+        document.getElementById('toast');
+
+    el.textContent =
+        message;
+
+    el.style.display =
+        'block';
+
+    clearTimeout(
+        window.__toastTimer
+    );
+
+    window.__toastTimer =
+        setTimeout(
+            () => {
+                el.style.display =
+                    'none';
+            },
+            2500
+        );
+}
+
+
+function chooseUpload(type) {
+    const input =
+        document.getElementById(
+            `${type}Upload`
+        );
+
+    input.click();
+}
+
+
+function fileUrl(type, id) {
+    return (
+        `${BASE}/api/` +
+        `${type}/` +
+        `${encodeURIComponent(id)}/file`
+    );
+}
+
+
+function selectMedia(
+    type,
+    id
+) {
+    selected[type] =
+        selected[type] === id
+            ? null
+            : id;
+
+    loadLibrary();
+}
+
+
+function renderVideoGrid(
+    targetId,
+    type,
+    items
+) {
+    const target =
+        document.getElementById(
+            targetId
+        );
+
+    if (!items.length) {
+        target.innerHTML =
+            '<div class="empty">' +
+            'Nenhum arquivo cadastrado ainda.' +
+            '</div>';
+
+        return;
+    }
+
+    target.innerHTML =
+        items.map(item => {
+            const active =
+                selected[type] ===
+                item.id;
+
+            return `
+                <article
+                    class="media-item ${
+                        active
+                            ? 'selected'
+                            : ''
+                    }"
+                >
+                    <div class="media-preview">
+                        <video
+                            src="${fileUrl(
+                                type,
+                                item.id
+                            )}"
+                            controls
+                            preload="metadata"
+                        ></video>
+                    </div>
+
+                    <div class="media-info">
+                        <div class="media-name">
+                            ${item.name}
+                        </div>
+
+                        <div class="media-actions">
+                            <button
+                                class="${
+                                    active
+                                        ? 'btn-success'
+                                        : 'btn-light'
+                                }"
+                                onclick="selectMedia(
+                                    '${type}',
+                                    '${item.id}'
+                                )"
+                            >
+                                ${
+                                    active
+                                        ? '✓ Selecionado'
+                                        : 'Selecionar'
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join('');
+}
+
+
+function resetMusicPreview(audio) {
+    const button =
+        document.querySelector(
+            `[data-music-button="${audio.dataset.musicId}"]`
+        );
+
+    if (button) {
+        button.textContent = '▶';
+        button.setAttribute(
+            'aria-label',
+            'Reproduzir música'
+        );
+    }
+
+    audio.currentTime = 0;
+}
+
+
+function playMusicPreview(
+    itemId,
+    button
+) {
+    const current =
+        document.getElementById(
+            `musicAudio-${itemId}`
+        );
+
+    if (!current) {
+        return;
+    }
+
+    document
+        .querySelectorAll(
+            'audio[data-music-preview]'
+        )
+        .forEach(audio => {
+            if (
+                audio !== current &&
+                !audio.paused
+            ) {
+                audio.pause();
+
+                const otherButton =
+                    document.querySelector(
+                        `[data-music-button="${audio.dataset.musicId}"]`
+                    );
+
+                if (otherButton) {
+                    otherButton.textContent = '▶';
+                }
+            }
+        });
+
+    if (current.paused) {
+        current
+            .play()
+            .then(() => {
+                button.textContent = '❚❚';
+
+                button.setAttribute(
+                    'aria-label',
+                    'Pausar música'
+                );
+            })
+            .catch(error => {
+                console.error(
+                    '[MUSIC PREVIEW]',
+                    error
+                );
+            });
+
+        return;
+    }
+
+    current.pause();
+
+    button.textContent = '▶';
+
+    button.setAttribute(
+        'aria-label',
+        'Reproduzir música'
+    );
+}
+
+
+function renderMusicGrid(items) {
+    const target =
+        document.getElementById(
+            'musicGrid'
+        );
+
+    if (!items.length) {
+        target.innerHTML =
+            '<div class="empty">' +
+            'Nenhuma música cadastrada ainda.' +
+            '</div>';
+
+        return;
+    }
+
+    target.innerHTML =
+        items.map(item => {
+            const active =
+                selected.music ===
+                item.id;
+
+            const src =
+                fileUrl(
+                    'music',
+                    item.id
+                );
+
+            return `
+                <article
+                    class="media-item ${
+                        active
+                            ? 'selected'
+                            : ''
+                    }"
+                >
+                    <div
+                        class="media-preview"
+                        style="
+                            min-height:145px;
+                            background:#f8fafc;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                        "
+                    >
+                        <audio
+                            id="musicAudio-${item.id}"
+                            src="${src}"
+                            preload="metadata"
+                            data-music-preview
+                            data-music-id="${item.id}"
+                            onended="resetMusicPreview(this)"
+                            style="display:none"
+                        ></audio>
+
+                        <button
+                            type="button"
+                            data-music-button="${item.id}"
+                            aria-label="Reproduzir música"
+                            onclick="playMusicPreview(
+                                '${item.id}',
+                                this
+                            )"
+                            style="
+                                width:58px;
+                                height:58px;
+                                border-radius:50%;
+                                border:1px solid #d7e3ee;
+                                background:#ffffff;
+                                color:#0f766e;
+                                font-size:25px;
+                                cursor:pointer;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                box-shadow:
+                                    0 3px 10px
+                                    rgba(15,23,42,.08);
+                            "
+                        >▶</button>
+                    </div>
+
+                    <div class="media-info">
+                        <div class="media-name">
+                            🎵 ${item.name}
+                        </div>
+
+                        <div class="media-actions">
+                            <button
+                                class="${
+                                    active
+                                        ? 'btn-success'
+                                        : 'btn-light'
+                                }"
+                                onclick="selectMedia(
+                                    'music',
+                                    '${item.id}'
+                                )"
+                            >
+                                ${
+                                    active
+                                        ? '✓ Selecionada'
+                                        : 'Selecionar'
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join('');
+}
+
+
+async function loadLibrary() {
+    try {
+        const response =
+            await fetch(
+                `${BASE}/api/library`
+            );
+
+        const payload =
+            await response.json();
+
+        if (!payload.success) {
+            throw new Error(
+                payload.error ||
+                'Falha ao carregar biblioteca.'
+            );
+        }
+
+        renderVideoGrid(
+            'openingGrid',
+            'opening',
+            payload.openings || []
+        );
+
+        renderVideoGrid(
+            'closingGrid',
+            'closing',
+            payload.closings || []
+        );
+
+        renderMusicGrid(
+            payload.music || []
+        );
+
+    } catch (error) {
+        console.error(error);
+
+        toast(
+            'Erro ao carregar biblioteca.'
+        );
+    }
+}
+
+
+async function uploadMedia(
+    type,
+    file
+) {
+    const form =
+        new FormData();
+
+    form.append(
+        'file',
+        file
+    );
+
+    const response =
+        await fetch(
+            `${BASE}/api/${type}`,
+            {
+                method: 'POST',
+                body: form
+            }
+        );
+
+    const payload =
+        await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            payload.error ||
+            'Falha no upload.'
+        );
+    }
+
+    toast(
+        'Arquivo adicionado.'
+    );
+
+    await loadLibrary();
+}
+
+
+for (
+    const type
+    of [
+        'opening',
+        'closing',
+        'music'
+    ]
+) {
+    const input =
+        document.getElementById(
+            `${type}Upload`
+        );
+
+    input.addEventListener(
+        'change',
+        async event => {
+            const file =
+                event.target.files?.[0];
+
+            if (!file) {
+                return;
+            }
+
+            try {
+                await uploadMedia(
+                    type,
+                    file
+                );
+            } catch (error) {
+                console.error(error);
+
+                toast(
+                    error.message
+                );
+            } finally {
+                input.value = '';
+            }
+        }
+    );
+}
+
+
+document
+    .getElementById('loadProductBtn')
+    .addEventListener(
+        'click',
+        () => {
+            toast(
+                'Busca de fotos será ligada na próxima etapa.'
+            );
+        }
+    );
+
+
+document
+    .getElementById('generateBtn')
+    .addEventListener(
+        'click',
+        () => {
+            toast(
+                'Gerador será ligado na próxima etapa.'
+            );
+        }
+    );
+
+
+loadLibrary();
+</script>
+
+</body>
+</html>

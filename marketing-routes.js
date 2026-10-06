@@ -46,8 +46,18 @@ const publicationHistoryStore =
     require('./marketing/publication-history-store');
 
 
+const videoProductionRoutes =
+    require('./marketing/video-production-routes');
+
+
 const router =
     express.Router();
+
+
+router.use(
+    '/video-production',
+    videoProductionRoutes
+);
 
 
 const MARKETING_PUBLIC_BASE_URL =
