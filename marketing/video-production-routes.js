@@ -15,6 +15,11 @@ const {
     DIRECTORIES
 } = require('./video-production-library');
 
+const {
+    getProductMedia
+} = require('../product-media-orchestrator');
+
+
 const router = express.Router();
 
 
@@ -232,6 +237,60 @@ async function normalizeVideo(
         outputPath
     ]);
 }
+
+
+/*
+ * Mídias de produto para a Central de Produção.
+ *
+ * A rota não conhece detalhes de Shopee,
+ * feed, SQLite ou captura.
+ *
+ * Toda a decisão fica no
+ * product-media-orchestrator.
+ */
+router.post(
+    '/api/product-media',
+    async (req, res) => {
+        try {
+            const url =
+                String(
+                    req.body?.url || ''
+                ).trim();
+
+            if (!url) {
+                return res.status(400).json({
+                    success: false,
+                    error:
+                        'Informe o link do produto.'
+                });
+            }
+
+            const product =
+                await getProductMedia({
+                    url,
+                    minImages: 5,
+                    enrich: true
+                });
+
+            return res.json({
+                success: true,
+                product
+            });
+        } catch (error) {
+            console.error(
+                '[VIDEO PRODUCTION PRODUCT MEDIA]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    error?.message ||
+                    'Não foi possível carregar as mídias do produto.'
+            });
+        }
+    }
+);
 
 
 /*

@@ -243,6 +243,100 @@
             gap: 12px;
         }
 
+        .photo-item {
+            border: 2px solid #e4eaf2;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #ffffff;
+            cursor: pointer;
+            transition: .15s ease;
+            position: relative;
+        }
+
+        .photo-item:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                0 5px 16px
+                rgba(15,23,42,.08);
+        }
+
+        .photo-item.selected {
+            border-color: #15956f;
+            box-shadow:
+                0 0 0 3px
+                rgba(21,149,111,.12);
+        }
+
+        .photo-image {
+            aspect-ratio: 1 / 1;
+            background: #f3f6fa;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .photo-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .photo-order {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #15956f;
+            color: white;
+            font-weight: 800;
+            font-size: 12px;
+            box-shadow:
+                0 2px 8px
+                rgba(0,0,0,.16);
+        }
+
+        .photo-info {
+            padding: 9px;
+        }
+
+        .photo-select-status {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 7px;
+        }
+
+        .photo-item.selected
+        .photo-select-status {
+            color: #0f766e;
+        }
+
+        .photo-order-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .photo-order-actions button {
+            flex: 1;
+            min-height: 30px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #f8fafc;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .photo-order-actions button:disabled {
+            opacity: .35;
+            cursor: default;
+        }
+
         .photo-placeholder {
             min-height: 170px;
             border: 2px dashed #d4ddea;
@@ -512,9 +606,12 @@
             </div>
         </div>
 
-        <div class="photos-help">
+        <div
+            id="productMediaStatus"
+            class="photos-help"
+        >
             Todas as fotos encontradas para o produto aparecerão aqui.
-            Você poderá selecionar as melhores e escolher a ordem.
+            Até 5 serão selecionadas automaticamente para o vídeo.
         </div>
 
         <div
@@ -540,43 +637,11 @@
             </span>
         </div>
 
-        <div class="storyboard">
-            <div class="story-item">
-                🎬 Abertura
-            </div>
+        <div
+            id="storyboard"
+            class="storyboard"
+        ></div>
 
-            <div class="story-arrow">
-                →
-            </div>
-
-            <div class="story-item">
-                🖼️ Foto 1
-            </div>
-
-            <div class="story-arrow">
-                →
-            </div>
-
-            <div class="story-item">
-                🖼️ Foto 2
-            </div>
-
-            <div class="story-arrow">
-                →
-            </div>
-
-            <div class="story-item">
-                🖼️ Foto 3
-            </div>
-
-            <div class="story-arrow">
-                →
-            </div>
-
-            <div class="story-item">
-                🎬 Finalização
-            </div>
-        </div>
 
         <div class="generate-wrap">
             <button
@@ -1173,6 +1238,487 @@ function renderMusicGrid(items) {
 }
 
 
+
+let currentProduct = null;
+let productPhotos = [];
+let selectedPhotos = [];
+
+
+function escapeProductHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+}
+
+
+function renderProductPhotos() {
+    const grid =
+        document.getElementById(
+            'photosGrid'
+        );
+
+    if (!productPhotos.length) {
+        grid.innerHTML = `
+            <div class="photo-placeholder">
+                <strong>🖼️</strong>
+                Nenhuma foto carregada.
+            </div>
+        `;
+
+        return;
+    }
+
+    grid.innerHTML =
+        productPhotos
+            .map(
+                (url, photoIndex) => {
+                    const selectedIndex =
+                        selectedPhotos.indexOf(
+                            url
+                        );
+
+                    const active =
+                        selectedIndex !== -1;
+
+                    const order =
+                        active
+                            ? selectedIndex + 1
+                            : null;
+
+                    const safeUrl =
+                        escapeProductHtml(
+                            url
+                        );
+
+                    return `
+                        <article
+                            class="photo-item ${
+                                active
+                                    ? 'selected'
+                                    : ''
+                            }"
+                            onclick="toggleProductPhoto(
+                                ${photoIndex}
+                            )"
+                        >
+                            <div class="photo-image">
+                                <img
+                                    src="${safeUrl}"
+                                    alt="Foto ${
+                                        photoIndex + 1
+                                    } do produto"
+                                    loading="lazy"
+                                >
+
+                                ${
+                                    active
+                                        ? `
+                                            <div class="photo-order">
+                                                ${order}
+                                            </div>
+                                        `
+                                        : ''
+                                }
+                            </div>
+
+                            <div class="photo-info">
+                                <div class="photo-select-status">
+                                    ${
+                                        active
+                                            ? `✓ Selecionada • posição ${order}`
+                                            : 'Selecionar foto'
+                                    }
+                                </div>
+
+                                ${
+                                    active
+                                        ? `
+                                            <div class="photo-order-actions">
+                                                <button
+                                                    type="button"
+                                                    ${
+                                                        selectedIndex === 0
+                                                            ? 'disabled'
+                                                            : ''
+                                                    }
+                                                    onclick="
+                                                        event.stopPropagation();
+                                                        moveProductPhoto(
+                                                            ${photoIndex},
+                                                            -1
+                                                        );
+                                                    "
+                                                    title="Mover para a esquerda"
+                                                >
+                                                    ←
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    ${
+                                                        selectedIndex ===
+                                                        selectedPhotos.length - 1
+                                                            ? 'disabled'
+                                                            : ''
+                                                    }
+                                                    onclick="
+                                                        event.stopPropagation();
+                                                        moveProductPhoto(
+                                                            ${photoIndex},
+                                                            1
+                                                        );
+                                                    "
+                                                    title="Mover para a direita"
+                                                >
+                                                    →
+                                                </button>
+                                            </div>
+                                        `
+                                        : ''
+                                }
+                            </div>
+                        </article>
+                    `;
+                }
+            )
+            .join('');
+}
+
+
+function renderStoryboard() {
+    const storyboard =
+        document.getElementById(
+            'storyboard'
+        );
+
+    const blocks = [
+        '🎬 Abertura'
+    ];
+
+    selectedPhotos.forEach(
+        (_, index) => {
+            blocks.push(
+                `🖼️ Foto ${index + 1}`
+            );
+        }
+    );
+
+    blocks.push(
+        '🎬 Finalização'
+    );
+
+    const html = [];
+
+    blocks.forEach(
+        (label, index) => {
+            if (index > 0) {
+                html.push(
+                    `
+                        <div class="story-arrow">
+                            →
+                        </div>
+                    `
+                );
+            }
+
+            html.push(
+                `
+                    <div class="story-item">
+                        ${label}
+                    </div>
+                `
+            );
+        }
+    );
+
+    storyboard.innerHTML =
+        html.join('');
+}
+
+
+function toggleProductPhoto(
+    photoIndex
+) {
+    const url =
+        productPhotos[
+            photoIndex
+        ];
+
+    if (!url) {
+        return;
+    }
+
+    const selectedIndex =
+        selectedPhotos.indexOf(
+            url
+        );
+
+    if (selectedIndex !== -1) {
+        selectedPhotos.splice(
+            selectedIndex,
+            1
+        );
+    } else {
+        if (
+            selectedPhotos.length >= 5
+        ) {
+            toast(
+                'O vídeo usa até 5 fotos. Retire uma antes de selecionar outra.'
+            );
+
+            return;
+        }
+
+        selectedPhotos.push(
+            url
+        );
+    }
+
+    renderProductPhotos();
+    renderStoryboard();
+}
+
+
+function moveProductPhoto(
+    photoIndex,
+    direction
+) {
+    const url =
+        productPhotos[
+            photoIndex
+        ];
+
+    const currentIndex =
+        selectedPhotos.indexOf(
+            url
+        );
+
+    if (currentIndex === -1) {
+        return;
+    }
+
+    const targetIndex =
+        currentIndex +
+        direction;
+
+    if (
+        targetIndex < 0 ||
+        targetIndex >=
+            selectedPhotos.length
+    ) {
+        return;
+    }
+
+    const [
+        moved
+    ] =
+        selectedPhotos.splice(
+            currentIndex,
+            1
+        );
+
+    selectedPhotos.splice(
+        targetIndex,
+        0,
+        moved
+    );
+
+    renderProductPhotos();
+    renderStoryboard();
+}
+
+
+function productMediaSourceLabel(
+    product
+) {
+    const enrichment =
+        product?.enrichment ||
+        {};
+
+    if (enrichment.captured) {
+        return 'acervo enriquecido automaticamente';
+    }
+
+    if (enrichment.feedUsed) {
+        return 'acervo + catálogo';
+    }
+
+    return 'acervo';
+}
+
+
+async function loadProductMedia() {
+    const input =
+        document.getElementById(
+            'productUrl'
+        );
+
+    const button =
+        document.getElementById(
+            'loadProductBtn'
+        );
+
+    const status =
+        document.getElementById(
+            'productMediaStatus'
+        );
+
+    const url =
+        String(
+            input.value || ''
+        ).trim();
+
+    if (!url) {
+        toast(
+            'Cole o link do produto.'
+        );
+
+        input.focus();
+        return;
+    }
+
+    const oldText =
+        button.textContent;
+
+    button.disabled = true;
+    button.textContent =
+        'Buscando...';
+
+    status.textContent =
+        'Procurando as melhores fotos no acervo...';
+
+    try {
+        const response =
+            await fetch(
+                `${BASE}/api/product-media`,
+                {
+                    method:
+                        'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:
+                        JSON.stringify({
+                            url
+                        })
+                }
+            );
+
+        const payload =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !payload.success
+        ) {
+            const message =
+                typeof payload.error ===
+                    'string'
+                    ? payload.error
+                    : payload.error?.message;
+
+            throw new Error(
+                message ||
+                'Não foi possível buscar as fotos.'
+            );
+        }
+
+        const product =
+            payload.product ||
+            {};
+
+        const images =
+            Array.isArray(
+                product.images
+            )
+                ? product.images
+                : [];
+
+        productPhotos =
+            [
+                ...new Set(
+                    images
+                        .map(
+                            value =>
+                                String(
+                                    value || ''
+                                ).trim()
+                        )
+                        .filter(Boolean)
+                )
+            ];
+
+        currentProduct =
+            product;
+
+        selectedPhotos =
+            productPhotos.slice(
+                0,
+                5
+            );
+
+        renderProductPhotos();
+        renderStoryboard();
+
+        const source =
+            productMediaSourceLabel(
+                product
+            );
+
+        const title =
+            product.title
+                ? ` • ${product.title}`
+                : '';
+
+        status.textContent =
+            `${productPhotos.length} foto(s) encontrada(s) • ${source}${title}`;
+
+        if (
+            Array.isArray(
+                product.warnings
+            ) &&
+            product.warnings.length
+        ) {
+            console.warn(
+                '[VIDEO PRODUCT MEDIA]',
+                product.warnings
+            );
+        }
+
+        toast(
+            `${selectedPhotos.length} foto(s) selecionada(s) para o vídeo.`
+        );
+    } catch (error) {
+        console.error(error);
+
+        currentProduct = null;
+        productPhotos = [];
+        selectedPhotos = [];
+
+        renderProductPhotos();
+        renderStoryboard();
+
+        status.textContent =
+            'Não foi possível carregar as fotos deste produto.';
+
+        toast(
+            error.message ||
+            'Erro ao buscar fotos.'
+        );
+    } finally {
+        button.disabled = false;
+        button.textContent =
+            oldText;
+    }
+}
+
+
 async function loadLibrary() {
     try {
         const response =
@@ -1333,10 +1879,18 @@ document
     .getElementById('loadProductBtn')
     .addEventListener(
         'click',
-        () => {
-            toast(
-                'Busca de fotos será ligada na próxima etapa.'
-            );
+        loadProductMedia
+    );
+
+
+document
+    .getElementById('productUrl')
+    .addEventListener(
+        'keydown',
+        event => {
+            if (event.key === 'Enter') {
+                loadProductMedia();
+            }
         }
     );
 
@@ -1353,6 +1907,7 @@ document
     );
 
 
+renderStoryboard();
 loadLibrary();
 </script>
 
