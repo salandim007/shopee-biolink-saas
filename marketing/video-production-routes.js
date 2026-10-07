@@ -10,6 +10,8 @@ const {
     ensureDirectories,
     listVideos,
     resolveVideoPath,
+    getDefaultSelections,
+    setDefaultSelection,
     DIRECTORIES
 } = require('./video-production-library');
 
@@ -249,11 +251,15 @@ router.get(
                 listVideos('music')
             ]);
 
+            const defaults =
+                await getDefaultSelections();
+
             return res.json({
                 success: true,
                 openings,
                 closings,
-                music
+                music,
+                defaults
             });
         } catch (error) {
             console.error(
@@ -269,6 +275,76 @@ router.get(
         }
     }
 );
+
+
+
+/*
+ * Define o padrão de abertura,
+ * fechamento ou música.
+ */
+router.put(
+    '/api/default/:type',
+    async (req, res) => {
+        try {
+            const type =
+                String(
+                    req.params.type || ''
+                );
+
+            if (
+                ![
+                    'opening',
+                    'closing',
+                    'music'
+                ].includes(type)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    error:
+                        'Tipo de padrão inválido.'
+                });
+            }
+
+            const id =
+                String(
+                    req.body?.id || ''
+                );
+
+            if (!id) {
+                return res.status(400).json({
+                    success: false,
+                    error:
+                        'Informe o item que será o padrão.'
+                });
+            }
+
+            await setDefaultSelection(
+                type,
+                id
+            );
+
+            const defaults =
+                await getDefaultSelections();
+
+            return res.json({
+                success: true,
+                defaults
+            });
+        } catch (error) {
+            console.error(
+                '[VIDEO PRODUCTION DEFAULT]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    'Não foi possível salvar o padrão.'
+            });
+        }
+    }
+);
+
 
 
 /*

@@ -687,6 +687,14 @@ const selected = {
     music: null
 };
 
+const defaults = {
+    opening: null,
+    closing: null,
+    music: null
+};
+
+let defaultsInitialized = false;
+
 
 function toast(message) {
     const el =
@@ -745,6 +753,69 @@ function selectMedia(
 }
 
 
+async function setDefaultMedia(
+    type,
+    id
+) {
+    try {
+        const response =
+            await fetch(
+                `${BASE}/api/default/${type}`,
+                {
+                    method: 'PUT',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        id
+                    })
+                }
+            );
+
+        const payload =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                payload.error ||
+                'Não foi possível salvar o padrão.'
+            );
+        }
+
+        Object.assign(
+            defaults,
+            payload.defaults || {}
+        );
+
+        /*
+         * Ao tornar um item padrão,
+         * ele também passa a ser a
+         * seleção da produção atual.
+         */
+        selected[type] = id;
+
+        toast(
+            'Padrão atualizado.'
+        );
+
+        await loadLibrary();
+    } catch (error) {
+        console.error(
+            '[VIDEO DEFAULT]',
+            error
+        );
+
+        toast(
+            error.message ||
+            'Erro ao salvar padrão.'
+        );
+    }
+}
+
+
 function renderVideoGrid(
     targetId,
     type,
@@ -770,6 +841,10 @@ function renderVideoGrid(
                 selected[type] ===
                 item.id;
 
+            const isDefault =
+                defaults[type] ===
+                item.id;
+
             return `
                 <article
                     class="media-item ${
@@ -792,6 +867,23 @@ function renderVideoGrid(
                     <div class="media-info">
                         <div class="media-name">
                             ${item.name}
+
+                            ${
+                                isDefault
+                                    ? `
+                                        <span
+                                            style="
+                                                margin-left:6px;
+                                                font-size:11px;
+                                                color:#0f766e;
+                                                font-weight:700;
+                                            "
+                                        >
+                                            ★ Padrão
+                                        </span>
+                                    `
+                                    : ''
+                            }
                         </div>
 
                         <div class="media-actions">
@@ -812,6 +904,27 @@ function renderVideoGrid(
                                         : 'Selecionar'
                                 }
                             </button>
+
+                            ${
+                                !isDefault
+                                    ? `
+                                        <button
+                                            type="button"
+                                            class="btn-light"
+                                            onclick="setDefaultMedia(
+                                                '${type}',
+                                                '${item.id}'
+                                            )"
+                                            style="
+                                                font-size:11px;
+                                                padding:6px 9px;
+                                            "
+                                        >
+                                            ☆ Tornar padrão
+                                        </button>
+                                    `
+                                    : ''
+                            }
                         </div>
                     </div>
                 </article>
@@ -926,6 +1039,10 @@ function renderMusicGrid(items) {
                 selected.music ===
                 item.id;
 
+            const isDefault =
+                defaults.music ===
+                item.id;
+
             const src =
                 fileUrl(
                     'music',
@@ -990,6 +1107,23 @@ function renderMusicGrid(items) {
                     <div class="media-info">
                         <div class="media-name">
                             🎵 ${item.name}
+
+                            ${
+                                isDefault
+                                    ? `
+                                        <span
+                                            style="
+                                                margin-left:6px;
+                                                font-size:11px;
+                                                color:#0f766e;
+                                                font-weight:700;
+                                            "
+                                        >
+                                            ★ Padrão
+                                        </span>
+                                    `
+                                    : ''
+                            }
                         </div>
 
                         <div class="media-actions">
@@ -1010,6 +1144,27 @@ function renderMusicGrid(items) {
                                         : 'Selecionar'
                                 }
                             </button>
+
+                            ${
+                                !isDefault
+                                    ? `
+                                        <button
+                                            type="button"
+                                            class="btn-light"
+                                            onclick="setDefaultMedia(
+                                                'music',
+                                                '${item.id}'
+                                            )"
+                                            style="
+                                                font-size:11px;
+                                                padding:6px 9px;
+                                            "
+                                        >
+                                            ☆ Tornar padrão
+                                        </button>
+                                    `
+                                    : ''
+                            }
                         </div>
                     </div>
                 </article>
@@ -1033,6 +1188,38 @@ async function loadLibrary() {
                 payload.error ||
                 'Falha ao carregar biblioteca.'
             );
+        }
+
+        Object.assign(
+            defaults,
+            payload.defaults || {}
+        );
+
+        /*
+         * Os padrões entram automaticamente
+         * somente na primeira abertura.
+         *
+         * Depois, a escolha manual do usuário
+         * para aquela produção é preservada.
+         */
+        if (!defaultsInitialized) {
+            for (
+                const type of [
+                    'opening',
+                    'closing',
+                    'music'
+                ]
+            ) {
+                if (
+                    selected[type] === null &&
+                    defaults[type]
+                ) {
+                    selected[type] =
+                        defaults[type];
+                }
+            }
+
+            defaultsInitialized = true;
         }
 
         renderVideoGrid(

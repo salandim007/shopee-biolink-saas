@@ -16,6 +16,18 @@ const DIRECTORIES = {
     music: path.join(ROOT, 'music')
 };
 
+const SETTINGS_FILE = path.join(
+    ROOT,
+    'settings.json'
+);
+
+const DEFAULT_TYPES = [
+    'opening',
+    'closing',
+    'music'
+];
+
+
 const VIDEO_EXTENSIONS = new Set([
     '.mp4',
     '.mov',
@@ -198,9 +210,201 @@ async function resolveVideoPath(
     return fullPath;
 }
 
+
+function normalizeSettings(value) {
+    const source =
+        value &&
+        typeof value === 'object'
+            ? value
+            : {};
+
+    return {
+        opening:
+            typeof source.opening === 'string'
+                ? source.opening
+                : null,
+
+        closing:
+            typeof source.closing === 'string'
+                ? source.closing
+                : null,
+
+        music:
+            typeof source.music === 'string'
+                ? source.music
+                : null
+    };
+}
+
+
+async function readSettings() {
+    await ensureDirectories();
+
+    try {
+        const raw =
+            await fs.readFile(
+                SETTINGS_FILE,
+                'utf8'
+            );
+
+        return normalizeSettings(
+            JSON.parse(raw)
+        );
+    } catch (error) {
+        if (
+            error &&
+            error.code === 'ENOENT'
+        ) {
+            return normalizeSettings({});
+        }
+
+        throw error;
+    }
+}
+
+
+async function writeSettings(settings) {
+    await ensureDirectories();
+
+    const normalized =
+        normalizeSettings(settings);
+
+    const temporaryFile =
+        `${SETTINGS_FILE}.tmp`;
+
+    await fs.writeFile(
+        temporaryFile,
+        JSON.stringify(
+            normalized,
+            null,
+            2
+        ) + '\n',
+        'utf8'
+    );
+
+    await fs.rename(
+        temporaryFile,
+        SETTINGS_FILE
+    );
+
+    return normalized;
+}
+
+
+/*
+ * Retorna os IDs atualmente configurados
+ * como padrão.
+ *
+ * Se ainda não existir configuração e houver
+ * exatamente um item daquele tipo, ele vira
+ * padrão automaticamente.
+ */
+async function getDefaultSelections() {
+    const settings =
+        await readSettings();
+
+    const selections = {
+        opening: null,
+        closing: null,
+        music: null
+    };
+
+    let changed = false;
+
+    for (const type of DEFAULT_TYPES) {
+        const items =
+            await listVideos(type);
+
+        let selectedItem =
+            items.find(
+                item =>
+                    item.filename ===
+                    settings[type]
+            ) || null;
+
+        if (
+            !selectedItem &&
+            items.length === 1
+        ) {
+            selectedItem =
+                items[0];
+
+            settings[type] =
+                selectedItem.filename;
+
+            changed = true;
+        } else if (
+            !selectedItem &&
+            settings[type]
+        ) {
+            settings[type] = null;
+            changed = true;
+        }
+
+        selections[type] =
+            selectedItem
+                ? selectedItem.id
+                : null;
+    }
+
+    if (changed) {
+        await writeSettings(
+            settings
+        );
+    }
+
+    return selections;
+}
+
+
+/*
+ * Define explicitamente um item
+ * como padrão daquele tipo.
+ */
+async function setDefaultSelection(
+    type,
+    id
+) {
+    if (
+        !DEFAULT_TYPES.includes(type)
+    ) {
+        throw new Error(
+            `Tipo de padrão inválido: ${type}`
+        );
+    }
+
+    const filePath =
+        await resolveVideoPath(
+            type,
+            id
+        );
+
+    const filename =
+        path.basename(filePath);
+
+    const settings =
+        await readSettings();
+
+    settings[type] =
+        filename;
+
+    await writeSettings(
+        settings
+    );
+
+    return {
+        type,
+        id,
+        filename
+    };
+}
+
+
 module.exports = {
     ensureDirectories,
     listVideos,
     resolveVideoPath,
+    getDefaultSelections,
+    setDefaultSelection,
     DIRECTORIES
 };
