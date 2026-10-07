@@ -147,6 +147,16 @@ async function resolveBackgroundMusic(options = {}) {
             ''
         ).trim();
 
+    if (
+        Object.prototype.hasOwnProperty.call(
+            options,
+            'musicPath'
+        ) &&
+        !explicitPath
+    ) {
+        return null;
+    }
+
     if (explicitPath) {
         const resolved =
             path.resolve(
@@ -205,6 +215,7 @@ function buildFilterGraph({
     fps,
     secondsPerImage,
     transitionDuration,
+    closingInputIndex = imageCount,
     musicInputIndex = null,
     totalDuration = null,
     musicVolume = 0.16
@@ -252,32 +263,34 @@ function buildFilterGraph({
      * Frente:
      * mantém o avatar inteiro e centralizado.
      */
-    filters.push(
-        `[${imageCount}:v]split=2[avatarbg][avatarfg]`
-    );
+    if (closingInputIndex !== null) {
+        filters.push(
+            `[${closingInputIndex}:v]split=2[avatarbg][avatarfg]`
+        );
 
-    filters.push(
-        `[avatarbg]` +
-        `scale=${width}:${height}:force_original_aspect_ratio=increase,` +
-        `crop=${width}:${height},` +
-        `boxblur=20:1` +
-        `[avatarbg2]`
-    );
+        filters.push(
+            `[avatarbg]` +
+            `scale=${width}:${height}:force_original_aspect_ratio=increase,` +
+            `crop=${width}:${height},` +
+            `boxblur=20:1` +
+            `[avatarbg2]`
+        );
 
-    filters.push(
-        `[avatarfg]` +
-        `scale=${width}:${height}:force_original_aspect_ratio=decrease` +
-        `[avatarfg2]`
-    );
+        filters.push(
+            `[avatarfg]` +
+            `scale=${width}:${height}:force_original_aspect_ratio=decrease` +
+            `[avatarfg2]`
+        );
 
-    filters.push(
-        `[avatarbg2][avatarfg2]` +
-        `overlay=(W-w)/2:(H-h)/2,` +
-        `fps=${fps},` +
-        `setsar=1,` +
-        `setpts=PTS-STARTPTS` +
-        `[vclose]`
-    );
+        filters.push(
+            `[avatarbg2][avatarfg2]` +
+            `overlay=(W-w)/2:(H-h)/2,` +
+            `fps=${fps},` +
+            `setsar=1,` +
+            `setpts=PTS-STARTPTS` +
+            `[vclose]`
+        );
+    }
 
 
     /*
@@ -348,6 +361,41 @@ function buildFilterGraph({
             transitionDuration
         );
 
+    if (closingInputIndex === null) {
+        filters.push(
+            `[${previous}]null[vout]`
+        );
+
+        const safeDuration =
+            Math.max(
+                1,
+                Number(totalDuration) ||
+                productDuration ||
+                1
+            );
+
+        if (musicInputIndex !== null) {
+            filters.push(
+                `[${musicInputIndex}:a]` +
+                `asetpts=PTS-STARTPTS,` +
+                `volume=${musicVolume},` +
+                `atrim=0:${safeDuration.toFixed(3)},` +
+                `aresample=48000,` +
+                `aformat=channel_layouts=stereo` +
+                `[aout]`
+            );
+        } else {
+            filters.push(
+                `anullsrc=r=48000:cl=stereo,` +
+                `atrim=duration=${safeDuration.toFixed(3)},` +
+                `asetpts=PTS-STARTPTS[aout]`
+            );
+        }
+
+        return filters.join(';');
+    }
+
+
     const avatarOffset =
         Math.max(
             0,
@@ -386,7 +434,7 @@ function buildFilterGraph({
 
 
     filters.push(
-        `[${imageCount}:a]` +
+        `[${closingInputIndex}:a]` +
         `asetpts=PTS-STARTPTS,` +
         `adelay=${audioDelayMs}:all=1` +
         `[${avatarAudioLabel}]`
@@ -553,6 +601,150 @@ function executeFfmpeg(
 }
 
 
+async function probeReelMedia(
+    filePath,
+    ffprobePath = 'ffprobe'
+) {
+    return new Promise(
+        (resolve, reject) => {
+            const child =
+                spawn(
+                    ffprobePath,
+                    [
+                        '-v',
+                        'error',
+
+                        '-show_entries',
+                        'format=duration:stream=codec_type',
+
+                        '-of',
+                        'json',
+
+                        filePath
+                    ],
+                    {
+                        windowsHide:
+                            true,
+
+                        stdio: [
+                            'ignore',
+                            'pipe',
+                            'pipe'
+                        ]
+                    }
+                );
+
+            let stdout = '';
+            let stderr = '';
+
+            child.stdout.on(
+                'data',
+                chunk => {
+                    stdout +=
+                        chunk.toString();
+                }
+            );
+
+            child.stderr.on(
+                'data',
+                chunk => {
+                    stderr +=
+                        chunk.toString();
+                }
+            );
+
+            child.on(
+                'error',
+                error => {
+                    reject(
+                        new ReelGeneratorError(
+                            'Não foi possível iniciar o FFprobe.',
+                            'REEL_MEDIA_PROBE_FAILED',
+                            {
+                                message:
+                                    error.message
+                            }
+                        )
+                    );
+                }
+            );
+
+            child.on(
+                'close',
+                code => {
+                    if (code !== 0) {
+                        reject(
+                            new ReelGeneratorError(
+                                'Não foi possível analisar o vídeo selecionado.',
+                                'REEL_MEDIA_PROBE_FAILED',
+                                {
+                                    ffprobeOutput:
+                                        stderr.slice(
+                                            -2000
+                                        )
+                                }
+                            )
+                        );
+
+                        return;
+                    }
+
+                    try {
+                        const info =
+                            JSON.parse(
+                                stdout
+                            );
+
+                        const duration =
+                            Number(
+                                info.format
+                                    ?.duration
+                            );
+
+                        if (
+                            !Number.isFinite(
+                                duration
+                            ) ||
+                            duration <= 0
+                        ) {
+                            throw new Error(
+                                'Duração inválida.'
+                            );
+                        }
+
+                        const hasAudio =
+                            (
+                                info.streams ||
+                                []
+                            ).some(
+                                stream =>
+                                    stream.codec_type ===
+                                    'audio'
+                            );
+
+                        resolve({
+                            duration,
+                            hasAudio
+                        });
+                    } catch (error) {
+                        reject(
+                            new ReelGeneratorError(
+                                'O vídeo selecionado não possui duração válida.',
+                                'REEL_INVALID_MEDIA',
+                                {
+                                    message:
+                                        error.message
+                                }
+                            )
+                        );
+                    }
+                }
+            );
+        }
+    );
+}
+
+
 async function generateReel(options = {}) {
     const fetchImpl =
         options.fetchImpl ||
@@ -598,7 +790,7 @@ async function generateReel(options = {}) {
         options.transitionDuration ||
         0.45;
 
-    const closingDuration =
+    let closingDuration =
         options.closingDuration ||
         10.08;
 
@@ -618,27 +810,101 @@ async function generateReel(options = {}) {
                 : '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
         );
 
-    const avatarPath =
-        options.avatarPath ||
-        path.join(
-            process.cwd(),
-            'assets',
-            'video',
-            'avatar.mp4'
+    const hasClosingOption =
+        Object.prototype.hasOwnProperty.call(
+            options,
+            'closingPath'
         );
 
-    try {
-        await fs.access(
-            avatarPath
-        );
-    } catch {
-        throw new ReelGeneratorError(
-            'O vídeo do avatar não foi encontrado.',
-            'REEL_AVATAR_NOT_FOUND',
-            {
+    const closingEnabled =
+        hasClosingOption
+            ? Boolean(options.closingPath)
+            : true;
+
+    if (!closingEnabled) {
+        closingDuration = 0;
+    }
+
+    const avatarPath =
+        closingEnabled
+            ? (
+                options.closingPath ||
+                options.avatarPath ||
+                path.join(
+                    process.cwd(),
+                    'assets',
+                    'video',
+                    'avatar.mp4'
+                )
+            )
+            : null;
+
+    if (closingEnabled) {
+        try {
+            await fs.access(
                 avatarPath
-            }
-        );
+            );
+        } catch {
+            throw new ReelGeneratorError(
+                'O vídeo do avatar não foi encontrado.',
+                'REEL_AVATAR_NOT_FOUND',
+                {
+                    avatarPath
+                }
+            );
+        }
+    }
+
+
+    const ffprobePath =
+        options.ffprobePath ||
+        process.env.FFPROBE_PATH ||
+        'ffprobe';
+
+    const introPath =
+        options.introPath
+            ? path.resolve(
+                options.introPath
+            )
+            : null;
+
+    let introInfo = null;
+
+    if (introPath) {
+        try {
+            await fs.access(
+                introPath
+            );
+        } catch {
+            throw new ReelGeneratorError(
+                'O vídeo de abertura não foi encontrado.',
+                'REEL_INTRO_NOT_FOUND',
+                {
+                    introPath
+                }
+            );
+        }
+
+        introInfo =
+            await probeReelMedia(
+                introPath,
+                ffprobePath
+            );
+    }
+
+    if (
+        closingEnabled &&
+        options.closingPath &&
+        !options.closingDuration
+    ) {
+        const closingInfo =
+            await probeReelMedia(
+                avatarPath,
+                ffprobePath
+            );
+
+        closingDuration =
+            closingInfo.duration;
     }
 
 
@@ -707,9 +973,13 @@ async function generateReel(options = {}) {
         );
 
     const durationSeconds =
-        productDuration +
-        closingDuration -
-        transitionDuration;
+        closingEnabled
+            ? (
+                productDuration +
+                closingDuration -
+                transitionDuration
+            )
+            : productDuration;
 
     const musicPath =
         await resolveBackgroundMusic(
@@ -733,7 +1003,11 @@ async function generateReel(options = {}) {
 
     const musicInputIndex =
         musicPath
-            ? localImages.length + 1
+            ? (
+                localImages.length +
+                (closingEnabled ? 1 : 0) +
+                (introInfo ? 1 : 0)
+            )
             : null;
 
 
@@ -743,7 +1017,7 @@ async function generateReel(options = {}) {
             'reel.mp4'
         );
 
-    const filterGraph =
+    let filterGraph =
         buildFilterGraph({
             imageCount:
                 localImages.length,
@@ -752,6 +1026,10 @@ async function generateReel(options = {}) {
             fps,
             secondsPerImage,
             transitionDuration,
+            closingInputIndex:
+                closingEnabled
+                    ? localImages.length
+                    : null,
             closingDuration,
             fontFile,
             boldFontFile,
@@ -761,6 +1039,83 @@ async function generateReel(options = {}) {
             musicVolume:
                 0.16
         });
+
+    if (introInfo) {
+        const introInputIndex =
+            localImages.length +
+            (closingEnabled ? 1 : 0);
+
+        const introDuration =
+            introInfo.duration
+                .toFixed(3);
+
+        /*
+         * Abertura:
+         * normaliza para o mesmo padrão
+         * vertical do Reel.
+         */
+        filterGraph +=
+            `;[${introInputIndex}:v]` +
+            `fps=${fps},` +
+            `scale=${width}:${height}:` +
+            `force_original_aspect_ratio=decrease,` +
+            `pad=${width}:${height}:` +
+            `(ow-iw)/2:(oh-ih)/2:color=black,` +
+            `setsar=1,` +
+            `format=yuv420p,` +
+            `trim=duration=${introDuration},` +
+            `setpts=PTS-STARTPTS` +
+            `[openingVideo]`;
+
+        /*
+         * Une:
+         * abertura -> fotos -> fechamento.
+         */
+        filterGraph +=
+            ';[openingVideo][vout]' +
+            'concat=n=2:v=1:a=0' +
+            '[productionVideo]';
+
+        /*
+         * Áudio da abertura.
+         *
+         * Se não houver áudio no arquivo,
+         * gera silêncio com a mesma duração.
+         */
+        if (introInfo.hasAudio) {
+            filterGraph +=
+                `;[${introInputIndex}:a]` +
+                `atrim=duration=${introDuration},` +
+                `asetpts=PTS-STARTPTS,` +
+                `aresample=48000,` +
+                `aformat=channel_layouts=stereo` +
+                `[openingAudio]`;
+        } else {
+            filterGraph +=
+                ';anullsrc=' +
+                'r=48000:cl=stereo,' +
+                `atrim=duration=${introDuration},` +
+                'asetpts=PTS-STARTPTS' +
+                '[openingAudio]';
+        }
+
+        /*
+         * Normaliza também o áudio do Reel
+         * antes da concatenação.
+         */
+        filterGraph +=
+            ';[aout]' +
+            'aresample=48000,' +
+            'aformat=channel_layouts=stereo,' +
+            'asetpts=PTS-STARTPTS' +
+            '[reelAudio]';
+
+        filterGraph +=
+            ';[openingAudio][reelAudio]' +
+            'concat=n=2:v=0:a=1' +
+            '[productionAudio]';
+    }
+
 
     const args = [
         '-y'
@@ -778,12 +1133,22 @@ async function generateReel(options = {}) {
 
 
     /*
-     * Avatar com vídeo + áudio.
+     * Fechamento opcional.
      */
-    args.push(
-        '-i',
-        avatarPath
-    );
+    if (closingEnabled) {
+        args.push(
+            '-i',
+            avatarPath
+        );
+    }
+
+
+    if (introPath) {
+        args.push(
+            '-i',
+            introPath
+        );
+    }
 
 
     if (musicPath) {
@@ -801,10 +1166,14 @@ async function generateReel(options = {}) {
         filterGraph,
 
         '-map',
-        '[vout]',
+        introInfo
+            ? '[productionVideo]'
+            : '[vout]',
 
         '-map',
-        '[aout]',
+        introInfo
+            ? '[productionAudio]'
+            : '[aout]',
 
         '-c:v',
         'libx264',
@@ -863,7 +1232,34 @@ async function generateReel(options = {}) {
 
         durationSeconds:
             Number(
-                durationSeconds.toFixed(2)
+                (
+                    durationSeconds +
+                    (
+                        introInfo
+                            ?.duration ||
+                        0
+                    )
+                ).toFixed(2)
+            ),
+
+        introIncluded:
+            Boolean(
+                introInfo
+            ),
+
+        introDurationSeconds:
+            introInfo
+                ? Number(
+                    introInfo.duration
+                        .toFixed(2)
+                )
+                : 0,
+
+        closingDurationSeconds:
+            Number(
+                Number(
+                    closingDuration
+                ).toFixed(2)
             ),
 
         musicEnabled:

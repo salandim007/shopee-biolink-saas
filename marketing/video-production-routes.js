@@ -19,6 +19,10 @@ const {
     getProductMedia
 } = require('../product-media-orchestrator');
 
+const {
+    generateReel
+} = require('./reel-generator');
+
 
 const router = express.Router();
 
@@ -289,6 +293,224 @@ router.post(
                     'Não foi possível carregar as mídias do produto.'
             });
         }
+    }
+);
+
+
+/*
+ * Gera o vídeo final da Central.
+ *
+ * A Central informa apenas:
+ * - fotos escolhidas;
+ * - abertura escolhida;
+ * - fechamento escolhido;
+ * - música escolhida.
+ *
+ * O motor FFmpeg continua centralizado
+ * em marketing/reel-generator.js.
+ */
+router.post(
+    '/api/generate',
+    async (req, res) => {
+        const body =
+            req.body || {};
+
+        const imageUrls =
+            Array.isArray(
+                body.imageUrls
+            )
+                ? [
+                    ...new Set(
+                        body.imageUrls
+                            .map(
+                                value =>
+                                    String(
+                                        value || ''
+                                    ).trim()
+                            )
+                            .filter(Boolean)
+                    )
+                ].slice(0, 5)
+                : [];
+
+        const openingId =
+            String(
+                body.openingId || ''
+            ).trim();
+
+        const closingId =
+            String(
+                body.closingId || ''
+            ).trim();
+
+        const musicId =
+            String(
+                body.musicId || ''
+            ).trim();
+
+        if (!imageUrls.length) {
+            return res.status(400).json({
+                success: false,
+                error:
+                    'Selecione pelo menos uma foto.'
+            });
+        }
+
+        try {
+            await ensureDirectories();
+
+            const openingPath =
+                openingId
+                    ? await resolveVideoPath('opening', openingId)
+                    : null;
+
+            const closingPath =
+                closingId
+                    ? await resolveVideoPath('closing', closingId)
+                    : null;
+
+            const musicPath =
+                musicId
+                    ? await resolveVideoPath(
+                        'music',
+                        musicId
+                    )
+                    : null;
+
+            const result =
+                await generateReel({
+                    imageUrls,
+
+                    introPath:
+                        openingPath,
+
+                    closingPath:
+                        closingPath,
+
+                    musicPath,
+
+                    outputDirectory:
+                        DIRECTORIES.output
+                });
+
+            const videoUrl =
+                `/admin/vitrine2/marketing/video-production` +
+                `/api/output/` +
+                encodeURIComponent(
+                    result.jobId
+                ) +
+                `/file`;
+
+            return res.json({
+                success: true,
+
+                video: {
+                    jobId:
+                        result.jobId,
+
+                    url:
+                        videoUrl,
+
+                    imageCount:
+                        result.imageCount,
+
+                    width:
+                        result.width,
+
+                    height:
+                        result.height,
+
+                    fps:
+                        result.fps,
+
+                    durationSeconds:
+                        result.durationSeconds,
+
+                    introIncluded:
+                        result.introIncluded,
+
+                    introDurationSeconds:
+                        result.introDurationSeconds,
+
+                    closingDurationSeconds:
+                        result.closingDurationSeconds,
+
+                    musicEnabled:
+                        result.musicEnabled,
+
+                    musicTrack:
+                        result.musicTrack
+                }
+            });
+        } catch (error) {
+            console.error(
+                '[VIDEO PRODUCTION GENERATE]',
+                error?.code || '',
+                error?.message || error
+            );
+
+            return res.status(500).json({
+                success: false,
+
+                error:
+                    error?.message ||
+                    'Não foi possível gerar o vídeo.'
+            });
+        }
+    }
+);
+
+
+/*
+ * Entrega o MP4 gerado.
+ *
+ * O jobId nunca vira caminho livre:
+ * apenas caracteres seguros são aceitos.
+ */
+router.get(
+    '/api/output/:jobId/file',
+    async (req, res) => {
+        const jobId =
+            String(
+                req.params.jobId || ''
+            ).trim();
+
+        if (
+            !/^[a-zA-Z0-9_-]+$/.test(
+                jobId
+            )
+        ) {
+            return res.status(400).json({
+                success: false,
+                error:
+                    'Identificador de vídeo inválido.'
+            });
+        }
+
+        const filePath =
+            path.join(
+                DIRECTORIES.output,
+                jobId,
+                'reel.mp4'
+            );
+
+        try {
+            await fs.access(
+                filePath
+            );
+        } catch {
+            return res.status(404).json({
+                success: false,
+                error:
+                    'Vídeo não encontrado.'
+            });
+        }
+
+        return res.sendFile(
+            path.resolve(
+                filePath
+            )
+        );
     }
 );
 

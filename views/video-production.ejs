@@ -382,6 +382,50 @@
             padding: 6px 0 2px;
         }
 
+        .generated-video-panel {
+            margin-top: 22px;
+            padding: 16px;
+            border: 1px solid #dce5ef;
+            border-radius: 16px;
+            background: #f8fafc;
+        }
+
+        .generated-video-panel[hidden] {
+            display: none;
+        }
+
+        .generated-video-title {
+            margin: 0 0 12px;
+            font-size: 17px;
+            font-weight: 800;
+            color: #172033;
+        }
+
+        .generated-video-wrap {
+            max-width: 360px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #10151d;
+            box-shadow:
+                0 8px 24px
+                rgba(15,23,42,.12);
+        }
+
+        .generated-video-wrap video {
+            width: 100%;
+            display: block;
+            aspect-ratio: 9 / 16;
+            background: #000;
+        }
+
+        .generated-video-meta {
+            margin-top: 12px;
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+        }
+
         .generate-btn {
             min-width: 280px;
             min-height: 54px;
@@ -652,6 +696,30 @@
                 ▶ GERAR VÍDEO
             </button>
         </div>
+
+        <div
+            id="generatedVideoPanel"
+            class="generated-video-panel"
+            hidden
+        >
+            <div class="generated-video-title">
+                ✅ Vídeo pronto
+            </div>
+
+            <div class="generated-video-wrap">
+                <video
+                    id="generatedVideo"
+                    controls
+                    playsinline
+                    preload="metadata"
+                ></video>
+            </div>
+
+            <div
+                id="generatedVideoMeta"
+                class="generated-video-meta"
+            ></div>
+        </div>
     </section>
 
 
@@ -758,6 +826,12 @@ const defaults = {
     music: null
 };
 
+const mediaLibrary = {
+    opening: [],
+    closing: [],
+    music: []
+};
+
 let defaultsInitialized = false;
 
 
@@ -809,12 +883,42 @@ function selectMedia(
     type,
     id
 ) {
+    /*
+     * Seleção exclusiva:
+     * clicar novamente no item atual
+     * não o desmarca.
+     *
+     * Para trocar, basta selecionar
+     * outro item do mesmo tipo.
+     */
     selected[type] =
         selected[type] === id
             ? null
             : id;
 
-    loadLibrary();
+    if (type === 'opening') {
+        renderVideoGrid(
+            'openingGrid',
+            'opening',
+            mediaLibrary.opening
+        );
+    }
+
+    if (type === 'closing') {
+        renderVideoGrid(
+            'closingGrid',
+            'closing',
+            mediaLibrary.closing
+        );
+    }
+
+    if (type === 'music') {
+        renderMusicGrid(
+            mediaLibrary.music
+        );
+    }
+
+    renderStoryboard();
 }
 
 
@@ -1388,56 +1492,201 @@ function renderProductPhotos() {
 }
 
 
+function getSelectedMediaName(
+    type
+) {
+    const id =
+        selected[type];
+
+    if (!id) {
+        return null;
+    }
+
+    const item =
+        (
+            mediaLibrary[type] ||
+            []
+        ).find(
+            candidate =>
+                candidate.id === id
+        );
+
+    return item?.name || null;
+}
+
+
 function renderStoryboard() {
     const storyboard =
         document.getElementById(
             'storyboard'
         );
 
-    const blocks = [
-        '🎬 Abertura'
-    ];
+    const openingName =
+        getSelectedMediaName(
+            'opening'
+        );
 
-    selectedPhotos.forEach(
-        (_, index) => {
-            blocks.push(
-                `🖼️ Foto ${index + 1}`
-            );
-        }
-    );
+    const closingName =
+        getSelectedMediaName(
+            'closing'
+        );
 
-    blocks.push(
-        '🎬 Finalização'
-    );
+    const musicName =
+        getSelectedMediaName(
+            'music'
+        );
 
     const html = [];
 
-    blocks.forEach(
-        (label, index) => {
-            if (index > 0) {
-                html.push(
-                    `
-                        <div class="story-arrow">
-                            →
-                        </div>
-                    `
-                );
-            }
 
+    /*
+     * ABERTURA
+     */
+    html.push(
+        `
+            <div class="story-item">
+                <div>🎬 Abertura</div>
+
+                <div
+                    style="
+                        margin-top:5px;
+                        font-size:11px;
+                        font-weight:600;
+                        color:${
+                            openingName
+                                ? '#64748b'
+                                : '#b42318'
+                        };
+                    "
+                >
+                    ${
+                        escapeProductHtml(
+                            openingName ||
+                            '⚠️ Não selecionada'
+                        )
+                    }
+                </div>
+            </div>
+        `
+    );
+
+
+    /*
+     * FOTOS SELECIONADAS
+     */
+    selectedPhotos.forEach(
+        (url, index) => {
             html.push(
                 `
+                    <div class="story-arrow">
+                        →
+                    </div>
+
                     <div class="story-item">
-                        ${label}
+                        <div>
+                            🖼️ Foto ${index + 1}
+                        </div>
+
+                        <img
+                            src="${
+                                escapeProductHtml(
+                                    url
+                                )
+                            }"
+                            alt="Foto ${index + 1}"
+                            style="
+                                width:72px;
+                                height:72px;
+                                object-fit:contain;
+                                display:block;
+                                margin:8px auto 0;
+                                border-radius:8px;
+                                background:white;
+                                border:1px solid #dce5ef;
+                            "
+                        >
                     </div>
                 `
             );
         }
     );
 
+
+    /*
+     * FINALIZACAO
+     */
+    html.push(
+        `
+            <div class="story-arrow">
+                →
+            </div>
+
+            <div class="story-item">
+                <div>🎬 Finalização</div>
+
+                <div
+                    style="
+                        margin-top:5px;
+                        font-size:11px;
+                        font-weight:600;
+                        color:${
+                            closingName
+                                ? '#64748b'
+                                : '#b42318'
+                        };
+                    "
+                >
+                    ${
+                        escapeProductHtml(
+                            closingName ||
+                            '⚠️ Não selecionada'
+                        )
+                    }
+                </div>
+            </div>
+        `
+    );
+
+
+    /*
+     * MUSICA
+     *
+     * Não é uma etapa sequencial,
+     * então aparece como elemento
+     * adicional da produção.
+     */
+    html.push(
+        `
+            <div class="story-arrow">
+                ＋
+            </div>
+
+            <div class="story-item">
+                <div>🎵 Música</div>
+
+                <div
+                    style="
+                        margin-top:5px;
+                        font-size:11px;
+                        font-weight:600;
+                        color:#64748b;
+                    "
+                >
+                    ${
+                        escapeProductHtml(
+                            musicName ||
+                            'Sem música'
+                        )
+                    }
+                </div>
+            </div>
+        `
+    );
+
+
     storyboard.innerHTML =
         html.join('');
 }
-
 
 function toggleProductPhoto(
     photoIndex
@@ -1719,6 +1968,161 @@ async function loadProductMedia() {
 }
 
 
+
+async function generateProductionVideo() {
+    const button =
+        document.getElementById(
+            'generateBtn'
+        );
+
+    const panel =
+        document.getElementById(
+            'generatedVideoPanel'
+        );
+
+    const video =
+        document.getElementById(
+            'generatedVideo'
+        );
+
+    const meta =
+        document.getElementById(
+            'generatedVideoMeta'
+        );
+
+    if (!selectedPhotos.length) {
+        toast(
+            'Selecione pelo menos uma foto.'
+        );
+
+        return;
+    }
+
+    const oldText =
+        button.textContent;
+
+    button.disabled = true;
+
+    button.textContent =
+        '⏳ GERANDO VÍDEO...';
+
+    try {
+        const response =
+            await fetch(
+                `${BASE}/api/generate`,
+                {
+                    method:
+                        'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:
+                        JSON.stringify({
+                            imageUrls:
+                                selectedPhotos,
+
+                            openingId:
+                                selected.opening,
+
+                            closingId:
+                                selected.closing,
+
+                            musicId:
+                                selected.music
+                        })
+                }
+            );
+
+        const payload =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !payload.success
+        ) {
+            const message =
+                typeof payload.error ===
+                    'string'
+                    ? payload.error
+                    : payload.error
+                        ?.message;
+
+            throw new Error(
+                message ||
+                'Não foi possível gerar o vídeo.'
+            );
+        }
+
+        const result =
+            payload.video;
+
+        if (!result?.url) {
+            throw new Error(
+                'A geração terminou sem retornar o arquivo do vídeo.'
+            );
+        }
+
+        video.src =
+            result.url +
+            `?v=${Date.now()}`;
+
+        video.load();
+
+        const duration =
+            Number(
+                result.durationSeconds
+            );
+
+        const durationText =
+            Number.isFinite(duration)
+                ? `${duration.toFixed(1)} s`
+                : 'duração indisponível';
+
+        meta.textContent =
+            `${result.imageCount} foto(s) • ` +
+            `${durationText} • ` +
+            `${result.width}×${result.height} • ` +
+            `${result.fps} fps` +
+            (
+                result.musicEnabled
+                    ? ' • música ativa'
+                    : ' • sem música'
+            );
+
+        panel.hidden = false;
+
+        panel.scrollIntoView({
+            behavior:
+                'smooth',
+
+            block:
+                'center'
+        });
+
+        toast(
+            'Vídeo gerado com sucesso.'
+        );
+    } catch (error) {
+        console.error(
+            error
+        );
+
+        toast(
+            error.message ||
+            'Erro ao gerar vídeo.'
+        );
+    } finally {
+        button.disabled = false;
+
+        button.textContent =
+            oldText;
+    }
+}
+
+
 async function loadLibrary() {
     try {
         const response =
@@ -1740,6 +2144,15 @@ async function loadLibrary() {
             defaults,
             payload.defaults || {}
         );
+
+        mediaLibrary.opening =
+            payload.openings || [];
+
+        mediaLibrary.closing =
+            payload.closings || [];
+
+        mediaLibrary.music =
+            payload.music || [];
 
         /*
          * Os padrões entram automaticamente
@@ -1783,6 +2196,8 @@ async function loadLibrary() {
         renderMusicGrid(
             payload.music || []
         );
+
+        renderStoryboard();
 
     } catch (error) {
         console.error(error);
@@ -1899,11 +2314,7 @@ document
     .getElementById('generateBtn')
     .addEventListener(
         'click',
-        () => {
-            toast(
-                'Gerador será ligado na próxima etapa.'
-            );
-        }
+        generateProductionVideo
     );
 
 

@@ -13,7 +13,8 @@ const productMediaService =
 
 const {
     extractShopeeIds,
-    resolveShopeeUrl
+    resolveShopeeUrl,
+    getShopeeProductFromUrl
 } = require('../shopee-product-url');
 
 const {
@@ -342,8 +343,60 @@ async function getProductMedia(
 
 
     if (!entry) {
+        try {
+            const apiResult =
+                await getShopeeProductFromUrl(
+                    identity.resolvedUrl ||
+                    input.url
+                );
+
+            const apiProduct =
+                apiResult?.product || null;
+
+            if (apiProduct) {
+                apiProduct.images =
+                    unique([
+                        ...(apiProduct.images || []),
+                        apiProduct.image
+                    ]);
+
+                apiProduct.videos =
+                    unique(
+                        apiProduct.videos || []
+                    );
+
+                entry =
+                    catalog.addProduct(
+                        apiProduct
+                    );
+
+                defaultCatalogStore.save(
+                    catalog
+                );
+
+                shopId =
+                    shopId ||
+                    text(apiProduct.shopId);
+
+                state =
+                    getState(
+                        library,
+                        identity.itemId,
+                        minImages
+                    );
+            }
+        } catch (error) {
+            warnings.push(
+                `Affiliate API: ${
+                    error?.message || error
+                }`
+            );
+        }
+    }
+
+    if (!entry) {
         throw new Error(
-            'Produto não encontrado no acervo nem no catálogo/feed.'
+            'Produto não encontrado no acervo, feed ou Affiliate API.'
         );
     }
 
