@@ -440,3 +440,158 @@ Observações importantes:
 - O botão `Publicar na Página do Facebook` continua separado e usa a API Meta.
 - A automação completa da interface do Facebook fica como plano futuro.
 
+
+---
+
+## 10. RECUPERAÇÃO DA GALERIA SHOPEE — VALIDADO EM 2026-10-08
+
+### Estado atual validado
+
+A Central de Produção de Vídeo usa:
+
+Central
+→ /api/product-media
+→ product-media-orchestrator
+→ product-media-providers/shopee.js
+→ product-media-library
+→ enriquecimento por captura quando necessário
+
+Regra atual:
+
+- minImages: 5
+- enrich: true
+- acervo existente é reutilizado
+- se houver poucas imagens, o provider tenta enriquecimento
+- imagens capturadas são persistidas para reutilização
+
+### Chrome persistente
+
+O capturador conecta em:
+
+http://127.0.0.1:9222
+
+O Chrome usa:
+
+/app/data/chrome-shopee-persistent
+
+Ambiente gráfico:
+
+DISPLAY=:99
+Xvfb :99
+
+O capturador usa puppeteer.connect().
+NÃO substituir por puppeteer.launch() sem necessidade.
+
+### Sintoma de sessão Shopee inválida
+
+Mesmo havendo cookies, a sessão pode estar expirada.
+
+Sintomas confirmados:
+
+- /verify/traffic/error
+- is_logged_in=false
+- get_account_info retorna error: 19
+- get_pc pode retornar HTTP 200 com payload de erro 90309999
+- captura retorna blocked: true
+- images: []
+
+Isso significa problema de sessão/autenticação,
+não problema de filtro de imagens nem da interface.
+
+### Recuperação visual da sessão
+
+Se necessário, acessar o mesmo Chrome persistente por Xvfb.
+
+Instalar temporariamente no container:
+
+x11vnc
+novnc
+websockify
+
+Subir VNC na tela existente:
+
+DISPLAY=:99 x11vnc \
+  -display :99 \
+  -localhost \
+  -forever \
+  -shared \
+  -nopw \
+  -rfbport 5900
+
+Subir noVNC:
+
+websockify \
+  --web=/usr/share/novnc \
+  6080 \
+  localhost:5900
+
+O container pode possuir mais de uma rede Docker.
+NÃO concatenar os IPs.
+
+Listar corretamente:
+
+docker inspect \
+  -f '{{range $name,$net := .NetworkSettings.Networks}}{{printf "%s -> %s\n" $name $net.IPAddress}}{{end}}' \
+  "$(docker compose ps -q shopee-biolink)"
+
+Criar túnel SSH no Windows usando um IP válido do container:
+
+ssh -N -L 6080:IP_DO_CONTAINER:6080 admin@IP_DA_VPS
+
+Abrir:
+
+http://127.0.0.1:6080/vnc.html
+
+Fazer login normalmente na Shopee no Chromium exibido.
+A sessão ficará no perfil persistente.
+
+### Teste decisivo do capturador
+
+Produto validado:
+
+shopId: 654040744
+itemId: 23899039241
+
+Após restaurar a sessão:
+
+blocked: false
+imageCount: 15
+
+### Teste decisivo do provider
+
+getProductMedia({
+  url,
+  minImages: 5,
+  enrich: true
+})
+
+Resultado validado:
+
+imageCount: 16
+hasEnoughImages: true
+needsEnrichment: false
+captureAttempted: true
+captured: true
+warnings: []
+
+### Resultado final na Central
+
+A Central voltou a mostrar 16 fotos reais.
+
+As primeiras 5 são selecionadas inicialmente para o vídeo,
+mas productPhotos mantém toda a galeria disponível.
+
+### Ordem correta de diagnóstico
+
+Se as fotos sumirem novamente:
+
+1. NÃO alterar primeiro a interface.
+2. Testar captureShopeeMedia().
+3. Verificar blocked e finalUrl.
+4. Se bloqueado, testar sessão Shopee.
+5. Restaurar login no Chrome persistente se necessário.
+6. Testar getProductMedia().
+7. Somente se o provider devolver várias fotos e a Central não,
+   investigar rota/frontend.
+8. NÃO alterar filtros de imagem sem evidência.
+
