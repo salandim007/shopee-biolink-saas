@@ -20,6 +20,22 @@ const {
 } = require('../product-media-orchestrator');
 
 const {
+    listCoverTemplates
+} = require('./cover-template-library');
+
+const {
+    generateCover
+} = require('./cover-generator');
+
+const {
+    APPROVED_DIR,
+    listApprovedCovers,
+    approveCover,
+    selectApprovedCover,
+    getApprovedCover
+} = require('./cover-library');
+
+const {
     generateReel
 } = require('./reel-generator');
 
@@ -309,156 +325,233 @@ router.post(
  * O motor FFmpeg continua centralizado
  * em marketing/reel-generator.js.
  */
-router.post(
-    '/api/generate',
-    async (req, res) => {
-        const body =
-            req.body || {};
 
-        const imageUrls =
-            Array.isArray(
-                body.imageUrls
-            )
-                ? [
-                    ...new Set(
-                        body.imageUrls
-                            .map(
-                                value =>
-                                    String(
-                                        value || ''
-                                    ).trim()
-                            )
-                            .filter(Boolean)
-                    )
-                ].slice(0, 5)
-                : [];
+/*
+ * VIDEO_ASYNC_JOBS_V1
+ * Geração em segundo plano, sem bloquear a conexão HTTP.
+ * Cada tarefa mantém status.json na pasta do vídeo.
+ */
+const activeVideoJobs = new Set();
 
-        const openingId =
-            String(
-                body.openingId || ''
-            ).trim();
+async function saveVideoJob(jobId, data) {
+    const dir = path.join(DIRECTORIES.output, jobId);
+    await fs.mkdir(dir, { recursive: true });
 
-        const closingId =
-            String(
-                body.closingId || ''
-            ).trim();
+    const target = path.join(dir, 'status.json');
+    const temporary = target + '.tmp';
 
-        const musicId =
-            String(
-                body.musicId || ''
-            ).trim();
+    await fs.writeFile(
+        temporary,
+        JSON.stringify(data, null, 2),
+        'utf8'
+    );
 
-        if (!imageUrls.length) {
-            return res.status(400).json({
-                success: false,
-                error:
-                    'Selecione pelo menos uma foto.'
-            });
+    await fs.rename(temporary, target);
+}
+
+router.post('/api/generate', async (req, res) => {
+    const body = req.body || {};
+
+    const imageUrls = Array.isArray(body.imageUrls)
+        ? [...new Set(
+            body.imageUrls
+                .map(value => String(value || '').trim())
+                .filter(Boolean)
+        )].slice(0, 5)
+        : [];
+
+    if (!imageUrls.length) {
+        return res.status(400).json({
+            success: false,
+            error: 'Selecione pelo menos uma foto.'
+        });
+    }
+
+    try {
+        await ensureDirectories();
+
+        const openingId = String(body.openingId || '').trim();
+        const closingId = String(body.closingId || '').trim();
+        const musicId = String(body.musicId || '').trim();
+        const coverId = String(body.coverId || '').trim();
+
+        const openingPath = openingId
+            ? await resolveVideoPath('opening', openingId)
+            : null;
+
+        const closingPath = closingId
+            ? await resolveVideoPath('closing', closingId)
+            : null;
+
+        const musicPath = musicId
+            ? await resolveVideoPath('music', musicId)
+            : null;
+
+        let coverPath = null;
+
+        if (coverId) {
+            const cover = await getApprovedCover(coverId);
+
+            if (!cover) {
+                throw new Error('Capa aprovada não encontrada.');
+            }
+
+            coverPath = path.join(APPROVED_DIR, cover.filename);
+            await fs.access(coverPath);
         }
 
-        try {
-            await ensureDirectories();
+        const jobId =
+            Date.now().toString(36) + '-' +
+            require('node:crypto').randomBytes(6).toString('hex');
 
-            const openingPath =
-                openingId
-                    ? await resolveVideoPath('opening', openingId)
-                    : null;
+        const now = new Date().toISOString();
 
-            const closingPath =
-                closingId
-                    ? await resolveVideoPath('closing', closingId)
-                    : null;
+        await saveVideoJob(jobId, {
+            jobId,
+            status: 'processing',
+            createdAt: now,
+            updatedAt: now
+        });
 
-            const musicPath =
-                musicId
-                    ? await resolveVideoPath(
-                        'music',
-                        musicId
-                    )
-                    : null;
+        activeVideoJobs.add(jobId);
 
-            const result =
-                await generateReel({
+        const generation = (async () => {
+            try {
+                const result = await generateReel({
+                    jobId,
                     imageUrls,
-
-                    introPath:
-                        openingPath,
-
-                    closingPath:
-                        closingPath,
-
+                    introPath: openingPath,
+                    closingPath,
                     musicPath,
-
-                    outputDirectory:
-                        DIRECTORIES.output
+                    coverPath,
+                    outputDirectory: DIRECTORIES.output
                 });
 
-            const videoUrl =
-                `/admin/vitrine2/marketing/video-production` +
-                `/api/output/` +
-                encodeURIComponent(
-                    result.jobId
-                ) +
-                `/file`;
+                const url =
+                    '/admin/vitrine2/marketing/video-production' +
+                    '/api/output/' +
+                    encodeURIComponent(jobId) +
+                    '/file';
 
-            return res.json({
-                success: true,
+                const video = {
+                    ...result,
+                    url
+                };
 
-                video: {
-                    jobId:
-                        result.jobId,
+                await saveVideoJob(jobId, {
+                    jobId,
+                    status: 'completed',
+                    video,
+                    createdAt: now,
+                    updatedAt: new Date().toISOString()
+                });
 
-                    url:
-                        videoUrl,
+                console.log(
+                    '[VIDEO ASYNC COMPLETED]',
+                    jobId
+                );
+            } catch (error) {
+                console.error(
+                    '[VIDEO ASYNC FAILED]',
+                    jobId,
+                    error
+                );
 
-                    imageCount:
-                        result.imageCount,
-
-                    width:
-                        result.width,
-
-                    height:
-                        result.height,
-
-                    fps:
-                        result.fps,
-
-                    durationSeconds:
-                        result.durationSeconds,
-
-                    introIncluded:
-                        result.introIncluded,
-
-                    introDurationSeconds:
-                        result.introDurationSeconds,
-
-                    closingDurationSeconds:
-                        result.closingDurationSeconds,
-
-                    musicEnabled:
-                        result.musicEnabled,
-
-                    musicTrack:
-                        result.musicTrack
+                try {
+                    await saveVideoJob(jobId, {
+                        jobId,
+                        status: 'failed',
+                        error: error?.message ||
+                            'Falha na geração do vídeo.',
+                        createdAt: now,
+                        updatedAt: new Date().toISOString()
+                    });
+                } catch (saveError) {
+                    console.error(
+                        '[VIDEO ASYNC STATUS ERROR]',
+                        saveError
+                    );
                 }
-            });
-        } catch (error) {
-            console.error(
-                '[VIDEO PRODUCTION GENERATE]',
-                error?.code || '',
-                error?.message || error
-            );
+            } finally {
+                activeVideoJobs.delete(jobId);
+            }
+        })();
 
-            return res.status(500).json({
+        void generation;
+
+        return res.status(202).json({
+            success: true,
+            jobId,
+            status: 'processing'
+        });
+    } catch (error) {
+        console.error('[VIDEO PRODUCTION GENERATE]', error);
+
+        return res.status(500).json({
+            success: false,
+            error: error?.message ||
+                'Não foi possível iniciar o vídeo.'
+        });
+    }
+});
+
+
+/*
+ * Consulta do processamento.
+ */
+router.get('/api/generate/:jobId/status', async (req, res) => {
+    const jobId = String(req.params.jobId || '');
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(jobId)) {
+        return res.status(400).json({
+            success: false,
+            error: 'Identificador inválido.'
+        });
+    }
+
+    try {
+        const filename = path.join(
+            DIRECTORIES.output,
+            jobId,
+            'status.json'
+        );
+
+        const data = JSON.parse(
+            await fs.readFile(filename, 'utf8')
+        );
+
+        if (
+            data.status === 'processing' &&
+            !activeVideoJobs.has(jobId)
+        ) {
+            data.status = 'failed';
+            data.error =
+                'Processamento interrompido. Gere novamente.';
+            data.updatedAt = new Date().toISOString();
+
+            await saveVideoJob(jobId, data);
+        }
+
+        return res.set('Cache-Control', 'no-store').json({
+            success: true,
+            ...data
+        });
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            return res.status(404).json({
                 success: false,
-
-                error:
-                    error?.message ||
-                    'Não foi possível gerar o vídeo.'
+                error: 'Tarefa não encontrada.'
             });
         }
+
+        console.error('[VIDEO STATUS ERROR]', error);
+
+        return res.status(500).json({
+            success: false,
+            error: 'Não foi possível consultar o vídeo.'
+        });
     }
-);
+});
 
 
 /*
@@ -511,6 +604,353 @@ router.get(
                 filePath
             )
         );
+    }
+);
+
+
+/*
+ * Templates de capa disponíveis.
+ */
+router.get(
+    '/api/covers/templates',
+    async (req, res) => {
+        try {
+            return res.json({
+                success: true,
+                templates: listCoverTemplates()
+            });
+        } catch (error) {
+            console.error(
+                '[VIDEO PRODUCTION COVER TEMPLATES]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    'Não foi possível carregar os templates de capa.'
+            });
+        }
+    }
+);
+
+
+/*
+ * Gera uma capa SVG.
+ */
+router.post(
+    '/api/covers/generate',
+    async (req, res) => {
+        try {
+            const body =
+                req.body || {};
+
+            const result =
+                await generateCover({
+                    templateId:
+                        String(
+                            body.templateId ||
+                            'oferta-forte'
+                        ).trim(),
+
+                    paletteId:
+                        String(
+                            body.paletteId ||
+                            'coral'
+                        ).trim(),
+
+                    headline:
+                        String(
+                            body.headline || ''
+                        ).trim(),
+
+                    subheadline:
+                        String(
+                            body.subheadline || ''
+                        ).trim(),
+
+                    badge:
+                        String(
+                            body.badge || ''
+                        ).trim(),
+
+                    cta:
+                        String(
+                            body.cta || ''
+                        ).trim(),
+
+                    price:
+                        String(
+                            body.price || ''
+                        ).trim(),
+
+                    productImage:
+                        String(
+                            body.productImage || ''
+                        ).trim()
+                });
+
+            return res.json({
+                success: true,
+                cover: {
+                    ...result,
+                    url:
+                        `/admin/vitrine2/marketing/video-production/api/covers/` +
+                        `${encodeURIComponent(result.filename)}/file`
+                }
+            });
+        } catch (error) {
+            console.error(
+                '[VIDEO PRODUCTION COVER GENERATE]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    error?.message ||
+                    'Não foi possível gerar a capa.'
+            });
+        }
+    }
+);
+
+
+/*
+ * Entrega o arquivo da capa gerada.
+ */
+router.get(
+    '/api/covers/:filename/file',
+    async (req, res) => {
+        try {
+            const filename =
+                String(
+                    req.params.filename || ''
+                ).trim();
+
+            if (
+                !filename ||
+                path.basename(filename) !== filename
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    error:
+                        'Arquivo de capa inválido.'
+                });
+            }
+
+            const filePath =
+                path.join(
+                    process.cwd(),
+                    'data',
+                    'video-production',
+                    'covers',
+                    filename
+                );
+
+            await fs.access(filePath);
+
+            return res.sendFile(
+                path.resolve(filePath)
+            );
+        } catch (error) {
+            return res.status(404).json({
+                success: false,
+                error:
+                    'Capa não encontrada.'
+            });
+        }
+    }
+);
+
+
+/*
+ * Capas aprovadas.
+ */
+router.get(
+    '/api/covers/approved',
+    async (req, res) => {
+        try {
+            const result =
+                await listApprovedCovers();
+
+            return res.json({
+                success: true,
+                ...result
+            });
+        } catch (error) {
+            console.error(
+                '[COVER LIBRARY LIST]',
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                error:
+                    'Não foi possível carregar as capas aprovadas.'
+            });
+        }
+    }
+);
+
+
+/*
+ * Aprova e preserva uma capa gerada.
+ */
+router.post(
+    '/api/covers/approve',
+    async (req, res) => {
+        try {
+            const body =
+                req.body || {};
+
+            const cover =
+                await approveCover({
+                    filename:
+                        String(
+                            body.filename || ''
+                        ).trim(),
+
+                    templateId:
+                        String(
+                            body.templateId || ''
+                        ).trim(),
+
+                    paletteId:
+                        String(
+                            body.paletteId || ''
+                        ).trim(),
+
+                    itemId:
+                        String(
+                            body.itemId || ''
+                        ).trim(),
+
+                    shopId:
+                        String(
+                            body.shopId || ''
+                        ).trim(),
+
+                    productTitle:
+                        String(
+                            body.productTitle || ''
+                        ).trim(),
+
+                    headline:
+                        String(
+                            body.headline || ''
+                        ).trim(),
+
+                    subheadline:
+                        String(
+                            body.subheadline || ''
+                        ).trim(),
+
+                    badge:
+                        String(
+                            body.badge || ''
+                        ).trim(),
+
+                    cta:
+                        String(
+                            body.cta || ''
+                        ).trim(),
+
+                    price:
+                        String(
+                            body.price || ''
+                        ).trim()
+                });
+
+            return res.json({
+                success: true,
+                cover: {
+                    ...cover,
+
+                    url:
+                        `${req.baseUrl}/api/covers/approved/` +
+                        `${encodeURIComponent(cover.id)}/file`
+                }
+            });
+        } catch (error) {
+            console.error(
+                '[COVER LIBRARY APPROVE]',
+                error
+            );
+
+            return res.status(400).json({
+                success: false,
+                error:
+                    error?.message ||
+                    'Não foi possível aprovar a capa.'
+            });
+        }
+    }
+);
+
+
+/*
+ * Seleciona a capa que será usada
+ * pela produção atual.
+ */
+router.put(
+    '/api/covers/approved/:id/select',
+    async (req, res) => {
+        try {
+            const result =
+                await selectApprovedCover(
+                    req.params.id
+                );
+
+            return res.json({
+                success: true,
+                ...result
+            });
+        } catch (error) {
+            return res.status(404).json({
+                success: false,
+                error:
+                    error?.message ||
+                    'Capa não encontrada.'
+            });
+        }
+    }
+);
+
+
+/*
+ * Arquivo persistente de uma
+ * capa aprovada.
+ */
+router.get(
+    '/api/covers/approved/:id/file',
+    async (req, res) => {
+        try {
+            const cover =
+                await getApprovedCover(
+                    req.params.id
+                );
+
+            if (!cover) {
+                return res.status(404).end();
+            }
+
+            const filePath =
+                path.join(
+                    APPROVED_DIR,
+                    cover.filename
+                );
+
+            await fs.access(
+                filePath
+            );
+
+            return res.sendFile(
+                path.resolve(filePath)
+            );
+        } catch (error) {
+            return res.status(404).end();
+        }
     }
 );
 

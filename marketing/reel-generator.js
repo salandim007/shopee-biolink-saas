@@ -2,6 +2,11 @@
 
 const fs = require('node:fs/promises');
 const path = require('node:path');
+
+const {
+    getApprovedCover,
+    APPROVED_DIR
+} = require('./cover-library');
 const crypto = require('node:crypto');
 const { spawn } = require('node:child_process');
 
@@ -517,6 +522,206 @@ function buildFilterGraph({
     return filters.join(';');
 }
 
+function renderCoverToPng(
+    sourcePath,
+    destinationPath,
+    chromiumPath
+) {
+    return new Promise(
+        (resolve, reject) => {
+            const child =
+                spawn(
+                    chromiumPath,
+                    [
+                        '--headless=new',
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--hide-scrollbars',
+                        '--window-size=1280,720',
+                        `--screenshot=${destinationPath}`,
+                        `file://${sourcePath}`
+                    ],
+                    {
+                        stdio: [
+                            'ignore',
+                            'ignore',
+                            'pipe'
+                        ]
+                    }
+                );
+
+            let stderr = '';
+
+            child.stderr.on(
+                'data',
+                chunk => {
+                    stderr +=
+                        chunk.toString();
+
+                    if (stderr.length > 8000) {
+                        stderr =
+                            stderr.slice(-8000);
+                    }
+                }
+            );
+
+            child.on(
+                'error',
+                () => {
+                    reject(
+                        new ReelGeneratorError(
+                            'Não foi possível iniciar o Chromium para gerar a capa.',
+                            'REEL_COVER_RENDER_FAILED'
+                        )
+                    );
+                }
+            );
+
+            child.on(
+                'close',
+                code => {
+                    if (code === 0) {
+                        resolve();
+                        return;
+                    }
+
+                    reject(
+                        new ReelGeneratorError(
+                            'Não foi possível renderizar a capa.',
+                            'REEL_COVER_RENDER_FAILED',
+                            {
+                                exitCode: code,
+                                chromiumOutput:
+                                    stderr
+                            }
+                        )
+                    );
+                }
+            );
+        }
+    );
+}
+
+
+async function prependCoverToVideo({
+    ffmpegPath,
+    coverPath,
+    inputPath,
+    outputPath,
+    width,
+    height,
+    fps,
+    duration
+}) {
+    const safeDuration =
+        Math.max(
+            1,
+            Number(duration) || 2
+        );
+
+    const filterGraph = [
+        `[0:v]` +
+            `scale=${width}:${height}:` +
+            `force_original_aspect_ratio=decrease,` +
+            `pad=${width}:${height}:` +
+            `(ow-iw)/2:(oh-ih)/2:color=white,` +
+            `fps=${fps},` +
+            `setsar=1,` +
+            `format=yuv420p,` +
+            `trim=duration=${safeDuration.toFixed(3)},` +
+            `setpts=PTS-STARTPTS` +
+            `[coverVideo]`,
+
+        `anullsrc=r=48000:cl=stereo,` +
+            `atrim=duration=${safeDuration.toFixed(3)},` +
+            `asetpts=PTS-STARTPTS` +
+            `[coverAudio]`,
+
+        `[1:v]` +
+            `fps=${fps},` +
+            `scale=${width}:${height}:` +
+            `force_original_aspect_ratio=decrease,` +
+            `pad=${width}:${height}:` +
+            `(ow-iw)/2:(oh-ih)/2:color=black,` +
+            `setsar=1,` +
+            `format=yuv420p,` +
+            `setpts=PTS-STARTPTS` +
+            `[mainVideo]`,
+
+        `[1:a]` +
+            `aresample=48000,` +
+            `aformat=channel_layouts=stereo,` +
+            `asetpts=PTS-STARTPTS` +
+            `[mainAudio]`,
+
+        `[coverVideo][coverAudio]` +
+            `[mainVideo][mainAudio]` +
+            `concat=n=2:v=1:a=1` +
+            `[finalVideo][finalAudio]`
+    ].join(';');
+
+    await executeFfmpeg(
+        ffmpegPath,
+        [
+            '-y',
+
+            '-loop',
+            '1',
+
+            '-framerate',
+            String(fps),
+
+            '-i',
+            coverPath,
+
+            '-i',
+            inputPath,
+
+            '-filter_complex',
+            filterGraph,
+
+            '-map',
+            '[finalVideo]',
+
+            '-map',
+            '[finalAudio]',
+
+            '-c:v',
+            'libx264',
+
+            '-c:a',
+            'aac',
+
+            '-b:a',
+            '128k',
+
+            '-ar',
+            '48000',
+
+            '-ac',
+            '2',
+
+            '-preset',
+            'medium',
+
+            '-crf',
+            '20',
+
+            '-pix_fmt',
+            'yuv420p',
+
+            '-movflags',
+            '+faststart',
+
+            '-r',
+            String(fps),
+
+            outputPath
+        ]
+    );
+}
+
+
 function executeFfmpeg(
     ffmpegPath,
     args
@@ -760,6 +965,50 @@ async function generateReel(options = {}) {
         );
     }
 
+    let coverPath = null;
+
+    if (options.coverPath) {
+        coverPath = path.resolve(
+            String(options.coverPath)
+        );
+    } else if (options.coverId) {
+        const approvedCover =
+            await getApprovedCover(
+                String(options.coverId)
+            );
+
+        if (!approvedCover) {
+            throw new ReelGeneratorError(
+                'A capa aprovada não foi encontrada.',
+                'REEL_COVER_NOT_FOUND',
+                {
+                    coverId: options.coverId
+                }
+            );
+        }
+
+        coverPath = path.join(
+            APPROVED_DIR,
+            approvedCover.filename
+        );
+    }
+
+    if (coverPath) {
+        try {
+            await fs.access(
+                coverPath
+            );
+        } catch {
+            throw new ReelGeneratorError(
+                'O arquivo da capa não foi encontrado.',
+                'REEL_COVER_NOT_FOUND',
+                {
+                    coverPath
+                }
+            );
+        }
+    }
+
     const imageUrls =
         normalizeImageUrls(
             options.imageUrls
@@ -933,6 +1182,25 @@ async function generateReel(options = {}) {
                 true
         }
     );
+
+    let coverPngPath = null;
+    const coverDuration = coverPath ? 1.2 : 0;
+
+    if (coverPath) {
+        coverPngPath =
+            path.join(
+                jobDirectory,
+                'capa.png'
+            );
+
+        await renderCoverToPng(
+            coverPath,
+            coverPngPath,
+            options.chromiumPath ||
+                process.env.CHROMIUM_PATH ||
+                '/usr/bin/chromium'
+        );
+    }
 
     const localImages = [];
 
@@ -1212,6 +1480,46 @@ async function generateReel(options = {}) {
         ffmpegPath,
         args
     );
+
+    if (coverPngPath) {
+        const baseOutputPath =
+            path.join(
+                jobDirectory,
+                'reel-sem-capa.mp4'
+            );
+
+        await fs.rename(
+            outputPath,
+            baseOutputPath
+        );
+
+        try {
+            await prependCoverToVideo({
+                ffmpegPath,
+                coverPath:
+                    coverPngPath,
+                inputPath:
+                    baseOutputPath,
+                outputPath,
+                width,
+                height,
+                fps,
+                duration:
+                    coverDuration
+            });
+        } catch (error) {
+            /*
+             * Recupera o vídeo original
+             * se a etapa da capa falhar.
+             */
+            await fs.rename(
+                baseOutputPath,
+                outputPath
+            );
+
+            throw error;
+        }
+    }
 
     return {
         success:

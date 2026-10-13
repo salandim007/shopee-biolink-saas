@@ -519,7 +519,233 @@
                 min-width: 0;
             }
         }
-    </style>
+
+        .cover-grid {
+            display: grid;
+            grid-template-columns: minmax(320px, 420px) 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .cover-form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .cover-form label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .cover-form input,
+        .cover-form select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d8e2ef;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #fff;
+            box-sizing: border-box;
+        }
+
+        .cover-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .cover-preview-panel {
+            background: #f8fbff;
+            border: 1px solid #dbe8f4;
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .cover-preview-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 220px;
+            border: 2px dashed #d3dfed;
+            border-radius: 16px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .cover-preview-wrap img {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .cover-preview-meta {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        @media (max-width: 900px) {
+            .cover-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cover-palette-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .cover-palette-btn {
+            border: 2px solid transparent;
+            border-radius: 999px;
+            padding: 7px 12px 7px 8px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 700;
+            color: #334155;
+            box-shadow: 0 2px 7px rgba(0,0,0,.08);
+        }
+
+        .cover-palette-btn::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 6px;
+            vertical-align: middle;
+            border-radius: 50%;
+            background: var(--palette);
+            border: 2px solid rgba(0,0,0,.08);
+        }
+
+        .cover-palette-btn.selected {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37,99,235,.12);
+        }
+
+
+        .approved-covers-area {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .approved-covers-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .approved-covers-header strong {
+            display: block;
+            font-size: 16px;
+            color: #0f172a;
+        }
+
+        .approved-covers-header span {
+            display: block;
+            margin-top: 3px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .approved-covers-count {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .approved-covers-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fill,
+                    minmax(190px, 1fr)
+                );
+            gap: 14px;
+        }
+
+        .approved-cover-card {
+            position: relative;
+            overflow: hidden;
+            padding: 7px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            background: #ffffff;
+            cursor: pointer;
+            transition:
+                transform .16s ease,
+                border-color .16s ease,
+                box-shadow .16s ease;
+        }
+
+        .approved-cover-card:hover {
+            transform: translateY(-2px);
+            border-color: #93c5fd;
+            box-shadow:
+                0 8px 22px
+                rgba(15,23,42,.10);
+        }
+
+        .approved-cover-card.selected {
+            border-color: #16a34a;
+            box-shadow:
+                0 0 0 3px
+                rgba(22,163,74,.13);
+        }
+
+        .approved-cover-card img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .approved-cover-label {
+            margin-top: 7px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #334155;
+        }
+
+        .approved-cover-selected {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: #16a34a;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 900;
+            box-shadow:
+                0 3px 9px
+                rgba(0,0,0,.18);
+        }
+
+        .approved-covers-empty {
+            padding: 22px;
+            border: 2px dashed #dbe4ee;
+            border-radius: 14px;
+            text-align: center;
+            color: #64748b;
+            background: #f8fafc;
+        }
+
+</style>
 </head>
 
 <body>
@@ -670,6 +896,189 @@
         </div>
     </section>
 
+
+
+    <section class="card">
+        <div class="section-title">
+            <div>
+                <h2>🖼️ Capa do vídeo</h2>
+                <span>
+                    Gere uma capa chamativa no estilo YouTube usando a foto principal do produto.
+                </span>
+            </div>
+        </div>
+
+        <div class="cover-grid">
+            <div class="cover-form">
+                <div>
+                    <label for="coverTemplate">Template</label>
+                    <select id="coverTemplate">
+                        <option value="oferta-forte">Oferta Forte</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Cor do template</label>
+
+                    <div class="cover-palette-options">
+                        <button type="button"
+                            class="cover-palette-btn selected"
+                            data-palette="coral"
+                            onclick="selectCoverPalette('coral', this)"
+                            style="--palette:#f39a82"
+                        >Coral</button>
+
+                        <button type="button"
+                            class="cover-palette-btn"
+                            data-palette="azul"
+                            onclick="selectCoverPalette('azul', this)"
+                            style="--palette:#9bcfea"
+                        >Azul</button>
+
+                        <button type="button"
+                            class="cover-palette-btn"
+                            data-palette="menta"
+                            onclick="selectCoverPalette('menta', this)"
+                            style="--palette:#9de2c3"
+                        >Menta</button>
+
+                        <button type="button"
+                            class="cover-palette-btn"
+                            data-palette="lilas"
+                            onclick="selectCoverPalette('lilas', this)"
+                            style="--palette:#c8a8e7"
+                        >Lilás</button>
+
+                        <button type="button"
+                            class="cover-palette-btn"
+                            data-palette="dourado"
+                            onclick="selectCoverPalette('dourado', this)"
+                            style="--palette:#e7cd99"
+                        >Dourado</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="coverHeadline">Título principal</label>
+                    <input
+                        id="coverHeadline"
+                        type="text"
+                        placeholder="Ex.: ACHADO IMPERDÍVEL!"
+                    >
+                </div>
+
+                <div>
+                    <label for="coverSubheadline">Subtítulo</label>
+                    <input
+                        id="coverSubheadline"
+                        type="text"
+                        placeholder="Ex.: VEJA ESSE PRODUTO"
+                    >
+                </div>
+
+                <div>
+                    <label for="coverBadge">Selo</label>
+                    <input
+                        id="coverBadge"
+                        type="text"
+                        placeholder="Ex.: TOP OFERTA"
+                    >
+                </div>
+
+                <div>
+                    <label for="coverCta">Chamada final</label>
+                    <input
+                        id="coverCta"
+                        type="text"
+                        placeholder="Ex.: CONFIRA AGORA"
+                    >
+                </div>
+
+                <div>
+                    <label for="coverPrice">Preço (opcional)</label>
+                    <input
+                        id="coverPrice"
+                        type="text"
+                        placeholder="Ex.: R$ 99,90"
+                    >
+                </div>
+
+                <div class="photos-help">
+                    A capa usa automaticamente a primeira foto selecionada do produto.
+                </div>
+
+                <div class="cover-actions">
+                    <button
+                        id="generateCoverBtn"
+                        class="btn-primary"
+                        type="button"
+                    >
+                        🪄 GERAR CAPA
+                    </button>
+
+                    <button
+                        id="approveCoverBtn"
+                        class="btn-add"
+                        type="button"
+                        disabled
+                    >
+                        ✅ APROVAR CAPA
+                    </button>
+                </div>
+            </div>
+
+            <div class="cover-preview-panel">
+                <div class="cover-preview-wrap">
+                    <div
+                        id="generatedCoverPlaceholder"
+                        class="photo-placeholder"
+                    >
+                        <strong>🖼️</strong>
+                        Busque um produto e clique em
+                        <b>Gerar capa</b>.
+                    </div>
+
+                    <img
+                        id="generatedCover"
+                        alt="Prévia da capa gerada"
+                        style="display:none;"
+                    >
+                </div>
+
+                <div
+                    id="generatedCoverMeta"
+                    class="cover-preview-meta"
+                ></div>
+            </div>
+        </div>
+
+        <div class="approved-covers-area">
+            <div class="approved-covers-header">
+                <div>
+                    <strong>✅ Capas aprovadas</strong>
+                    <span>
+                        Clique em uma capa para selecionar para o vídeo.
+                    </span>
+                </div>
+
+                <div
+                    id="approvedCoversCount"
+                    class="approved-covers-count"
+                >
+                    0 capas
+                </div>
+            </div>
+
+            <div
+                id="approvedCoversGrid"
+                class="approved-covers-grid"
+            >
+                <div class="approved-covers-empty">
+                    Nenhuma capa aprovada ainda.
+                </div>
+            </div>
+        </div>
+    </section>
 
 
     <section class="card">
@@ -1346,6 +1755,11 @@ function renderMusicGrid(items) {
 let currentProduct = null;
 let productPhotos = [];
 let selectedPhotos = [];
+let currentCover = null;
+let selectedCoverPalette = 'coral';
+
+let approvedCovers = [];
+let selectedApprovedCoverId = null;
 
 
 function escapeProductHtml(value) {
@@ -1355,6 +1769,342 @@ function escapeProductHtml(value) {
         .replaceAll("'", '&#039;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;');
+}
+
+
+function normalizeNumber(value) {
+    if (
+        value === null ||
+        value === undefined ||
+        value === ''
+    ) {
+        return null;
+    }
+
+    const number =
+        Number(value);
+
+    return Number.isFinite(number)
+        ? number
+        : null;
+}
+
+
+function formatMoneyBRL(value) {
+    const number =
+        normalizeNumber(value);
+
+    if (number === null) {
+        return '';
+    }
+
+    return new Intl.NumberFormat(
+        'pt-BR',
+        {
+            style: 'currency',
+            currency: 'BRL'
+        }
+    ).format(number);
+}
+
+
+function ellipsis(
+    value,
+    max = 60
+) {
+    const text =
+        String(value || '').trim();
+
+    if (!text) {
+        return '';
+    }
+
+    if (text.length <= max) {
+        return text;
+    }
+
+    return (
+        text.slice(
+            0,
+            max - 1
+        ).trim() + '…'
+    );
+}
+
+
+function getProductPriceValue(product) {
+    const candidates = [
+        product?.offer?.currentPrice,
+        product?.offer?.salePrice,
+        product?.offer?.price,
+        product?.commercial?.price,
+        product?.price,
+        product?.salePrice
+    ];
+
+    for (const candidate of candidates) {
+        const number =
+            normalizeNumber(
+                candidate
+            );
+
+        if (
+            number !== null &&
+            number > 0
+        ) {
+            return number;
+        }
+    }
+
+    return null;
+}
+
+
+function getCoverImage() {
+    return (
+        selectedPhotos[0] ||
+        productPhotos[0] ||
+        currentProduct?.image ||
+        ''
+    );
+}
+
+
+function resetCoverPreview() {
+    const image =
+        document.getElementById(
+            'generatedCover'
+        );
+
+    const placeholder =
+        document.getElementById(
+            'generatedCoverPlaceholder'
+        );
+
+    const meta =
+        document.getElementById(
+            'generatedCoverMeta'
+        );
+
+    if (image) {
+        image.removeAttribute('src');
+        image.style.display = 'none';
+    }
+
+    if (placeholder) {
+        placeholder.style.display = 'flex';
+    }
+
+    if (meta) {
+        meta.textContent = '';
+    }
+
+    currentCover = null;
+
+    const approveButton =
+        document.getElementById(
+            'approveCoverBtn'
+        );
+
+    if (approveButton) {
+        approveButton.disabled = true;
+    }
+}
+
+
+function prefillCoverFields(
+    force = false
+) {
+    const headline =
+        document.getElementById(
+            'coverHeadline'
+        );
+
+    const subheadline =
+        document.getElementById(
+            'coverSubheadline'
+        );
+
+    const badge =
+        document.getElementById(
+            'coverBadge'
+        );
+
+    const cta =
+        document.getElementById(
+            'coverCta'
+        );
+
+    const price =
+        document.getElementById(
+            'coverPrice'
+        );
+
+    if (
+        !headline ||
+        !subheadline ||
+        !badge ||
+        !cta ||
+        !price
+    ) {
+        return;
+    }
+
+    if (
+        force ||
+        !headline.value.trim()
+    ) {
+        headline.value =
+            'ACHADO IMPERDÍVEL!';
+    }
+
+    if (
+        force ||
+        !subheadline.value.trim()
+    ) {
+        subheadline.value =
+            ellipsis(
+                currentProduct?.title ||
+                'VEJA ESSE PRODUTO',
+                58
+            );
+    }
+
+    if (
+        force ||
+        !badge.value.trim()
+    ) {
+        badge.value =
+            'TOP OFERTA';
+    }
+
+    if (
+        force ||
+        !cta.value.trim()
+    ) {
+        cta.value =
+            'CONFIRA AGORA';
+    }
+
+    if (
+        force ||
+        !price.value.trim()
+    ) {
+        const numericPrice =
+            getProductPriceValue(
+                currentProduct
+            );
+
+        price.value =
+            numericPrice === null
+                ? ''
+                : formatMoneyBRL(
+                    numericPrice
+                );
+    }
+}
+
+
+async function loadShopeeProductGallery(
+    product
+) {
+    const shopId =
+        String(
+            product?.shopId || ''
+        ).trim();
+
+    const itemId =
+        String(
+            product?.itemId || ''
+        ).trim();
+
+    if (
+        !/^\d+$/.test(shopId) ||
+        !/^\d+$/.test(itemId)
+    ) {
+        console.warn(
+            '[VIDEO PRODUCT GALLERY] IDs indisponíveis.',
+            {
+                shopId,
+                itemId
+            }
+        );
+
+        return [];
+    }
+
+    try {
+        const response =
+            await fetch(
+                '/admin/vitrine2/marketing/media/gallery',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        shopId,
+                        itemId
+                    })
+                }
+            );
+
+        const payload =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !payload.success
+        ) {
+            throw new Error(
+                payload?.error?.message ||
+                payload?.error ||
+                'Galeria Shopee indisponível.'
+            );
+        }
+
+        const images =
+            Array.isArray(
+                payload.images
+            )
+                ? payload.images
+                    .map(
+                        value =>
+                            String(
+                                value || ''
+                            ).trim()
+                    )
+                    .filter(Boolean)
+                : [];
+
+        console.log(
+            '[VIDEO PRODUCT GALLERY]',
+            {
+                shopId,
+                itemId,
+                imageCount:
+                    images.length
+            }
+        );
+
+        return images;
+    } catch (error) {
+        console.warn(
+            '[VIDEO PRODUCT GALLERY]',
+            error?.message ||
+            error
+        );
+
+        /*
+         * Não impede o produto de carregar.
+         * Se a captura falhar, usamos as
+         * imagens que já vieram do acervo.
+         */
+        return [];
+    }
 }
 
 
@@ -1537,6 +2287,46 @@ function renderStoryboard() {
         );
 
     const html = [];
+
+    const selectedCover =
+        approvedCovers.find(
+            cover =>
+                cover.id ===
+                selectedApprovedCoverId
+        ) || null;
+
+    if (selectedCover) {
+        html.push(
+            `
+                <div class="story-item">
+                    <div>🖼️ Capa</div>
+
+                    <img
+                        src="${
+                            approvedCoverFileUrl(
+                                selectedCover.id
+                            )
+                        }"
+                        alt="Capa selecionada"
+                        style="
+                            width:96px;
+                            height:54px;
+                            object-fit:cover;
+                            display:block;
+                            margin:8px auto 0;
+                            border-radius:8px;
+                            background:white;
+                            border:1px solid #dce5ef;
+                        "
+                    >
+                </div>
+
+                <div class="story-arrow">
+                    →
+                </div>
+            `
+        );
+    }
 
 
     /*
@@ -1882,26 +2672,55 @@ async function loadProductMedia() {
             payload.product ||
             {};
 
-        const images =
-            Array.isArray(
-                product.images
-            )
-                ? product.images
-                : [];
+        const baseImages =
+            [
+                product.image,
+
+                ...(
+                    Array.isArray(
+                        product.images
+                    )
+                        ? product.images
+                        : []
+                )
+            ]
+                .map(
+                    value =>
+                        String(
+                            value || ''
+                        ).trim()
+                )
+                .filter(Boolean);
+
+        status.textContent =
+            'Buscando galeria completa do produto...';
+
+        const galleryImages =
+            await loadShopeeProductGallery(
+                product
+            );
 
         productPhotos =
             [
-                ...new Set(
-                    images
-                        .map(
-                            value =>
-                                String(
-                                    value || ''
-                                ).trim()
-                        )
-                        .filter(Boolean)
-                )
+                ...new Set([
+                    ...baseImages,
+                    ...galleryImages
+                ])
             ];
+
+        console.log(
+            '[VIDEO PRODUCT PHOTOS]',
+            {
+                acervo:
+                    baseImages.length,
+
+                galeria:
+                    galleryImages.length,
+
+                total:
+                    productPhotos.length
+            }
+        );
 
         currentProduct =
             product;
@@ -1911,6 +2730,13 @@ async function loadProductMedia() {
                 0,
                 5
             );
+
+        prefillCoverFields(
+            true
+        );
+
+        resetCoverPreview();
+        renderApprovedCovers();
 
         renderProductPhotos();
         renderStoryboard();
@@ -1949,6 +2775,7 @@ async function loadProductMedia() {
         currentProduct = null;
         productPhotos = [];
         selectedPhotos = [];
+        resetCoverPreview();
 
         renderProductPhotos();
         renderStoryboard();
@@ -1970,155 +2797,109 @@ async function loadProductMedia() {
 
 
 async function generateProductionVideo() {
-    const button =
-        document.getElementById(
-            'generateBtn'
-        );
-
-    const panel =
-        document.getElementById(
-            'generatedVideoPanel'
-        );
-
-    const video =
-        document.getElementById(
-            'generatedVideo'
-        );
-
-    const meta =
-        document.getElementById(
-            'generatedVideoMeta'
-        );
+    const button = document.getElementById('generateBtn');
+    const panel = document.getElementById('generatedVideoPanel');
+    const video = document.getElementById('generatedVideo');
+    const meta = document.getElementById('generatedVideoMeta');
 
     if (!selectedPhotos.length) {
-        toast(
-            'Selecione pelo menos uma foto.'
-        );
-
+        toast('Selecione pelo menos uma foto.');
         return;
     }
 
-    const oldText =
-        button.textContent;
-
+    const oldText = button.textContent;
     button.disabled = true;
-
-    button.textContent =
-        '⏳ GERANDO VÍDEO...';
+    button.textContent = '⏳ PREPARANDO VÍDEO...';
+    panel.hidden = true;
 
     try {
-        const response =
-            await fetch(
-                `${BASE}/api/generate`,
-                {
-                    method:
-                        'POST',
+        const response = await fetch(`${BASE}/api/generate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                imageUrls: [...selectedPhotos],
+                openingId: selected.opening,
+                closingId: selected.closing,
+                musicId: selected.music,
+                coverId: selectedApprovedCoverId
+            })
+        });
 
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
+        const payload = await response.json();
 
-                    body:
-                        JSON.stringify({
-                            imageUrls:
-                                selectedPhotos,
-
-                            openingId:
-                                selected.opening,
-
-                            closingId:
-                                selected.closing,
-
-                            musicId:
-                                selected.music
-                        })
-                }
-            );
-
-        const payload =
-            await response.json();
-
-        if (
-            !response.ok ||
-            !payload.success
-        ) {
-            const message =
-                typeof payload.error ===
-                    'string'
-                    ? payload.error
-                    : payload.error
-                        ?.message;
-
+        if (!response.ok || !payload.success || !payload.jobId) {
             throw new Error(
-                message ||
-                'Não foi possível gerar o vídeo.'
+                payload.error || 'Não foi possível iniciar o vídeo.'
             );
         }
 
-        const result =
-            payload.video;
+        const jobId = payload.jobId;
+        button.textContent = '⏳ GERANDO MP4...';
+
+        let result = null;
+
+        while (true) {
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            const statusResponse = await fetch(
+                `${BASE}/api/generate/${encodeURIComponent(jobId)}/status`,
+                { cache: 'no-store' }
+            );
+
+            const status = await statusResponse.json();
+
+            if (!statusResponse.ok || !status.success) {
+                throw new Error(
+                    status.error || 'Erro ao consultar a geração.'
+                );
+            }
+
+            if (status.status === 'failed') {
+                throw new Error(
+                    status.error || 'Falha ao gerar vídeo.'
+                );
+            }
+
+            if (status.status === 'completed') {
+                result = status.video;
+                break;
+            }
+        }
 
         if (!result?.url) {
-            throw new Error(
-                'A geração terminou sem retornar o arquivo do vídeo.'
-            );
+            throw new Error('O vídeo terminou sem URL.');
         }
 
-        video.src =
-            result.url +
-            `?v=${Date.now()}`;
-
+        video.src = result.url + `?v=${Date.now()}`;
         video.load();
 
-        const duration =
-            Number(
-                result.durationSeconds
-            );
-
-        const durationText =
-            Number.isFinite(duration)
-                ? `${duration.toFixed(1)} s`
-                : 'duração indisponível';
+        const duration = Number(result.durationSeconds);
+        const durationText = Number.isFinite(duration)
+            ? `${duration.toFixed(1)} s`
+            : 'duração indisponível';
 
         meta.textContent =
             `${result.imageCount} foto(s) • ` +
             `${durationText} • ` +
             `${result.width}×${result.height} • ` +
             `${result.fps} fps` +
-            (
-                result.musicEnabled
-                    ? ' • música ativa'
-                    : ' • sem música'
-            );
+            (result.musicEnabled ? ' • música ativa' : ' • sem música');
 
         panel.hidden = false;
-
         panel.scrollIntoView({
-            behavior:
-                'smooth',
-
-            block:
-                'center'
+            behavior: 'smooth',
+            block: 'center'
         });
 
-        toast(
-            'Vídeo gerado com sucesso.'
-        );
+        toast('Vídeo gerado com sucesso.');
     } catch (error) {
-        console.error(
-            error
-        );
-
-        toast(
-            error.message ||
-            'Erro ao gerar vídeo.'
-        );
+        console.error('[VIDEO ASYNC FRONTEND]', error);
+        toast(error.message || 'Erro ao gerar vídeo.');
     } finally {
         button.disabled = false;
-
-        button.textContent =
-            oldText;
+        button.textContent = oldText;
     }
 }
 
@@ -2308,6 +3089,636 @@ document
             }
         }
     );
+
+
+function selectCoverPalette(
+    paletteId,
+    button
+) {
+    selectedCoverPalette =
+        String(
+            paletteId || 'coral'
+        );
+
+    document
+        .querySelectorAll(
+            '.cover-palette-btn'
+        )
+        .forEach(
+            item =>
+                item.classList.remove(
+                    'selected'
+                )
+        );
+
+    if (button) {
+        button.classList.add(
+            'selected'
+        );
+    }
+}
+
+
+
+function currentProductItemId() {
+    return String(
+        currentProduct?.itemId ||
+        currentProduct?.id ||
+        ''
+    ).trim();
+}
+
+
+function currentProductShopId() {
+    return String(
+        currentProduct?.shopId ||
+        ''
+    ).trim();
+}
+
+
+function approvedCoverFileUrl(id) {
+    return (
+        `${BASE}/api/covers/approved/` +
+        `${encodeURIComponent(id)}/file`
+    );
+}
+
+
+function renderApprovedCovers() {
+    const grid =
+        document.getElementById(
+            'approvedCoversGrid'
+        );
+
+    const count =
+        document.getElementById(
+            'approvedCoversCount'
+        );
+
+    if (
+        !grid ||
+        !count
+    ) {
+        return;
+    }
+
+    const itemId =
+        currentProductItemId();
+
+    const visible =
+        itemId
+            ? approvedCovers.filter(
+                cover =>
+                    !cover.itemId ||
+                    String(
+                        cover.itemId
+                    ) === itemId
+            )
+            : approvedCovers;
+
+    count.textContent =
+        `${visible.length} ${
+            visible.length === 1
+                ? 'capa'
+                : 'capas'
+        }`;
+
+    if (!visible.length) {
+        grid.innerHTML = `
+            <div class="approved-covers-empty">
+                Nenhuma capa aprovada
+                ${
+                    itemId
+                        ? 'para este produto'
+                        : 'ainda'
+                }.
+            </div>
+        `;
+
+        return;
+    }
+
+    grid.innerHTML =
+        visible
+            .map(
+                cover => {
+                    const selected =
+                        cover.id ===
+                        selectedApprovedCoverId;
+
+                    const templateName =
+                        cover.templateId ===
+                            'oferta-premium'
+                            ? 'Oferta Premium'
+                            : 'Oferta Forte';
+
+                    const palette =
+                        String(
+                            cover.paletteId ||
+                            ''
+                        );
+
+                    return `
+                        <article
+                            class="approved-cover-card ${
+                                selected
+                                    ? 'selected'
+                                    : ''
+                            }"
+                            onclick="selectApprovedCoverForVideo(
+                                '${cover.id}'
+                            )"
+                            title="Selecionar esta capa para o vídeo"
+                        >
+                            ${
+                                selected
+                                    ? `
+                                        <div class="approved-cover-selected">
+                                            ✓ PARA O VÍDEO
+                                        </div>
+                                    `
+                                    : ''
+                            }
+
+                            <img
+                                src="${approvedCoverFileUrl(
+                                    cover.id
+                                )}"
+                                alt="Capa aprovada"
+                                loading="lazy"
+                            >
+
+                            <div class="approved-cover-label">
+                                ${templateName}
+                                ${
+                                    palette
+                                        ? ` • ${palette}`
+                                        : ''
+                                }
+                            </div>
+                        </article>
+                    `;
+                }
+            )
+            .join('');
+}
+
+
+async function loadApprovedCovers() {
+    try {
+        const response =
+            await fetch(
+                `${BASE}/api/covers/approved`
+            );
+
+        const payload =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !payload.success
+        ) {
+            throw new Error(
+                payload.error ||
+                'Não foi possível carregar as capas aprovadas.'
+            );
+        }
+
+        approvedCovers =
+            Array.isArray(
+                payload.covers
+            )
+                ? payload.covers
+                : [];
+
+        selectedApprovedCoverId =
+            payload.selectedCoverId ||
+            null;
+
+        renderApprovedCovers();
+    } catch (error) {
+        console.error(
+            '[APPROVED COVERS]',
+            error
+        );
+    }
+}
+
+
+async function approveCurrentCover() {
+    if (
+        !currentCover ||
+        !currentCover.filename
+    ) {
+        toast(
+            'Gere uma capa antes de aprovar.'
+        );
+
+        return;
+    }
+
+    const button =
+        document.getElementById(
+            'approveCoverBtn'
+        );
+
+    const oldText =
+        button.textContent;
+
+    button.disabled = true;
+    button.textContent =
+        '⏳ APROVANDO...';
+
+    try {
+        const response =
+            await fetch(
+                `${BASE}/api/covers/approve`,
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        filename:
+                            currentCover.filename,
+
+                        templateId:
+                            document
+                                .getElementById(
+                                    'coverTemplate'
+                                )
+                                .value,
+
+                        paletteId:
+                            selectedCoverPalette,
+
+                        itemId:
+                            currentProductItemId(),
+
+                        shopId:
+                            currentProductShopId(),
+
+                        productTitle:
+                            currentProduct?.title ||
+                            '',
+
+                        headline:
+                            document
+                                .getElementById(
+                                    'coverHeadline'
+                                )
+                                .value
+                                .trim(),
+
+                        subheadline:
+                            document
+                                .getElementById(
+                                    'coverSubheadline'
+                                )
+                                .value
+                                .trim(),
+
+                        badge:
+                            document
+                                .getElementById(
+                                    'coverBadge'
+                                )
+                                .value
+                                .trim(),
+
+                        cta:
+                            document
+                                .getElementById(
+                                    'coverCta'
+                                )
+                                .value
+                                .trim(),
+
+                        price:
+                            document
+                                .getElementById(
+                                    'coverPrice'
+                                )
+                                .value
+                                .trim()
+                    })
+                }
+            );
+
+        const payload =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !payload.success
+        ) {
+            throw new Error(
+                payload.error ||
+                'Não foi possível aprovar a capa.'
+            );
+        }
+
+        toast(
+            'Capa aprovada e salva.'
+        );
+
+        await loadApprovedCovers();
+    } catch (error) {
+        console.error(error);
+
+        toast(
+            error.message ||
+            'Erro ao aprovar capa.'
+        );
+    } finally {
+        button.disabled = false;
+        button.textContent =
+            oldText;
+    }
+}
+
+
+async function selectApprovedCoverForVideo(
+    id
+) {
+    try {
+        const response =
+            await fetch(
+                `${BASE}/api/covers/approved/` +
+                `${encodeURIComponent(id)}/select`,
+                {
+                    method: 'PUT'
+                }
+            );
+
+        const payload =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !payload.success
+        ) {
+            throw new Error(
+                payload.error ||
+                'Não foi possível selecionar a capa.'
+            );
+        }
+
+        selectedApprovedCoverId =
+            id;
+
+        const generatedVideo =
+            document.getElementById(
+                'generatedVideo'
+            );
+
+        if (generatedVideo) {
+            generatedVideo.poster =
+                approvedCoverFileUrl(id);
+        }
+
+        renderApprovedCovers();
+
+        renderStoryboard();
+
+        toast(
+            'Capa selecionada para o vídeo.'
+        );
+    } catch (error) {
+        console.error(error);
+
+        toast(
+            error.message ||
+            'Erro ao selecionar capa.'
+        );
+    }
+}
+
+
+async function generateCoverPreview() {
+    if (!currentProduct) {
+        toast(
+            'Busque um produto primeiro.'
+        );
+        return;
+    }
+
+    const productImage =
+        getCoverImage();
+
+    if (!productImage) {
+        toast(
+            'Selecione pelo menos uma foto para a capa.'
+        );
+        return;
+    }
+
+    const button =
+        document.getElementById(
+            'generateCoverBtn'
+        );
+
+    const image =
+        document.getElementById(
+            'generatedCover'
+        );
+
+    const placeholder =
+        document.getElementById(
+            'generatedCoverPlaceholder'
+        );
+
+    const meta =
+        document.getElementById(
+            'generatedCoverMeta'
+        );
+
+    const oldText =
+        button.textContent;
+
+    button.disabled = true;
+    button.textContent =
+        '⏳ GERANDO CAPA...';
+
+    try {
+        const headline =
+            document.getElementById(
+                'coverHeadline'
+            ).value.trim();
+
+        const subheadline =
+            document.getElementById(
+                'coverSubheadline'
+            ).value.trim();
+
+        const badge =
+            document.getElementById(
+                'coverBadge'
+            ).value.trim();
+
+        const cta =
+            document.getElementById(
+                'coverCta'
+            ).value.trim();
+
+        const price =
+            document.getElementById(
+                'coverPrice'
+            ).value.trim();
+
+        const templateId =
+            document.getElementById(
+                'coverTemplate'
+            ).value.trim() ||
+            'oferta-forte';
+
+        const response =
+            await fetch(
+                `${BASE}/api/covers/generate`,
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        templateId,
+                        paletteId:
+                            selectedCoverPalette,
+
+                        productImage,
+                        imageUrl:
+                            productImage,
+
+                        headline,
+                        subheadline,
+                        badge,
+                        cta,
+
+                        price,
+                        priceText:
+                            price,
+
+                        title:
+                            currentProduct?.title || '',
+
+                        productTitle:
+                            currentProduct?.title || ''
+                    })
+                }
+            );
+
+        const payload =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !payload.success
+        ) {
+            const message =
+                typeof payload.error ===
+                    'string'
+                    ? payload.error
+                    : payload.error
+                        ?.message;
+
+            throw new Error(
+                message ||
+                'Não foi possível gerar a capa.'
+            );
+        }
+
+        const cover =
+            payload.cover ||
+            payload.result ||
+            payload;
+
+        const url =
+            cover.url ||
+            cover.fileUrl ||
+            cover.previewUrl;
+
+        if (!url) {
+            throw new Error(
+                'A capa foi gerada, mas a URL não foi retornada.'
+            );
+        }
+
+        image.src =
+            url + `?v=${Date.now()}`;
+
+        image.style.display =
+            'block';
+
+        placeholder.style.display =
+            'none';
+
+        meta.textContent =
+            `Template: ${
+                cover.templateName ||
+                'Oferta Forte'
+            }${
+                currentProduct?.title
+                    ? ` • ${ellipsis(
+                        currentProduct.title,
+                        60
+                    )}`
+                    : ''
+            }`;
+
+        currentCover =
+            cover;
+
+        const approveButton =
+            document.getElementById(
+                'approveCoverBtn'
+            );
+
+        if (approveButton) {
+            approveButton.disabled = false;
+        }
+
+        toast(
+            'Capa gerada com sucesso.'
+        );
+    } catch (error) {
+        console.error(error);
+
+        toast(
+            error.message ||
+            'Erro ao gerar capa.'
+        );
+    } finally {
+        button.disabled = false;
+        button.textContent =
+            oldText;
+    }
+}
+
+
+document
+    .getElementById('generateCoverBtn')
+    .addEventListener(
+        'click',
+        generateCoverPreview
+    );
+
+
+document
+    .getElementById('approveCoverBtn')
+    .addEventListener(
+        'click',
+        approveCurrentCover
+    );
+
+
+loadApprovedCovers();
 
 
 document
