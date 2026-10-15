@@ -888,6 +888,37 @@ function createMetaPublisher(options = {}) {
             120000
         );
 
+        // Upload direto do MP4 da Central.
+        const fs = require('node:fs');
+        const path = require('node:path');
+
+        const parsedSource = new URL(source);
+        const prefix = '/media/meta/production-reel/';
+
+        if (!parsedSource.pathname.startsWith(prefix)) {
+            throw new MetaPublisherError(
+                'URL não pertence à Central de Produção.',
+                'FACEBOOK_REEL_LOCAL_VIDEO_REQUIRED'
+            );
+        }
+
+        const jobId = parsedSource.pathname.slice(prefix.length);
+
+        if (!jobId || !/^[a-zA-Z0-9_-]+$/.test(jobId)) {
+            throw new MetaPublisherError(
+                'Identificador do vídeo inválido.',
+                'FACEBOOK_REEL_JOB_ID_INVALID'
+            );
+        }
+
+        const localFile = path.join(
+            __dirname, '..', 'data',
+            'video-production', 'outputs',
+            jobId, 'reel.mp4'
+        );
+
+        const videoBuffer = await fs.promises.readFile(localFile);
+
         let uploaded;
 
         try {
@@ -895,8 +926,11 @@ function createMetaPublisher(options = {}) {
                 method: 'POST',
                 headers: {
                     Authorization: `OAuth ${accessToken}`,
-                    file_url: source
+                    offset: '0',
+                    file_size: String(videoBuffer.length),
+                    'Content-Type': 'application/octet-stream'
                 },
+                body: videoBuffer,
                 signal: controller.signal
             });
 
