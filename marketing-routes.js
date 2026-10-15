@@ -1585,27 +1585,12 @@ router.post(
                 );
 
 
-            if (
-                uniqueChannels.length !== 1 ||
-                uniqueChannels[0] !==
-                    'instagram'
-            ) {
-                return res.status(400).json({
-                    success: false,
 
-                    error: {
-                        code:
-                            'REEL_CHANNEL_NOT_SUPPORTED',
-
-                        message:
-                            'Nesta etapa o Reel está disponível apenas para Instagram.'
-                    }
-                });
-            }
         }
 
-        const reservedChannels =
-            [];
+        const reservedChannels = [];
+        const previouslyPublishedReels = {};
+        const previouslyPublishedRecords = {};
 
 
         try {
@@ -1629,6 +1614,19 @@ router.post(
                 if (
                     !reservation.allowed
                 ) {
+                    if (
+                        format === 'reel' &&
+                        reservation.publication?.status === 'PUBLISHED'
+                    ) {
+                        previouslyPublishedReels[channel] = {
+                            success: true,
+                            skipped: true,
+                            mediaId: reservation.publication.mediaId || null
+                        };
+                        previouslyPublishedRecords[channel] =
+                            reservation.publication;
+                        continue;
+                    }
                     for (
                         const reservedChannel
                         of reservedChannels
@@ -1666,6 +1664,18 @@ router.post(
                 );
             }
 
+
+            if (
+                format === 'reel' &&
+                reservedChannels.length === 0
+            ) {
+                return res.json({
+                    success: true,
+                    format,
+                    channels: previouslyPublishedReels,
+                    publications: previouslyPublishedRecords
+                });
+            }
 
             let result;
 
@@ -1718,24 +1728,54 @@ router.post(
              * PUBLICAÇÃO DO REEL
              */
             if (format === 'reel') {
-                const instagramResult =
-                    await metaPublisher
-                        .publishInstagramReel({
-                            videoUrl:
-                                normalizedVideoUrl,
+                const channelEntries = await Promise.all(
+                    reservedChannels.map(async channel => {
+                        try {
+                            const channelResult =
+                                channel === 'instagram'
+                                    ? await metaPublisher.publishInstagramReel({
+                                        videoUrl: normalizedVideoUrl,
+                                        caption
+                                    })
+                                    : await metaPublisher.publishFacebookReel({
+                                        videoUrl: normalizedVideoUrl,
+                                        caption
+                                    });
 
-                            caption
-                        });
+                            return [channel, channelResult];
+                        } catch (error) {
+                            console.error(
+                                '[META REEL] Falha no canal:',
+                                channel,
+                                error?.code || '',
+                                error?.message || error
+                            );
 
+                            return [
+                                channel,
+                                {
+                                    success: false,
+                                    error: {
+                                        code:
+                                            error?.code ||
+                                            'META_REEL_PUBLICATION_ERROR',
+                                        message:
+                                            error?.message ||
+                                            'Falha ao publicar Reel.'
+                                    }
+                                }
+                            ];
+                        }
+                    })
+                );
+
+                const channelResults =
+                    Object.assign({}, previouslyPublishedReels, Object.fromEntries(channelEntries));
 
                 result = {
-                    success:
-                        true,
-
-                    channels: {
-                        instagram:
-                            instagramResult
-                    }
+                    success: Object.values(channelResults)
+                        .every(value => value?.success === true),
+                    channels: channelResults
                 };
             }
 
@@ -1743,12 +1783,12 @@ router.post(
              * Grava o resultado no histórico.
              */
             const savedPublications =
-                {};
+                { ...previouslyPublishedRecords };
 
 
             for (
                 const channel
-                of uniqueChannels
+                of (format === 'reel' ? reservedChannels : uniqueChannels)
             ) {
                 const channelResult =
                     result

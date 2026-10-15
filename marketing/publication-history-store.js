@@ -508,6 +508,7 @@ async function markFailed({
               AND item_id = ?
               AND channel = ?
               AND format = ?
+              AND status = 'PROCESSING'
         `,
         [
             marketplace,

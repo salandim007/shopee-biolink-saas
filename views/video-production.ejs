@@ -1185,14 +1185,44 @@
                 id="generatedVideoMeta"
                 class="generated-video-meta"
             ></div>
+            <div
+                id="mediaPublishChannels"
+                style="margin-top:16px;display:flex;flex-wrap:wrap;gap:16px"
+            >
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                    <input
+                        id="mediaChannelInstagram"
+                        type="checkbox"
+                        value="instagram"
+                        checked
+                    >
+                    📸 Instagram Reels
+                </label>
+
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                    <input
+                        id="mediaChannelFacebook"
+                        type="checkbox"
+                        value="facebook"
+                    >
+                    🔵 Facebook Reels
+                </label>
+            </div>
+
             <button
                 id="mediaPublishReelBtn"
                 type="button"
                 disabled
                 style="margin-top:15px;padding:14px 20px;background:#16a34a;color:white;border:0;border-radius:10px;cursor:pointer;font-weight:700"
             >
-                📸 Publicar no Instagram
+                🚀 Publicar nos canais selecionados
             </button>
+            <div
+                id="mediaPublishChannelsResult"
+                role="status"
+                aria-live="polite"
+                style="white-space:pre-line;margin-top:12px"
+            ></div>
         </div>
     </section>
 
@@ -2982,91 +3012,126 @@ async function generateProductionVideo() {
             !/^[0-9]+$/.test(publishingItemId);
 
         publishButton.onclick = async () => {
+            const selectedChannels = [
+                document.getElementById('mediaChannelInstagram')?.checked
+                    ? 'instagram' : null,
+                document.getElementById('mediaChannelFacebook')?.checked
+                    ? 'facebook' : null
+            ].filter(Boolean);
+
+            const publicationStatus =
+                document.getElementById('mediaPublishChannelsResult');
+
+            if (!selectedChannels.length) {
+                publicationStatus.textContent =
+                    'Selecione pelo menos um canal.';
+                return;
+            }
+
             publishButton.disabled = true;
             publishButton.textContent = '⏳ Publicando...';
 
-        const publicationStatus =
-            document.getElementById('mediaReviewResult');
-
-        try {
-            if (!/^[0-9]+$/.test(publishingItemId)) {
-                throw new Error(
-                    'Produto sem itemId válido. Vídeo salvo, mas não publicado.'
-                );
-            }
-
-            // Legenda opcional: não bloquear publicação.
-            const caption =
-                document.getElementById('mediaPublishCaption')
-                    .value.trim();
-
-            const publicVideoUrl = new URL(
-                result.url,
-                window.location.origin
-            ).href;
-
-            publicationStatus.textContent =
-                '⏳ Enviando Reel para o Instagram...';
-
-            const publishResponse = await fetch(
-                '/admin/vitrine2/marketing/meta/publish',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        marketplace: 'shopee',
-                        itemId: publishingItemId,
-                        channels: ['instagram'],
-                        format: 'reel',
-                        videoUrl: publicVideoUrl,
-                        caption
-                    })
+            try {
+                if (!/^[0-9]+$/.test(publishingItemId)) {
+                    throw new Error('Produto sem itemId válido.');
                 }
-            );
 
-            const publishData = await publishResponse.json();
+                const caption =
+                    document.getElementById('mediaPublishCaption')
+                        ?.value.trim() || '';
 
-            if (!publishResponse.ok || !publishData.success) {
-                const error = publishData.error;
-                throw new Error(
-                    typeof error === 'string'
-                        ? error
-                        : error?.message ||
-                          'A Meta não confirmou a publicação.'
+                const publicVideoUrl = new URL(
+                    result.url,
+                    window.location.origin
+                ).href;
+
+                publicationStatus.textContent =
+                    '⏳ Enviando vídeo para os canais selecionados...';
+
+                const response = await fetch(
+                    '/admin/vitrine2/marketing/meta/publish',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            marketplace: 'shopee',
+                            itemId: publishingItemId,
+                            channels: selectedChannels,
+                            format: 'reel',
+                            videoUrl: publicVideoUrl,
+                            caption
+                        })
+                    }
                 );
-            }
 
-            if (!publishData.channels?.instagram?.mediaId) {
+                const data = await response.json();
+
+                const names = {
+                    instagram: 'Instagram',
+                    facebook: 'Facebook'
+                };
+
+                const lines = selectedChannels.map(channel => {
+                    const item = data.channels?.[channel];
+
+                    if (!item) {
+                        return '⚠️ ' + names[channel] +
+                            ': resultado não confirmado.';
+                    }
+
+                    if (item.skipped) {
+                        return '✅ ' + names[channel] +
+                            ': já publicado anteriormente.';
+                    }
+
+                    if (item.success && item.mediaId) {
+                        return '✅ ' + names[channel] +
+                            ': publicado! ID: ' + item.mediaId;
+                    }
+
+                    if (item.success) {
+                        return '⚠️ ' + names[channel] +
+                            ': envio aceito, mas ID não confirmado.';
+                    }
+
+                    return '❌ ' + names[channel] + ': ' +
+                        (item.error?.message || 'Falha na publicação.');
+                });
+
+                if (!response.ok || !data.channels) {
+                    const message =
+                        typeof data.error === 'string'
+                            ? data.error
+                            : data.error?.message ||
+                              'Publicação não confirmada.';
+                    throw new Error(message);
+                }
+
+                publicationStatus.textContent = lines.join('\n');
+
+                if (data.success && selectedChannels.every(
+                    channel => data.channels?.[channel]?.success
+                )) {
+                    toast('Publicação processada nos canais selecionados.');
+                } else {
+                    toast('Confira o resultado de cada canal.');
+                }
+
+            } catch (error) {
+                console.error('[META REELS MULTICANAL]', error);
+
                 publicationStatus.textContent =
-                    '⚠️ A API respondeu com sucesso, mas não retornou ' +
-                    'o ID do Reel. Confira o Instagram antes de tentar novamente.';
-            } else {
-                publicationStatus.textContent =
-                    '✅ Reel publicado no Instagram!\\n' +
-                    'ID: ' +
-                    publishData.channels.instagram.mediaId;
+                    '⚠️ Publicação não confirmada: ' +
+                    error.message +
+                    '\nConfira as redes antes de tentar novamente.';
 
-                toast('Reel publicado no Instagram!');
+                toast('Verifique o resultado da publicação.');
+            } finally {
+                publishButton.textContent =
+                    '🚀 Publicar nos canais selecionados';
             }
-
-        } catch (publishError) {
-            console.error(
-                '[INSTAGRAM AUTO REEL]',
-                publishError
-            );
-
-            publicationStatus.textContent =
-                '⚠️ Vídeo gerado, mas publicação não confirmada: ' +
-                publishError.message +
-                '\\nVerifique o Instagram antes de tentar novamente.';
-
-            toast('Verifique o resultado da publicação.');
-        } finally {
-            publishButton.textContent =
-                '📸 Publicar no Instagram';
-        }
         };
 
     } catch (error) {

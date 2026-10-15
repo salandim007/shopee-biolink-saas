@@ -816,6 +816,138 @@ function createMetaPublisher(options = {}) {
         };
     }
 
+
+    async function publishFacebookReel({ videoUrl, caption = '' }) {
+        const accessToken = env.FACEBOOK_PAGE_ACCESS_TOKEN;
+        const pageId = env.FACEBOOK_PAGE_ID;
+
+        if (!accessToken || !pageId) {
+            throw new MetaPublisherError(
+                'Credenciais da Página do Facebook ausentes.',
+                'FACEBOOK_CREDENTIAL_MISSING'
+            );
+        }
+
+        const source = String(videoUrl || '').trim();
+
+        if (!/^https:\/\//i.test(source)) {
+            throw new MetaPublisherError(
+                'URL HTTPS do Reel inválida.',
+                'FACEBOOK_REEL_VIDEO_URL_INVALID'
+            );
+        }
+
+        const endpoint =
+            `https://graph.facebook.com/v25.0/${encodeURIComponent(pageId)}/video_reels`;
+
+        // 1. Iniciar sessão de upload.
+        const started = await postForm(
+            endpoint,
+            {
+                upload_phase: 'start',
+                access_token: accessToken
+            },
+            'Facebook'
+        );
+
+        const videoId = String(started?.video_id || '');
+        const uploadUrl = String(started?.upload_url || '');
+
+        if (!/^\d+$/.test(videoId)) {
+            throw new MetaPublisherError(
+                'Facebook não retornou video_id.',
+                'FACEBOOK_REEL_VIDEO_ID_MISSING'
+            );
+        }
+
+        let parsedUploadUrl;
+
+        try {
+            parsedUploadUrl = new URL(uploadUrl);
+        } catch (_) {
+            throw new MetaPublisherError(
+                'Facebook não retornou uma URL de upload válida.',
+                'FACEBOOK_REEL_UPLOAD_URL_INVALID'
+            );
+        }
+
+        if (
+            parsedUploadUrl.protocol !== 'https:' ||
+            parsedUploadUrl.hostname !== 'rupload.facebook.com'
+        ) {
+            throw new MetaPublisherError(
+                'Destino de upload do Facebook inválido.',
+                'FACEBOOK_REEL_UPLOAD_URL_INVALID'
+            );
+        }
+
+        // 2. Transferir por URL hospedada.
+        const controller = new AbortController();
+        const timer = setTimeout(
+            () => controller.abort(),
+            120000
+        );
+
+        let uploaded;
+
+        try {
+            const response = await fetchImpl(uploadUrl, {
+                method: 'POST',
+                headers: {
+                    Authorization: `OAuth ${accessToken}`,
+                    file_url: source
+                },
+                signal: controller.signal
+            });
+
+            if (!response.ok) {
+                throw new MetaPublisherError(
+                    `Falha no upload do Facebook: HTTP ${response.status}.`,
+                    'FACEBOOK_REEL_UPLOAD_FAILED',
+                    { status: response.status }
+                );
+            }
+
+            uploaded = await response.json();
+        } finally {
+            clearTimeout(timer);
+        }
+
+        if (uploaded?.success !== true) {
+            throw new MetaPublisherError(
+                'Facebook não confirmou o upload do vídeo.',
+                'FACEBOOK_REEL_UPLOAD_NOT_CONFIRMED'
+            );
+        }
+
+        // 3. Finalizar publicação.
+        const published = await postForm(
+            endpoint,
+            {
+                upload_phase: 'finish',
+                video_id: videoId,
+                video_state: 'PUBLISHED',
+                description: String(caption || ''),
+                access_token: accessToken
+            },
+            'Facebook'
+        );
+
+        if (published?.success !== true) {
+            throw new MetaPublisherError(
+                'Facebook não confirmou a finalização do Reel.',
+                'FACEBOOK_REEL_PUBLISH_NOT_CONFIRMED'
+            );
+        }
+
+        return {
+            success: true,
+            mediaId: String(published.post_id || videoId),
+            videoId,
+            videoUrl: source
+        };
+    }
+
     async function publishFacebook({ imageUrl, caption = '' }) {
         const accessToken = env.FACEBOOK_PAGE_ACCESS_TOKEN;
         const pageId = env.FACEBOOK_PAGE_ID;
@@ -926,6 +1058,7 @@ function createMetaPublisher(options = {}) {
         publishInstagram,
         publishInstagramCarousel,
         publishInstagramReel,
+        publishFacebookReel,
         publishFacebook,
         publishToChannels
     };
