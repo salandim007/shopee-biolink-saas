@@ -240,16 +240,27 @@ async function listProducts(options = {}) {
             0
         );
 
-    let where = '';
+    const hasItemIdFilter =
+        Array.isArray(options.itemIds);
+
+    const itemIds =
+        hasItemIdFilter
+            ? options.itemIds
+                .map(value => String(value || '').trim())
+                .filter(Boolean)
+            : [];
+
+    const conditions = [];
     const params = [];
 
     if (search) {
-        where = `
-            WHERE
+        conditions.push(`
+            (
                 itemid = ?
                 OR LOWER(title) LIKE LOWER(?)
                 OR LOWER(shop_name) LIKE LOWER(?)
-        `;
+            )
+        `);
 
         params.push(
             search,
@@ -257,6 +268,36 @@ async function listProducts(options = {}) {
             `%${search}%`
         );
     }
+
+    if (hasItemIdFilter) {
+        if (itemIds.length) {
+            /*
+             * Usa json_each para evitar milhares de placeholders
+             * quando a quantidade de produtos analisados crescer.
+             */
+            conditions.push(`
+                CAST(itemid AS TEXT) IN (
+                    SELECT CAST(value AS TEXT)
+                    FROM json_each(?)
+                )
+            `);
+
+            params.push(
+                JSON.stringify(itemIds)
+            );
+        } else {
+            /*
+             * Filtro solicitado, mas nenhum produto corresponde.
+             * Retorna zero resultados em vez de todo o catálogo.
+             */
+            conditions.push('1 = 0');
+        }
+    }
+
+    const where =
+        conditions.length
+            ? `WHERE ${conditions.join(' AND ')}`
+            : '';
 
     const totalRow =
         await get(

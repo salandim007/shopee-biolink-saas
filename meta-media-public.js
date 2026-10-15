@@ -217,6 +217,29 @@ function buildSignedMetaReelUrl(
         return value;
     }
 
+    const productionMatch =
+        parsed.pathname.match(
+            /^\/admin\/vitrine2\/marketing\/video-production\/api\/output\/([a-zA-Z0-9_-]+)\/file$/
+        );
+
+    if (productionMatch) {
+        const productionJobId = productionMatch[1];
+        const productionExpires =
+            Math.floor(Date.now() / 1000) + TTL_SECONDS;
+        const productionSignature =
+            signatureFor(
+                `production-reel:${productionJobId}`,
+                productionExpires
+            );
+        const productionUrl = new URL(
+            `/media/meta/production-reel/${encodeURIComponent(productionJobId)}`,
+            PUBLIC_BASE_URL
+        );
+        productionUrl.searchParams.set('exp', String(productionExpires));
+        productionUrl.searchParams.set('sig', productionSignature);
+        return productionUrl.toString();
+    }
+
     const match =
         parsed.pathname.match(
             /^\/admin\/vitrine2\/marketing\/media\/reel\/([a-zA-Z0-9_-]+)$/
@@ -525,6 +548,49 @@ router.get(
     }
 );
 
+
+
+router.get('/production-reel/:jobId', (req, res) => {
+    const jobId = String(req.params.jobId || '').trim();
+    const exp = Number(req.query.exp);
+    const sig = String(req.query.sig || '');
+    const now = Math.floor(Date.now() / 1000);
+
+    if (
+        !/^[a-zA-Z0-9_-]+$/.test(jobId) ||
+        !Number.isInteger(exp) ||
+        exp < now ||
+        exp > now + TTL_SECONDS + 300 ||
+        !/^[a-f0-9]{64}$/i.test(sig)
+    ) {
+        return res.status(403).send('URL inválida ou expirada.');
+    }
+
+    const expected = signatureFor(`production-reel:${jobId}`, exp);
+    if (!crypto.timingSafeEqual(
+        Buffer.from(expected, 'hex'),
+        Buffer.from(sig, 'hex')
+    )) {
+        return res.status(403).send('Assinatura inválida.');
+    }
+
+    const filePath = path.join(
+        process.cwd(), 'data', 'video-production',
+        'outputs', jobId, 'reel.mp4'
+    );
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send('Vídeo não encontrado.');
+    }
+
+    res.set({
+        'Content-Type': 'video/mp4',
+        'Cache-Control': 'public, max-age=300',
+        'Accept-Ranges': 'bytes'
+    });
+
+    return res.sendFile(filePath);
+});
 
 module.exports = {
     metaMediaPublicRouter:

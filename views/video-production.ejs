@@ -771,7 +771,28 @@
             </span>
         </div>
 
-        <div class="product-link-row">
+
+        <div style="margin:0 0 18px">
+            <label for="catalogProductSearch"
+                   style="display:block;font-weight:700;margin-bottom:8px">
+                📦 Buscar no meu catálogo
+            </label>
+            <div class="product-link-row">
+                <input id="catalogProductSearch" type="search"
+                       placeholder="Nome ou código do produto">
+                <button id="catalogProductSearchBtn"
+                        class="btn-primary" type="button">
+                    Pesquisar
+                </button>
+            </div>
+            <div id="catalogProductResults"
+                 style="margin-top:12px"></div>
+        </div>
+
+        <p style="color:#64748b;margin:12px 0">
+            Ou informe um link da Shopee:
+        </p>
+<div class="product-link-row">
             <input
                 id="productUrl"
                 type="text"
@@ -1106,6 +1127,42 @@
             </button>
         </div>
 
+
+        <div id="mediaPublishPanel" class="card"
+             style="margin-top:20px;padding:20px;border:1px solid #dbe4ef;border-radius:16px">
+            <h2>🚀 Preparar publicação</h2>
+            <p style="color:#64748b">
+                Prepare seu Reel na própria Central de Mídias.
+            </p>
+
+            <label for="mediaPublishCaption"
+                   style="display:block;font-weight:600;margin:15px 0 8px">
+                Legenda da publicação
+            </label>
+            <textarea id="mediaPublishCaption" rows="5"
+                      style="width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px"
+                      placeholder="Escreva a legenda do seu Reel..."></textarea>
+
+
+            <button id="mediaGenerateCaptionBtn" type="button"
+                    style="margin:10px 0;padding:11px 16px;background:#16a34a;color:white;border:0;border-radius:10px;cursor:pointer">
+                ✨ Gerar legenda com IA
+            </button>
+
+            <div style="margin:16px 0">
+                <strong>Destino:</strong>
+                📸 Instagram — Reel
+            </div>
+
+            <button id="mediaReviewBtn" type="button"
+                    style="padding:12px 18px;background:#1877f2;color:white;border:0;border-radius:10px;cursor:pointer">
+                Revisar publicação
+            </button>
+
+            <div id="mediaReviewResult"
+                 style="margin-top:15px;white-space:pre-wrap"></div>
+        </div>
+
         <div
             id="generatedVideoPanel"
             class="generated-video-panel"
@@ -1128,6 +1185,14 @@
                 id="generatedVideoMeta"
                 class="generated-video-meta"
             ></div>
+            <button
+                id="mediaPublishReelBtn"
+                type="button"
+                disabled
+                style="margin-top:15px;padding:14px 20px;background:#16a34a;color:white;border:0;border-radius:10px;cursor:pointer;font-weight:700"
+            >
+                📸 Publicar no Instagram
+            </button>
         </div>
     </section>
 
@@ -2802,6 +2867,13 @@ async function generateProductionVideo() {
     const video = document.getElementById('generatedVideo');
     const meta = document.getElementById('generatedVideoMeta');
 
+    const publishingProduct = currentProduct
+        ? { ...currentProduct }
+        : null;
+
+    const publishingItemId = currentProductItemId();
+
+
     if (!selectedPhotos.length) {
         toast('Selecione pelo menos uma foto.');
         return;
@@ -2811,6 +2883,11 @@ async function generateProductionVideo() {
     button.disabled = true;
     button.textContent = '⏳ PREPARANDO VÍDEO...';
     panel.hidden = true;
+    const previousPublishButton =
+        document.getElementById('mediaPublishReelBtn');
+
+    previousPublishButton.disabled = true;
+    previousPublishButton.onclick = null;
 
     try {
         const response = await fetch(`${BASE}/api/generate`, {
@@ -2893,7 +2970,105 @@ async function generateProductionVideo() {
             block: 'center'
         });
 
-        toast('Vídeo gerado com sucesso.');
+
+        /*
+         * PUBLICACAO AUTOMATICA INSTAGRAM
+         * Executada somente depois do MP4 estar pronto.
+         */
+        const publishButton =
+            document.getElementById('mediaPublishReelBtn');
+
+        publishButton.disabled =
+            !/^[0-9]+$/.test(publishingItemId);
+
+        publishButton.onclick = async () => {
+            publishButton.disabled = true;
+            publishButton.textContent = '⏳ Publicando...';
+
+        const publicationStatus =
+            document.getElementById('mediaReviewResult');
+
+        try {
+            if (!/^[0-9]+$/.test(publishingItemId)) {
+                throw new Error(
+                    'Produto sem itemId válido. Vídeo salvo, mas não publicado.'
+                );
+            }
+
+            // Legenda opcional: não bloquear publicação.
+            const caption =
+                document.getElementById('mediaPublishCaption')
+                    .value.trim();
+
+            const publicVideoUrl = new URL(
+                result.url,
+                window.location.origin
+            ).href;
+
+            publicationStatus.textContent =
+                '⏳ Enviando Reel para o Instagram...';
+
+            const publishResponse = await fetch(
+                '/admin/vitrine2/marketing/meta/publish',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        marketplace: 'shopee',
+                        itemId: publishingItemId,
+                        channels: ['instagram'],
+                        format: 'reel',
+                        videoUrl: publicVideoUrl,
+                        caption
+                    })
+                }
+            );
+
+            const publishData = await publishResponse.json();
+
+            if (!publishResponse.ok || !publishData.success) {
+                const error = publishData.error;
+                throw new Error(
+                    typeof error === 'string'
+                        ? error
+                        : error?.message ||
+                          'A Meta não confirmou a publicação.'
+                );
+            }
+
+            if (!publishData.channels?.instagram?.mediaId) {
+                publicationStatus.textContent =
+                    '⚠️ A API respondeu com sucesso, mas não retornou ' +
+                    'o ID do Reel. Confira o Instagram antes de tentar novamente.';
+            } else {
+                publicationStatus.textContent =
+                    '✅ Reel publicado no Instagram!\\n' +
+                    'ID: ' +
+                    publishData.channels.instagram.mediaId;
+
+                toast('Reel publicado no Instagram!');
+            }
+
+        } catch (publishError) {
+            console.error(
+                '[INSTAGRAM AUTO REEL]',
+                publishError
+            );
+
+            publicationStatus.textContent =
+                '⚠️ Vídeo gerado, mas publicação não confirmada: ' +
+                publishError.message +
+                '\\nVerifique o Instagram antes de tentar novamente.';
+
+            toast('Verifique o resultado da publicação.');
+        } finally {
+            publishButton.textContent =
+                '📸 Publicar no Instagram';
+        }
+        };
+
     } catch (error) {
         console.error('[VIDEO ASYNC FRONTEND]', error);
         toast(error.message || 'Erro ao gerar vídeo.');
@@ -3729,8 +3904,314 @@ document
     );
 
 
+
+document.getElementById('mediaReviewBtn').addEventListener('click', () => {
+    const video = document.getElementById('generatedVideo');
+    const panel = document.getElementById('generatedVideoPanel');
+    const caption = document.getElementById('mediaPublishCaption').value.trim();
+    const result = document.getElementById('mediaReviewResult');
+
+    if (panel.hidden || !video.getAttribute('src')) {
+        result.textContent = '⚠️ Gere um MP4 antes de preparar a publicação.';
+        return;
+    }
+
+    if (!caption) {
+        result.textContent = '⚠️ Escreva uma legenda antes de continuar.';
+        return;
+    }
+
+    result.textContent =
+        '✅ Reel pronto para revisão.\\n' +
+        'Canal: Instagram\\n' +
+        'Vídeo: MP4 gerado na Central\\n' +
+        'Legenda: ' + caption + '\\n\\n' +
+        'Aguardando sua aprovação. Nenhuma publicação foi enviada.';
+});
+
+
+document.getElementById('mediaGenerateCaptionBtn')
+    .addEventListener('click', async () => {
+        const button = document.getElementById('mediaGenerateCaptionBtn');
+        const captionField = document.getElementById('mediaPublishCaption');
+
+        if (!currentProduct || !currentProduct.itemId || !currentProduct.title) {
+            toast('Selecione um produto antes de gerar a legenda.');
+            return;
+        }
+
+        const oldText = button.textContent;
+        button.disabled = true;
+        button.textContent = '⏳ Gerando legenda...';
+
+        try {
+            const response = await fetch(`${BASE}/api/post-text/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    product: currentProduct
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Falha ao gerar legenda.');
+            }
+
+            captionField.value = data.caption;
+            toast('Legenda gerada. Revise antes de publicar.');
+        } catch (error) {
+            toast(error.message || 'Erro ao gerar legenda.');
+        } finally {
+            button.disabled = false;
+            button.textContent = oldText;
+        }
+    });
+
+
+async function searchCatalogProducts() {
+    const field = document.getElementById('catalogProductSearch');
+    const results = document.getElementById('catalogProductResults');
+    const query = field.value.trim();
+
+    if (!query) {
+        results.textContent = 'Digite o nome ou código do produto.';
+        return;
+    }
+
+    results.textContent = 'Pesquisando no catálogo...';
+
+    try {
+        const params = new URLSearchParams({
+            search: query,
+            limit: '12',
+            offset: '0'
+        });
+
+        const response = await fetch('/api/products-media?' + params);
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Falha na busca.');
+        }
+
+        results.replaceChildren();
+
+        if (!Array.isArray(data.products) || !data.products.length) {
+            results.textContent = 'Nenhum produto encontrado.';
+            return;
+        }
+
+        for (const product of data.products) {
+            const itemId = String(product.itemId || '');
+            const shopId = String(product.shopId || '');
+
+            if (!/^\d+$/.test(itemId) || !/^\d+$/.test(shopId)) {
+                continue;
+            }
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.style.cssText =
+                'display:flex;align-items:center;gap:12px;width:100%;' +
+                'padding:10px;margin:5px 0;border:1px solid #dbe4ef;' +
+                'border-radius:10px;background:white;text-align:left;' +
+                'cursor:pointer';
+
+            if (product.image) {
+                const image = document.createElement('img');
+                image.src = product.image;
+                image.alt = '';
+                image.style.cssText =
+                    'width:52px;height:52px;object-fit:contain';
+                button.appendChild(image);
+            }
+
+            const title = document.createElement('span');
+            title.textContent = product.title || 'Produto ' + itemId;
+            button.appendChild(title);
+
+            button.addEventListener('click', () => {
+                document.getElementById('productUrl').value =
+                    'https://shopee.com.br/product/' + shopId + '/' + itemId;
+
+                results.textContent =
+                    'Produto selecionado: ' + (product.title || itemId);
+
+                loadProductMedia();
+            });
+
+            results.appendChild(button);
+        }
+
+        if (!results.children.length) {
+            results.textContent =
+                'Nenhum produto com identificadores válidos.';
+        }
+    } catch (error) {
+        results.textContent =
+            error.message || 'Não foi possível consultar o catálogo.';
+    }
+}
+
+document.getElementById('catalogProductSearchBtn')
+    .addEventListener('click', searchCatalogProducts);
+
+document.getElementById('catalogProductSearch')
+    .addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            searchCatalogProducts();
+        }
+    });
+
+
+
+async function loadIncomingProduct() {
+    const params = new URLSearchParams(window.location.search);
+    const itemId = params.get('itemId') || '';
+
+    if (!/^\d+$/.test(itemId)) return;
+
+    try {
+        const response = await fetch(
+            `${BASE}/api/catalog-product/${encodeURIComponent(itemId)}`,
+            { cache: 'no-store' }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success || !data.product) {
+            throw new Error(data.error || 'Produto não encontrado.');
+        }
+
+        const product = data.product;
+
+        currentProduct = product;
+
+        const shopId = String(product.shopId || '').trim();
+        const productUrl =
+            product.productLink ||
+            product.affiliateLink ||
+            (shopId
+                ? `https://shopee.com.br/product/${shopId}/${itemId}`
+                : '');
+
+        if (productUrl) {
+            document.getElementById('productUrl').value = productUrl;
+        }
+
+        const images = [
+            ...(Array.isArray(product.images) ? product.images : []),
+            product.image
+        ].filter(Boolean);
+
+        if (images.length) {
+            const uniqueImages = [...new Set(images)];
+
+            productPhotos = uniqueImages;
+            selectedPhotos = productPhotos.slice(0, 5);
+
+            prefillCoverFields(true);
+            resetCoverPreview();
+            renderApprovedCovers();
+            renderProductPhotos();
+            renderStoryboard();
+
+            toast('Produto carregado do catálogo.');
+        } else {
+            toast('Produto encontrado, mas sem fotos no catálogo.');
+        }
+    } catch (error) {
+        console.error('[CATALOG PRODUCT]', error);
+        toast(error.message || 'Falha ao carregar produto.');
+    }
+}
+
+
+const AUTOLOAD_PRODUCT_PHOTOS_TAG = true;
+let autoProductPhotosHydrated = false;
+
+function collectProductImagesFromCurrentProduct() {
+    const values = [
+        ...(Array.isArray(currentProduct?.images) ? currentProduct.images : []),
+        ...(Array.isArray(currentProduct?.media?.images) ? currentProduct.media.images : []),
+        currentProduct?.image || '',
+        currentProduct?.media?.image || ''
+    ];
+
+    return [
+        ...new Set(
+            values
+                .map(value => String(value || '').trim())
+                .filter(Boolean)
+        )
+    ];
+}
+
+function hydrateProductPhotosFromCurrentProduct(force = false) {
+    if ((!force && autoProductPhotosHydrated) || !currentProduct) {
+        return false;
+    }
+
+    const images =
+        collectProductImagesFromCurrentProduct();
+
+    if (!images.length) {
+        return false;
+    }
+
+    productPhotos = [...images];
+    selectedPhotos = [...images].slice(0, 5);
+    autoProductPhotosHydrated = true;
+
+    const status =
+        document.getElementById(
+            'productStatus'
+        );
+
+    if (status) {
+        status.textContent =
+            `${selectedPhotos.length} foto(s) carregada(s) automaticamente do produto.`;
+    }
+
+    renderProductPhotos();
+    renderStoryboard();
+
+    return true;
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        setTimeout(
+            () => hydrateProductPhotosFromCurrentProduct(true),
+            300
+        );
+
+        const timer =
+            setInterval(
+                () => {
+                    if (hydrateProductPhotosFromCurrentProduct()) {
+                        clearInterval(timer);
+                    }
+                },
+                1000
+            );
+
+        setTimeout(
+            () => clearInterval(timer),
+            15000
+        );
+    }
+);
+
 renderStoryboard();
 loadLibrary();
+loadIncomingProduct();
 </script>
 
 </body>

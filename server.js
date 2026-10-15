@@ -31,6 +31,9 @@ const productScoreStore =
 const contentQueueStore =
     require('./ai/content-queue-store');
 
+const productProcessingStateStore =
+    require('./ai/product-processing-state-store');
+
 
 const contentJobStore =
     require('./ai/content-job-store');
@@ -257,6 +260,64 @@ app.get(
     requireAdminAuth,
     async (req, res) => {
         try {
+            const filter =
+                String(
+                    req.query.filter || ''
+                )
+                    .trim()
+                    .toLowerCase();
+
+            /*
+             * Fonte única de estado operacional do produto.
+             */
+            const processingState =
+                productProcessingStateStore.readAll();
+
+            const processingItems =
+                Object.values(
+                    processingState
+                );
+
+            let itemIds = null;
+
+            if (
+                filter === 'ia' ||
+                filter === 'ready' ||
+                filter === 'ia-ready'
+            ) {
+
+                itemIds =
+                    processingItems
+                        .filter(
+                            item => {
+
+                                if (filter === 'ia') {
+                                    return (
+                                        item.aiProcessed === true
+                                    );
+                                }
+
+                                if (filter === 'ready') {
+                                    return (
+                                        item.contentReady === true
+                                    );
+                                }
+
+                                return (
+                                    item.aiProcessed === true &&
+                                    item.contentReady === true
+                                );
+                            }
+                        )
+                        .map(
+                            item =>
+                                String(
+                                    item.itemId || ''
+                                )
+                        )
+                        .filter(Boolean);
+            }
+
             const result =
                 await productMediaService.listProducts({
                     search:
@@ -266,8 +327,42 @@ app.get(
                         req.query.limit || 24,
 
                     offset:
-                        req.query.offset || 0
+                        req.query.offset || 0,
+
+                    itemIds
                 });
+
+            /*
+             * Selos da Central vêm da mesma fonte única.
+             */
+            result.products =
+                result.products.map(
+                    product => {
+
+                        const state =
+                            processingState[
+                                String(
+                                    product.itemId
+                                )
+                            ] || null;
+
+                        return {
+                            ...product,
+
+                            aiProcessed:
+                                state?.aiProcessed ===
+                                true,
+
+                            contentReady:
+                                state?.contentReady ===
+                                true,
+
+                            published:
+                                state?.published ===
+                                true
+                        };
+                    }
+                );
 
             return res.json({
                 success: true,
@@ -371,8 +466,8 @@ app.get(
  * ============================================================
  * IA - ANÁLISE E CONTEÚDO
  * ============================================================
- * Não publica automaticamente.
- * Conteúdo gerado fica aguardando aprovação.
+ * Conteúdo válido é liberado automaticamente para uso.
+ * A revisão final acontece no momento da publicação.
  * ============================================================
  */
 
@@ -556,14 +651,27 @@ app.get(
                     Number(req.query.offset || 0)
                 );
 
+            const returnAll =
+                String(
+                    req.query.all || ''
+                ).toLowerCase() ===
+                'true';
+
             const limit =
-                Math.min(
-                    100,
-                    Math.max(
-                        1,
-                        Number(req.query.limit || 24)
+                returnAll
+                    ? Math.max(
+                        0,
+                        total - offset
                     )
-                );
+                    : Math.min(
+                        100,
+                        Math.max(
+                            1,
+                            Number(
+                                req.query.limit || 24
+                            )
+                        )
+                    );
 
             items =
                 items.slice(

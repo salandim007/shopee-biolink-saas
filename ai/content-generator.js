@@ -619,7 +619,6 @@ lista de afirmações que devem ser evitadas
             format: 'json',
 
             options: {
-                timeoutMs: 20000,
                 think: false,
                 temperature: 0.4,
                 num_predict: 700

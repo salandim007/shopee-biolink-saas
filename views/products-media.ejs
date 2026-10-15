@@ -523,6 +523,49 @@ button{
     <button>Buscar</button>
   </form>
 
+  <div
+    id="productStatusFilters"
+    style="
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+      width:100%;
+      margin-top:8px;
+    "
+  >
+    <button
+      type="button"
+      data-product-filter=""
+      class="product-filter-btn active"
+    >
+      Todos
+    </button>
+
+    <button
+      type="button"
+      data-product-filter="ia"
+      class="product-filter-btn"
+    >
+      🟢 IA
+    </button>
+
+    <button
+      type="button"
+      data-product-filter="ready"
+      class="product-filter-btn"
+    >
+      🔵 Pronto
+    </button>
+
+    <button
+      type="button"
+      data-product-filter="ia-ready"
+      class="product-filter-btn"
+    >
+      🟢 IA + 🔵 Pronto
+    </button>
+  </div>
+
 </section>
 
 <div id="status">
@@ -580,27 +623,6 @@ button{
 
   </section>
 
-  <section class="ai-section">
-
-    <div class="ai-section-head">
-      <div>
-        <h2 class="ai-section-title">
-          Conteúdos aguardando aprovação
-        </h2>
-
-        <div class="ai-section-sub">
-          Materiais preparados pela IA antes de qualquer publicação
-        </div>
-      </div>
-    </div>
-
-    <div id="iaFila" class="ai-products">
-      <div class="ai-empty">
-        Nenhum conteúdo preparado ainda.
-      </div>
-    </div>
-
-  </section>
 
 </section>
 
@@ -662,6 +684,49 @@ button{
 .imgbox{
   position:relative;
 }
+
+.product-filter-btn{
+  border:1px solid #dce3ea;
+  background:#fff;
+  color:#334155;
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.product-filter-btn.active{
+  background:#17202a;
+  color:#fff;
+  border-color:#17202a;
+}
+
+.product-state-badges{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.product-state-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:4px 7px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.product-state-badge.ai{
+  background:#ecfdf5;
+  color:#15803d;
+}
+
+.product-state-badge.ready{
+  background:#eff6ff;
+  color:#1d4ed8;
+}
 </style>
 
 <script>
@@ -671,6 +736,7 @@ const totalEl = document.getElementById('total');
 
 let offset = 0;
 let buscaAtual = '';
+let filtroProdutoAtual = '';
 let totalProdutos = 0;
 
 function moeda(v){
@@ -708,6 +774,8 @@ function criarCard(p){
       class="card"
       data-item="${esc(p.itemId)}"
       data-shop="${esc(p.shopId)}"
+      data-ai="${p.aiProcessed ? 'true' : 'false'}"
+      data-ready="${p.contentReady ? 'true' : 'false'}"
     >
       <div class="imgbox">
         <img src="${esc(p.image || '')}" alt="">
@@ -724,6 +792,26 @@ function criarCard(p){
           ${esc(p.title)}
         </div>
 
+        ${
+          p.aiProcessed || p.contentReady
+            ? `
+                <div class="product-state-badges">
+                  ${
+                    p.aiProcessed
+                      ? '<span class="product-state-badge ai">● IA</span>'
+                      : ''
+                  }
+
+                  ${
+                    p.contentReady
+                      ? '<span class="product-state-badge ready">● Pronto</span>'
+                      : ''
+                  }
+                </div>
+              `
+            : ''
+        }
+
         <div class="price">
           ${moeda(preco)}
         </div>
@@ -738,10 +826,45 @@ function criarCard(p){
           <span>⭐ ${p.ratings?.product ?? '—'}</span>
           <span>Loja ⭐ ${p.ratings?.shop ?? '—'}</span>
         </div>
+        <button type="button"
+          class="produce-media-btn"
+          style="margin-top:12px;padding:10px;width:100%;
+                 background:#087f8c;color:white;border:0;
+                 border-radius:9px;cursor:pointer">
+          🎬 Produzir mídia
+        </button>
       </div>
     </article>
   `;
 }
+
+
+document.addEventListener('click', event => {
+  const button = event.target.closest('.produce-media-btn');
+  if (!button) return;
+
+  const card = button.closest('[data-item]');
+  if (!card) return;
+
+  const itemId = card.dataset.item || '';
+  const shopId = card.dataset.shop || '';
+
+  if (!/^\d+$/.test(itemId)) {
+    alert('Identificador do produto indisponível.');
+    return;
+  }
+
+  const params = new URLSearchParams({ itemId });
+
+  if (/^\d+$/.test(shopId)) {
+    params.set('shopId', shopId);
+  }
+
+  window.location.href =
+    '/admin/vitrine2/marketing/video-production?' +
+    params.toString();
+});
+
 
 async function carregarProdutos(){
   statusEl.textContent = 'Carregando produtos...';
@@ -755,6 +878,13 @@ async function carregarProdutos(){
 
   if(buscaAtual){
     params.set('search', buscaAtual);
+  }
+
+  if(filtroProdutoAtual){
+    params.set(
+      'filter',
+      filtroProdutoAtual
+    );
   }
 
   try{
@@ -794,9 +924,20 @@ async function carregarProdutos(){
       document.getElementById('paginaInfo');
 
     if(info){
-      info.textContent =
-        `Página ${paginaAtual} de ${totalPaginas.toLocaleString('pt-BR')}`;
-    }
+        const primeiroProduto =
+          totalProdutos > 0
+            ? offset + 1
+            : 0;
+
+        const ultimoProduto =
+          Math.min(
+            offset + 24,
+            totalProdutos
+          );
+
+        info.textContent =
+          `${primeiroProduto.toLocaleString('pt-BR')}–${ultimoProduto.toLocaleString('pt-BR')} de ${totalProdutos.toLocaleString('pt-BR')} • Página ${paginaAtual.toLocaleString('pt-BR')} de ${totalPaginas.toLocaleString('pt-BR')}`;
+      }
 
     const anterior =
       document.getElementById('anterior');
@@ -831,6 +972,44 @@ async function carregarProdutos(){
       err.message;
   }
 }
+
+document
+  .getElementById('productStatusFilters')
+  .addEventListener(
+    'click',
+    e => {
+
+      const button =
+        e.target.closest(
+          '[data-product-filter]'
+        );
+
+      if(!button){
+        return;
+      }
+
+      filtroProdutoAtual =
+        button.dataset.productFilter || '';
+
+      offset = 0;
+
+      document
+        .querySelectorAll(
+          '.product-filter-btn'
+        )
+        .forEach(
+          item =>
+            item.classList.remove(
+              'active'
+            )
+        );
+
+      button.classList.add('active');
+
+      carregarProdutos();
+    }
+  );
+
 
 document
   .getElementById('formBusca')
@@ -1180,7 +1359,37 @@ async function abrirProduto(itemId, shopId){
 }
 
 
-async function abrirTapToPost(itemId, shopId){
+function nomeCanalTap(channel){
+  const value =
+    String(channel || 'facebook')
+      .trim()
+      .toLowerCase();
+
+  const nomes = {
+    facebook: 'Facebook',
+    instagram: 'Instagram',
+    pinterest: 'Pinterest',
+    whatsapp: 'WhatsApp',
+    tiktok: 'TikTok',
+    kwai: 'Kwai'
+  };
+
+  return nomes[value] || value;
+}
+
+
+async function abrirTapToPost(
+  itemId,
+  shopId,
+  channel = 'facebook'
+){
+  const canal =
+    String(channel || 'facebook')
+      .trim()
+      .toLowerCase();
+
+  const canalLabel =
+    nomeCanalTap(canal);
   const painel =
     document.getElementById('produtoPainel');
 
@@ -1220,7 +1429,9 @@ async function abrirTapToPost(itemId, shopId){
         fetch(
           `/api/ai/content-queue?itemId=${
             encodeURIComponent(itemId)
-          }&channel=facebook`
+          }&channel=${
+            encodeURIComponent(canal)
+          }`
         )
       ]);
 
@@ -1283,14 +1494,16 @@ async function abrirTapToPost(itemId, shopId){
         .reverse()
         .find(
           item =>
-            item.status ===
-              'APPROVED'
+            item.status === 'APPROVED' ||
+            item.status === 'PUBLISHED'
         ) ||
       null;
 
     if(!pronto){
       throw new Error(
-        'Aprove o conteúdo antes de continuar para o Facebook.'
+        'Aprove o conteúdo antes de continuar para ' +
+        canalLabel +
+        '.'
       );
     }
 
@@ -1301,6 +1514,7 @@ async function abrirTapToPost(itemId, shopId){
 
     const linkShopee =
       produto.links?.short ||
+      produto.links?.affiliate ||
       produto.links?.product ||
       '';
 
@@ -1315,46 +1529,221 @@ async function abrirTapToPost(itemId, shopId){
         .slice(0, 5)
         .join(' ');
 
-    const textoPreparado =
-      String(
-        final.body ||
-        tituloProduto ||
-        ''
-      ).trim();
+      const textoOriginal =
+        String(
+          final.body ||
+          tituloProduto ||
+          ''
+        ).trim();
 
-    const hashtags =
-      Array.isArray(final.hashtags)
-        ? final.hashtags
-            .filter(Boolean)
-            .slice(0, 5)
-            .join(' ')
-        : '';
+      const hashtagsDoTexto =
+        textoOriginal.match(
+          /#[\p{L}\p{N}_]+/gu
+        ) || [];
 
-    const partesLegenda = [
-      textoPreparado,
-      '',
-      '🛒 Quer comprar ou ver mais detalhes?',
-        'Acesse o produto na Shopee pelo link abaixo 👇',
-      linkShopee
-    ];
+      const hashtagsDaIa =
+        Array.isArray(final.hashtags)
+          ? final.hashtags
+          : [];
 
-    if(hashtags){
-      partesLegenda.push(
+      const hashtagsLista = [
+        '#MixDeProdutos',
+        ...hashtagsDaIa,
+        ...hashtagsDoTexto
+      ]
+        .flatMap(value => {
+          const raw =
+            String(value || '').trim();
+
+          if(!raw){
+            return [];
+          }
+
+          const encontradas =
+            raw.match(
+              /#[\p{L}\p{N}_]+/gu
+            );
+
+          if(encontradas?.length){
+            return encontradas;
+          }
+
+          return [
+            raw.startsWith('#')
+              ? raw
+              : `#${raw}`
+          ];
+        })
+        .filter(Boolean)
+        .filter(
+          (tag, index, array) =>
+            array.findIndex(
+              other =>
+                other.toLowerCase() ===
+                tag.toLowerCase()
+            ) === index
+        )
+        .slice(0, 5);
+
+      const hashtags =
+        hashtagsLista.join(' ');
+
+      /*
+       * Limpa conteúdo antigo para evitar
+       * link, CTA e hashtags duplicados.
+       */
+      const textoPreparado =
+        textoOriginal
+          .replace(
+            /https?:\/\/(?:[a-z0-9-]+\.)?shopee\.com\.br\/\S+/gi,
+            ''
+          )
+          .replace(
+            /#[\p{L}\p{N}_]+/gu,
+            ''
+          )
+          .split('\n')
+          .filter(line => {
+            const value =
+              String(line || '').trim();
+
+            if(!value){
+              return true;
+            }
+
+            return !(
+              /Confira na Shopee/i.test(value) ||
+              /Acesse o produto na Shopee/i.test(value) ||
+              /Quer comprar ou ver mais detalhes\?/i.test(value) ||
+              /COMPRAR AQUI/i.test(value)
+            );
+          })
+          .join('\n')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+
+      const partesLegenda = [
+        textoPreparado
+      ];
+
+      if(linkShopee){
+        partesLegenda.push(
+          '',
+          '🛒 Confira na Shopee 👇',
+          linkShopee
+        );
+      }
+
+      if(hashtags){
+        partesLegenda.push(
+          '',
+          hashtags
+        );
+      }
+
+      let legenda =
+        partesLegenda
+          .join('\n')
+          .trim();
+
+
+    /*
+     * ========================================================
+     * ADAPTADOR DE LEGENDA - INSTAGRAM
+     * ========================================================
+     * Mantém o conteúdo criado pela IA.
+     * Remove CTA/link direto da Shopee.
+     * Usa chamada própria para Link na BIO.
+     * Facebook e demais canais permanecem intactos.
+     * ========================================================
+     */
+    if(canal === 'instagram'){
+
+      let textoInstagram =
+        String(
+          textoPreparado ||
+          ''
+        )
+          .split('\n')
+          .filter(line => {
+
+            const value =
+              String(line || '')
+                .trim();
+
+            if(!value){
+              return true;
+            }
+
+            /*
+             * Remove URLs diretas.
+             */
+            if(
+              /^https?:\/\//i.test(value)
+            ){
+              return false;
+            }
+
+            /*
+             * Remove CTAs antigos da Shopee/Facebook.
+             */
+            if(
+              /Acesse o produto na Shopee/i.test(value) ||
+              /Quer comprar ou ver mais detalhes\?/i.test(value) ||
+              /Confira na Shopee/i.test(value) ||
+              /COMPRAR AQUI/i.test(value)
+            ){
+              return false;
+            }
+
+            return true;
+          })
+          .join('\n')
+          .trim();
+
+
+      const partesInstagram = [
+        textoInstagram,
         '',
-        hashtags
-      );
+        'Quer comprar ou ver mais detalhes? Link na BIO'
+      ];
+
+
+      if(
+        hashtags &&
+        !textoInstagram.includes(hashtags)
+      ){
+        partesInstagram.push(
+          '',
+          hashtags
+        );
+      }
+
+
+      legenda =
+        partesInstagram
+          .join('\n')
+          .trim();
     }
 
-    const legenda =
-      partesLegenda.join('\n');
 
-    window.tapFacebookShare = {
+    window.tapChannelShare = {
       itemId,
       queueItemId:
         pronto.id,
+      channel:
+        canal,
       linkShopee,
       legenda
     };
+
+    /*
+     * Compatibilidade com o fluxo Facebook/Grupos já existente.
+     */
+    if(canal === 'facebook'){
+      window.tapFacebookShare =
+        window.tapChannelShare;
+    }
 
     const imagens =
       [
@@ -1380,8 +1769,25 @@ async function abrirTapToPost(itemId, shopId){
 
     window.tapToPostState = {
       itemId,
+      channel:
+        canal,
       coverUrl: imagem,
-      images: imagens
+      images: imagens,
+
+      videos: [
+        ...(Array.isArray(produto.media?.videos)
+          ? produto.media.videos
+          : []),
+
+        ...(Array.isArray(produto.videos)
+          ? produto.videos
+          : [])
+      ]
+        .filter(Boolean)
+        .filter(
+          (url, index, array) =>
+            array.indexOf(url) === index
+        )
     };
 
     conteudo.innerHTML = `
@@ -1390,7 +1796,7 @@ async function abrirTapToPost(itemId, shopId){
         style="border-top:4px solid #16a34a">
 
         <div class="report-kicker">
-          Facebook · conteúdo pronto
+          ${esc(canalLabel)} · conteúdo pronto
         </div>
 
         <h2 class="report-title">
@@ -1590,59 +1996,167 @@ async function abrirTapToPost(itemId, shopId){
         </div>
 
 
-        <button
-          type="button"
-          id="copiarTapLegenda"
-          style="
-            width:100%;
-            margin-top:12px;
-            padding:13px;
-            border:1px solid #16a34a;
-            border-radius:12px;
-            background:#fff;
-            color:#15803d;
-            font-size:15px;
-            font-weight:700;
-          "
-        >
-          Copiar legenda
-        </button>
+        <style>
+          .tap-action-grid{
+            display:grid;
+            grid-template-columns:
+              repeat(4,minmax(0,1fr));
+            gap:10px;
+            margin-top:14px;
+          }
 
-        <button
-          type="button"
-          id="abrirFacebookTap"
-          style="
-            width:100%;
-            margin-top:10px;
-            padding:14px;
+          .tap-action-btn{
+            min-width:0;
             border:0;
-            border-radius:12px;
+            background:transparent;
+            padding:5px 2px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:flex-start;
+            gap:7px;
+            color:#334155;
+            font-size:11px;
+            line-height:1.15;
+            font-weight:700;
+            text-align:center;
+            cursor:pointer;
+          }
+
+          .tap-action-btn::before{
+            width:48px;
+            height:48px;
+            border-radius:50%;
+            display:grid;
+            place-items:center;
+            box-sizing:border-box;
+            font-size:22px;
+            font-weight:900;
+            box-shadow:
+              0 4px 12px rgba(15,23,42,.10);
+          }
+
+          .tap-action-btn:active{
+            transform:scale(.96);
+          }
+
+          .tap-action-btn:disabled{
+            opacity:.55;
+          }
+
+          #abrirFacebookTap::before{
+            content:"f";
             background:#1877f2;
             color:#fff;
-            font-size:16px;
-            font-weight:800;
-          "
-        >
-          Publicar na Página do Facebook
-        </button>
+            font-family:
+              Arial,
+              Helvetica,
+              sans-serif;
+            font-size:28px;
+          }
 
-        <button
-          type="button"
-          id="compartilharGruposTap"
-          style="
-            width:100%;
-            margin-top:10px;
-            padding:14px;
-            border:0;
-            border-radius:12px;
-            background:#16a34a;
+          #abrirInstagramTap::before{
+            content:"◎";
+            background:#e1306c;
             color:#fff;
-            font-size:16px;
-            font-weight:800;
-          "
-        >
-          Compartilhar em Grupos
-        </button>
+            font-size:28px;
+            font-family:
+              Arial,
+              Helvetica,
+              sans-serif;
+          }
+
+          #canalPendenteTap::before{
+            content:"↗";
+            background:#e2e8f0;
+            color:#475569;
+            font-size:24px;
+          }
+
+          #copiarTapLink::before{
+            content:"🔗";
+            background:#eff6ff;
+            color:#2563eb;
+          }
+
+          #copiarTapLegenda::before{
+            content:"⧉";
+            background:#ecfdf5;
+            color:#15803d;
+            font-size:26px;
+          }
+
+          #compartilharGruposTap::before{
+            content:"👥";
+            background:#ecfdf5;
+            color:#15803d;
+          }
+        </style>
+
+        <div class="tap-action-grid">
+
+          ${
+            canal === 'facebook'
+              ? `
+                  <button
+                    type="button"
+                    id="abrirFacebookTap"
+                    class="tap-action-btn"
+                    title="Publicar no Facebook"
+                    aria-label="Publicar no Facebook"
+                  >Facebook</button>
+                `
+              : canal === 'instagram'
+                ? `
+                    <button
+                      type="button"
+                      id="abrirInstagramTap"
+                      class="tap-action-btn"
+                      title="Publicar no Instagram"
+                      aria-label="Publicar no Instagram"
+                    >Instagram</button>
+                  `
+                : `
+                    <button
+                      type="button"
+                      id="canalPendenteTap"
+                      class="tap-action-btn"
+                      disabled
+                    >${esc(canalLabel)}</button>
+                  `
+          }
+
+          <button
+            type="button"
+            id="copiarTapLink"
+            class="tap-action-btn"
+            title="Copiar somente o link"
+            aria-label="Copiar somente o link"
+          >Copiar link</button>
+
+          <button
+            type="button"
+            id="copiarTapLegenda"
+            class="tap-action-btn"
+            title="Copiar texto da publicação"
+            aria-label="Copiar texto da publicação"
+          >Copiar texto</button>
+
+          ${
+            canal === 'facebook'
+              ? `
+                  <button
+                    type="button"
+                    id="compartilharGruposTap"
+                    class="tap-action-btn"
+                    title="Compartilhar em grupos"
+                    aria-label="Compartilhar em grupos"
+                  >Grupos</button>
+                `
+              : ''
+          }
+
+        </div>
 
       </section>
     `;
@@ -1654,16 +2168,122 @@ async function abrirTapToPost(itemId, shopId){
 }
 
 
+document.addEventListener(
+  'click',
+  async e => {
+
+    if(
+      e.target.id !==
+        'copiarTapLink'
+    ){
+      return;
+    }
+
+    const button =
+      e.target;
+
+    const link =
+      String(
+        window.tapFacebookShare
+          ?.linkShopee ||
+        ''
+      ).trim();
+
+    if(!link){
+      alert(
+        'Link da Shopee não encontrado.'
+      );
+      return;
+    }
+
+    const channel =
+      String(
+        button.dataset.channel ||
+        'facebook'
+      )
+        .trim()
+        .toLowerCase();
+
+    const originalText =
+      button.textContent;
+
+    try{
+
+      if(
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ){
+        await navigator.clipboard
+          .writeText(link);
+
+      }else{
+
+        const temp =
+          document.createElement(
+            'textarea'
+          );
+
+        temp.value =
+          link;
+
+        temp.style.position =
+          'fixed';
+
+        temp.style.opacity =
+          '0';
+
+        document.body.appendChild(
+          temp
+        );
+
+        temp.select();
+
+        document.execCommand(
+          'copy'
+        );
+
+        temp.remove();
+      }
+
+      button.textContent =
+        'Link copiado';
+
+      setTimeout(
+        () => {
+          button.textContent =
+            originalText;
+        },
+        1400
+      );
+
+    }catch(error){
+
+      console.error(
+        '[copy-affiliate-link]',
+        error
+      );
+
+      alert(
+        'Não foi possível copiar o link.'
+      );
+    }
+  }
+);
+
+
 document.addEventListener('click', e => {
+  if (e.target.closest('.produce-media-btn')) {
+    return;
+  }
+
   const card = e.target.closest('.card');
 
   if(card){
-    const mobile =
-      window.matchMedia(
-        '(max-width: 700px)'
-      ).matches;
 
-    if(mobile){
+    const pronto =
+      card.dataset.ready === 'true';
+
+    if(pronto){
       abrirTapToPost(
         card.dataset.item,
         card.dataset.shop
@@ -1767,9 +2387,11 @@ document.addEventListener('click', async e => {
     return;
   }
 
-  const button = e.target;
+  const button =
+    e.target;
 
   const share =
+    window.tapChannelShare ||
     window.tapFacebookShare;
 
   const media =
@@ -1786,6 +2408,365 @@ document.addEventListener('click', async e => {
     return;
   }
 
+
+  /*
+   * ==========================================================
+   * DESKTOP / NOTEBOOK
+   * ==========================================================
+   *
+   * No Windows, navigator.share abre o painel nativo
+   * do sistema e normalmente o Facebook não aparece.
+   *
+   * Por isso:
+   * 1. copia a publicação;
+   * 2. abre os Grupos do Facebook no navegador.
+   * ==========================================================
+   */
+
+  const isMobile =
+    /Android|iPhone|iPad|iPod|Mobile/i
+      .test(navigator.userAgent) ||
+    (
+      /Macintosh/i.test(
+        navigator.userAgent
+      ) &&
+      navigator.maxTouchPoints > 1
+    );
+
+
+  if(!isMobile){
+
+    /*
+     * ========================================================
+     * NOTEBOOK / DESKTOP
+     * ========================================================
+     *
+     * 1. Publica diretamente na Página Mix de Produtos.
+     * 2. Usa a foto escolhida na Central.
+     * 3. Usa a legenda completa preparada.
+     * 4. Abre o post publicado no Facebook.
+     * 5. O usuário pode compartilhar esse post nos grupos.
+     * ========================================================
+     */
+
+    if(
+      !media ||
+      !media.coverUrl
+    ){
+      alert(
+        'Escolha uma foto de capa.'
+      );
+      return;
+    }
+
+    const originalText =
+      button.textContent;
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      'Publicando...';
+
+
+    /*
+     * Abre uma aba durante o clique do usuário.
+     * Depois apontamos essa aba para o post criado.
+     * Isso evita bloqueio de popup após o await.
+     */
+    const facebookTab =
+      window.open(
+        'about:blank',
+        '_blank'
+      );
+
+    try{
+
+      const response =
+        await fetch(
+          '/admin/vitrine2/marketing/meta/publish',
+          {
+            method:
+              'POST',
+
+            headers:{
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify({
+                marketplace:
+                  'shopee',
+
+                itemId:
+                  String(
+                    share.itemId
+                  ),
+
+                channels:[
+                  'facebook'
+                ],
+
+                format:
+                  'photo',
+
+                imageUrl:
+                  media.coverUrl,
+
+                caption:
+                  share.legenda
+              })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if(
+        !response.ok ||
+        !data.success
+      ){
+        throw new Error(
+          data?.channels
+            ?.facebook
+            ?.error
+            ?.message ||
+          data?.error
+            ?.message ||
+          'Não foi possível publicar no Facebook.'
+        );
+      }
+
+
+      const facebookResult =
+        data?.channels
+          ?.facebook ||
+        {};
+
+
+      if(
+        facebookResult.success ===
+          false
+      ){
+        throw new Error(
+          facebookResult
+            ?.error
+            ?.message ||
+          'Não foi possível publicar no Facebook.'
+        );
+      }
+
+
+      /*
+       * Atualiza a fila da IA da mesma forma
+       * que o botão Facebook normal.
+       */
+      let statusLocalOk =
+        true;
+
+      if(
+        share.queueItemId
+      ){
+        try{
+
+          const statusResponse =
+            await fetch(
+              `/api/ai/content/${
+                encodeURIComponent(
+                  share.queueItemId
+                )
+              }/published`,
+              {
+                method:
+                  'POST',
+
+                headers:{
+                  'Content-Type':
+                    'application/json'
+                },
+
+                body:
+                  JSON.stringify({
+                    channel:
+                      'facebook'
+                  })
+              }
+            );
+
+
+          const statusData =
+            await statusResponse
+              .json();
+
+
+          if(
+            !statusResponse.ok ||
+            !statusData.success
+          ){
+            throw new Error(
+              statusData.error ||
+              'Falha ao registrar publicação.'
+            );
+          }
+
+
+          await carregarIa();
+
+
+        }catch(statusError){
+
+          statusLocalOk =
+            false;
+
+          console.error(
+            '[groups-desktop-published-status]',
+            statusError
+          );
+        }
+      }
+
+
+      /*
+       * Monta o endereço do post recém-publicado.
+       *
+       * Normalmente postId:
+       * PAGE_ID_POST_ID
+       */
+      const postId =
+        String(
+          facebookResult.postId ||
+          ''
+        ).trim();
+
+      const photoId =
+        String(
+          facebookResult.photoId ||
+          ''
+        ).trim();
+
+
+      let facebookUrl =
+        'https://www.facebook.com/';
+
+
+      if(
+        postId &&
+        postId.includes('_')
+      ){
+
+        const parts =
+          postId.split('_');
+
+        const pageId =
+          parts[0];
+
+        const storyId =
+          parts
+            .slice(1)
+            .join('_');
+
+        facebookUrl =
+          'https://www.facebook.com/permalink.php' +
+          '?story_fbid=' +
+          encodeURIComponent(
+            storyId
+          ) +
+          '&id=' +
+          encodeURIComponent(
+            pageId
+          );
+
+      }else if(postId){
+
+        facebookUrl =
+          'https://www.facebook.com/' +
+          encodeURIComponent(
+            postId
+          );
+
+      }else if(photoId){
+
+        facebookUrl =
+          'https://www.facebook.com/photo/?fbid=' +
+          encodeURIComponent(
+            photoId
+          );
+      }
+
+
+      button.textContent =
+        statusLocalOk
+          ? 'Publicado ✓'
+          : 'Publicado ✓';
+
+
+      if(facebookTab){
+
+        facebookTab.location.href =
+          facebookUrl;
+
+      }else{
+
+        alert(
+          'Publicado com sucesso. ' +
+          'O navegador bloqueou a abertura do Facebook.'
+        );
+      }
+
+
+      setTimeout(
+        () => {
+          button.disabled =
+            false;
+
+          button.textContent =
+            originalText;
+        },
+        2000
+      );
+
+
+    }catch(error){
+
+      if(
+        facebookTab &&
+        !facebookTab.closed
+      ){
+        facebookTab.close();
+      }
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        originalText;
+
+      console.error(
+        '[groups-desktop-publish]',
+        error
+      );
+
+      alert(
+        error.message
+      );
+    }
+
+    return;
+  }
+
+
+  /*
+   * ==========================================================
+   * CELULAR / TABLET
+   * ==========================================================
+   *
+   * Mantém o compartilhamento nativo.
+   * ==========================================================
+   */
+
   if(!navigator.share){
     alert(
       'Este navegador não suporta o compartilhamento nativo.'
@@ -1797,6 +2778,7 @@ document.addEventListener('click', async e => {
     button.textContent;
 
   button.disabled = true;
+
   button.textContent =
     'Preparando compartilhamento...';
 
@@ -1806,10 +2788,6 @@ document.addEventListener('click', async e => {
       title:
         'Oferta Shopee',
 
-      /*
-       * O link já está dentro da legenda.
-       * Também enviamos no campo URL separado.
-       */
       text:
         share.legenda,
 
@@ -1820,10 +2798,6 @@ document.addEventListener('click', async e => {
 
     /*
      * Tenta anexar a foto escolhida.
-     *
-     * Se a Shopee bloquear a leitura da imagem
-     * pelo navegador, o compartilhamento continua
-     * normalmente com legenda + link.
      */
     if(
       media &&
@@ -1880,24 +2854,23 @@ document.addEventListener('click', async e => {
           'Continuando com texto e link.',
           imageError
         );
-
       }
     }
 
 
-    let legendaCopiada = false;
-
+    /*
+     * Também deixa a legenda no clipboard.
+     */
     try{
 
       if(
         navigator.clipboard &&
         navigator.clipboard.writeText
       ){
-        await navigator.clipboard.writeText(
-          share.legenda
-        );
-
-        legendaCopiada = true;
+        await navigator.clipboard
+          .writeText(
+            share.legenda
+          );
       }
 
     }catch(copyError){
@@ -1906,31 +2879,37 @@ document.addEventListener('click', async e => {
         '[groups-share] Legenda não copiada automaticamente.',
         copyError
       );
-
     }
 
+
     button.textContent =
-      legendaCopiada
-        ? 'Legenda copiada · Abrindo Facebook...'
-        : 'Abrindo Facebook...';
+      'Abrindo compartilhamento...';
 
     await navigator.share(
       shareData
     );
 
     button.textContent =
-      'Compartilhamento enviado ✓';
+      'Compartilhado ✓';
 
-    setTimeout(() => {
-      button.disabled = false;
-      button.textContent =
-        originalText;
-    }, 2000);
+
+    setTimeout(
+      () => {
+        button.disabled =
+          false;
+
+        button.textContent =
+          originalText;
+      },
+      1800
+    );
 
 
   }catch(error){
 
-    button.disabled = false;
+    button.disabled =
+      false;
+
     button.textContent =
       originalText;
 
@@ -1948,6 +2927,214 @@ document.addEventListener('click', async e => {
 
     alert(
       'Não foi possível abrir o compartilhamento.'
+    );
+  }
+});
+
+
+document.addEventListener('click', async e => {
+
+  if(e.target.id !== 'abrirInstagramTap'){
+    return;
+  }
+
+  const button =
+    e.target;
+
+  const share =
+    window.tapChannelShare;
+
+  const media =
+    window.tapToPostState;
+
+
+  if(
+    !share ||
+    share.channel !== 'instagram' ||
+    !share.itemId ||
+    !share.legenda
+  ){
+    alert(
+      'Dados da publicação do Instagram não encontrados.'
+    );
+    return;
+  }
+
+
+  if(
+    !media ||
+    !media.coverUrl
+  ){
+    alert(
+      'Escolha uma foto para o Instagram.'
+    );
+    return;
+  }
+
+
+  const originalText =
+    button.textContent;
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    'Publicando...';
+
+
+  try{
+
+    const response =
+      await fetch(
+        '/admin/vitrine2/marketing/meta/publish',
+        {
+          method:
+            'POST',
+
+          headers:{
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              marketplace:
+                'shopee',
+
+              itemId:
+                String(
+                  share.itemId
+                ),
+
+              channels:[
+                'instagram'
+              ],
+
+              format:
+                'photo',
+
+              imageUrl:
+                media.coverUrl,
+
+              caption:
+                share.legenda
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(
+      !response.ok ||
+      !data.success
+    ){
+      throw new Error(
+        data?.channels
+          ?.instagram
+          ?.error
+          ?.message ||
+        data?.error
+          ?.message ||
+        'Não foi possível publicar no Instagram.'
+      );
+    }
+
+
+    let statusLocalOk =
+      true;
+
+
+    if(share.queueItemId){
+
+      try{
+
+        const statusResponse =
+          await fetch(
+            `/api/ai/content/${
+              encodeURIComponent(
+                share.queueItemId
+              )
+            }/published`,
+            {
+              method:
+                'POST',
+
+              headers:{
+                'Content-Type':
+                  'application/json'
+              },
+
+              body:
+                JSON.stringify({
+                  channel:
+                    'instagram'
+                })
+            }
+          );
+
+
+        const statusData =
+          await statusResponse.json();
+
+
+        if(
+          !statusResponse.ok ||
+          !statusData.success
+        ){
+          throw new Error(
+            statusData.error ||
+            'Falha ao registrar publicação.'
+          );
+        }
+
+
+        await carregarIa();
+
+
+      }catch(statusError){
+
+        statusLocalOk =
+          false;
+
+        console.error(
+          '[instagram-published-status]',
+          statusError
+        );
+      }
+    }
+
+
+    button.textContent =
+      statusLocalOk
+        ? 'Publicado ✓'
+        : 'Publicado ✓ · status pendente';
+
+
+    alert(
+      statusLocalOk
+        ? 'Publicação enviada para o Instagram.'
+        : 'Publicado no Instagram, mas o status local ficou pendente.'
+    );
+
+
+  }catch(error){
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      originalText;
+
+    console.error(
+      '[instagram-publish]',
+      error
+    );
+
+    alert(
+      error.message
     );
   }
 });
@@ -2157,18 +3344,55 @@ document.addEventListener('click', async e => {
 
 
 document.addEventListener('click', e => {
+  const iaAtiva =
+    document.getElementById('tabIa')
+      ?.classList.contains('active');
+
   if(e.target.id === 'anterior'){
-    offset = Math.max(0, offset - 24);
-    carregarProdutos();
-    window.scrollTo({top:0, behavior:'smooth'});
+    if(iaAtiva){
+      iaOffset =
+        Math.max(
+          0,
+          iaOffset - IA_PAGE_SIZE
+        );
+
+      carregarIa();
+    }else{
+      offset =
+        Math.max(
+          0,
+          offset - 24
+        );
+
+      carregarProdutos();
+    }
+
+    window.scrollTo({
+      top:0,
+      behavior:'smooth'
+    });
   }
 
   if(e.target.id === 'proxima'){
-    if(offset + 24 < totalProdutos){
-      offset += 24;
-      carregarProdutos();
-      window.scrollTo({top:0, behavior:'smooth'});
+    if(iaAtiva){
+      if(
+        iaOffset + IA_PAGE_SIZE <
+        iaTotal
+      ){
+        iaOffset += IA_PAGE_SIZE;
+        carregarIa();
+      }
+    }else{
+      if(offset + 24 < totalProdutos){
+        offset += 24;
+        carregarProdutos();
+      }
     }
+
+    window.scrollTo({
+      top:0,
+      behavior:'smooth'
+    });
   }
 });
 
@@ -2180,6 +3404,10 @@ carregarProdutos();
 
 
 <script id="ai-tab-controller">
+
+let iaOffset = 0;
+let iaTotal = 0;
+const IA_PAGE_SIZE = 24;
 
 function ativarTodos(){
   document.getElementById('tabTodos')
@@ -2219,7 +3447,9 @@ function ativarIa(){
     .style.display = 'none';
 
   document.getElementById('paginacao')
-    .style.display = 'none';
+    .style.display = 'flex';
+
+  atualizarPaginacaoIa();
 }
 
 
@@ -2533,6 +3763,16 @@ function criarCardIa(item){
             Preparar conteúdo
           </button>
 
+          <button
+            type="button"
+            class="ai-btn-primary"
+            data-ai-produce-media="${esc(item.itemId)}"
+            data-ai-shop-id="${esc(item.shopId || '')}"
+            style="background:#087f8c;margin-top:8px"
+          >
+            🎬 Produzir mídia
+          </button>
+
         </div>
 
       </div>
@@ -2540,6 +3780,31 @@ function criarCardIa(item){
     </article>
   `;
 }
+
+
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-ai-produce-media]');
+
+  if (!button) return;
+
+  const itemId = button.dataset.aiProduceMedia;
+  const shopId = button.dataset.aiShopId;
+
+  if (!/^\d+$/.test(itemId)) {
+    alert('Não foi possível identificar este produto.');
+    return;
+  }
+
+  const params = new URLSearchParams({ itemId });
+
+  if (/^\d+$/.test(shopId)) {
+    params.set('shopId', shopId);
+  }
+
+  window.location.href =
+    '/admin/vitrine2/marketing/video-production?' +
+    params.toString();
+});
 
 </script>
 
@@ -2690,14 +3955,13 @@ async function carregarIa(){
   produtosEl.innerHTML =
     '<div class="ai-empty">Carregando avaliações...</div>';
 
-  filaEl.innerHTML =
-    '<div class="ai-empty">Carregando conteúdos...</div>';
-
   try{
     const [rResumo, rAnalises, rFila] =
       await Promise.all([
         fetch('/api/ai/summary'),
-        fetch('/api/ai/analyses?limit=100&offset=0'),
+        fetch(
+          `/api/ai/analyses?limit=${IA_PAGE_SIZE}&offset=${iaOffset}`
+        ),
         fetch('/api/ai/content-queue')
       ]);
 
@@ -2709,6 +3973,14 @@ async function carregarIa(){
 
     const fila =
       await rFila.json();
+
+    iaTotal = Number(analises.total || 0);
+
+    totalEl.textContent =
+      iaTotal.toLocaleString('pt-BR') +
+      ' produtos';
+
+    atualizarPaginacaoIa();
 
     if(!rResumo.ok || !resumo.success){
       throw new Error(
@@ -2738,7 +4010,8 @@ async function carregarIa(){
       resumo.analysis?.needsReview ?? 0;
 
     document.getElementById('iaConteudos').textContent =
-      resumo.queue?.readyForApproval ?? 0;
+      Number(resumo.queue?.approved || 0) +
+      Number(resumo.queue?.published || 0);
 
     produtosEl.innerHTML =
       analises.items.length
@@ -2748,10 +4021,13 @@ async function carregarIa(){
     window.aiQueueItems =
       fila.items || [];
 
-    filaEl.innerHTML =
-      fila.items.length
-        ? fila.items.map(criarCardFila).join('')
-        : '<div class="ai-empty">Nenhum conteúdo preparado ainda.</div>';
+    /*
+     * A fila continua disponível como dado/histórico,
+     * mas não é mais renderizada em milhares de cards.
+     */
+    if(filaEl){
+      filaEl.innerHTML = '';
+    }
 
   }catch(err){
     produtosEl.innerHTML =
@@ -2759,8 +4035,58 @@ async function carregarIa(){
   }
 }
 
+function atualizarPaginacaoIa(){
+  const info =
+    document.getElementById('paginaInfo');
+
+  const anterior =
+    document.getElementById('anterior');
+
+  const proxima =
+    document.getElementById('proxima');
+
+  const totalPaginas =
+    Math.max(
+      1,
+      Math.ceil(iaTotal / IA_PAGE_SIZE)
+    );
+
+  const paginaAtual =
+    Math.floor(iaOffset / IA_PAGE_SIZE) + 1;
+
+  const primeiro =
+    iaTotal > 0
+      ? iaOffset + 1
+      : 0;
+
+  const ultimo =
+    Math.min(
+      iaOffset + IA_PAGE_SIZE,
+      iaTotal
+    );
+
+  if(info){
+    info.textContent =
+      `${primeiro.toLocaleString('pt-BR')}–${ultimo.toLocaleString('pt-BR')} de ${iaTotal.toLocaleString('pt-BR')} • Página ${paginaAtual.toLocaleString('pt-BR')} de ${totalPaginas.toLocaleString('pt-BR')}`;
+  }
+
+  if(anterior){
+    anterior.disabled =
+      iaOffset <= 0;
+  }
+
+  if(proxima){
+    proxima.disabled =
+      iaOffset + IA_PAGE_SIZE >= iaTotal;
+  }
+}
+
+
 document.getElementById('tabIa')
-  .addEventListener('click', carregarIa);
+  .addEventListener('click', () => {
+    iaOffset = 0;
+    carregarIa();
+  });
 
 </script>
 
@@ -3441,8 +4767,9 @@ function mostrarConteudoIa(item){
                 <button
                   type="button"
                   class="ai-btn-primary"
-                  data-ai-approve-facebook="${esc(item.id)}"
+                  data-ai-approve-channel="${esc(item.id)}"
                   data-item-id="${esc(item.itemId)}"
+                  data-channel="${esc(item.channel || 'facebook')}"
                   style="
                     width:100%;
                     padding:14px;
@@ -3450,7 +4777,12 @@ function mostrarConteudoIa(item){
                     font-weight:800;
                   "
                 >
-                  Aprovar e continuar para Facebook
+                  Aprovar e continuar para ${esc(
+                    nomeCanalTap(
+                      item.channel ||
+                      'facebook'
+                    )
+                  )}
                 </button>
               `
             : ''
@@ -3462,8 +4794,9 @@ function mostrarConteudoIa(item){
                 <button
                   type="button"
                   class="ai-btn-primary"
-                  data-ai-continue-facebook="${esc(item.id)}"
+                  data-ai-continue-channel="${esc(item.id)}"
                   data-item-id="${esc(item.itemId)}"
+                  data-channel="${esc(item.channel || 'facebook')}"
                   style="
                     width:100%;
                     padding:14px;
@@ -3472,7 +4805,12 @@ function mostrarConteudoIa(item){
                     background:#1877f2;
                   "
                 >
-                  Continuar para Facebook
+                  Continuar para ${esc(
+                    nomeCanalTap(
+                      item.channel ||
+                      'facebook'
+                    )
+                  )}
                 </button>
               `
             : ''
@@ -3489,7 +4827,12 @@ function mostrarConteudoIa(item){
                   font-weight:800;
                   text-align:center;
                 ">
-                  Publicado no Facebook ✓
+                  Publicado em ${esc(
+                    nomeCanalTap(
+                      item.channel ||
+                      'facebook'
+                    )
+                  )} ✓
                 </div>
               `
             : ''
@@ -3542,34 +4885,42 @@ document.addEventListener(
   'click',
   async e => {
 
-    const approveFacebook =
+    const approveChannel =
       e.target.closest(
-        '[data-ai-approve-facebook]'
+        '[data-ai-approve-channel]'
       );
 
-    const continueFacebook =
+    const continueChannel =
       e.target.closest(
-        '[data-ai-continue-facebook]'
+        '[data-ai-continue-channel]'
       );
 
     if(
-      !approveFacebook &&
-      !continueFacebook
+      !approveChannel &&
+      !continueChannel
     ){
       return;
     }
 
     const button =
-      approveFacebook ||
-      continueFacebook;
+      approveChannel ||
+      continueChannel;
+
+    const channel =
+      String(
+        button.dataset.channel ||
+        'facebook'
+      )
+        .trim()
+        .toLowerCase();
 
     const itemId =
       button.dataset.itemId;
 
     const queueId =
-      approveFacebook
-        ? approveFacebook.dataset.aiApproveFacebook
-        : continueFacebook.dataset.aiContinueFacebook;
+      approveChannel
+        ? approveChannel.dataset.aiApproveChannel
+        : continueChannel.dataset.aiContinueChannel;
 
     const originalText =
       button.textContent;
@@ -3578,7 +4929,7 @@ document.addEventListener(
 
     try{
 
-      if(approveFacebook){
+      if(approveChannel){
 
         button.textContent =
           'Aprovando...';
@@ -3610,11 +4961,14 @@ document.addEventListener(
       }
 
       button.textContent =
-        'Abrindo Facebook...';
+        'Abrindo ' +
+        nomeCanalTap(channel) +
+        '...';
 
       await abrirTapToPost(
         itemId,
-        null
+        null,
+        channel
       );
 
     }catch(error){

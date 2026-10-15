@@ -156,7 +156,6 @@ Responda SOMENTE um JSON válido e curto:
             format: 'json',
 
             options: {
-                timeoutMs: 20000,
                 think: false,
                 temperature: 0.2,
                 num_predict: 180

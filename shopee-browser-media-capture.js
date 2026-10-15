@@ -36,7 +36,7 @@ function isGalleryCandidate(value) {
 
     return (
         /_tn(?:\?|$)/i.test(url) ||
-        /@resize_w(?:82|164)_nl(?:\.webp)?(?:\?|$)/i.test(url)
+        /@resize_w\d+_nl(?:\.webp)?(?:\?|$)/i.test(url)
     );
 }
 

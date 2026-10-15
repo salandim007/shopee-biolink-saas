@@ -40,7 +40,100 @@ const {
 } = require('./reel-generator');
 
 
+const {
+    generatePostText
+} = require('../ai/post-text-generator');
+
 const router = express.Router();
+
+const {
+    getProductByItemId
+} = require('../product-media-service');
+
+router.get('/api/catalog-product/:itemId', async (req, res) => {
+    try {
+        const itemId = String(req.params.itemId || '').trim();
+
+        if (!/^\\d+$/.test(itemId)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Identificador de produto inválido.'
+            });
+        }
+
+        const product = await getProductByItemId(itemId);
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                error: 'Produto não encontrado no catálogo.'
+            });
+        }
+
+        return res.set('Cache-Control', 'no-store').json({
+            success: true,
+            product
+        });
+    } catch (error) {
+        console.error('[VIDEO CATALOG PRODUCT]', error);
+
+        return res.status(500).json({
+            success: false,
+            error: 'Não foi possível consultar o produto.'
+        });
+    }
+});
+
+
+
+
+
+/*
+ * Gera legenda comercial para revisão.
+ * Não publica em nenhuma rede social.
+ */
+router.post('/api/post-text/generate', async (req, res) => {
+    try {
+        const product = req.body?.product;
+
+        if (
+            !product ||
+            typeof product !== 'object' ||
+            Array.isArray(product) ||
+            !/^\\d+$/.test(String(product.itemId || '')) ||
+            !String(product.title || '').trim()
+        ) {
+            return res.status(400).json({
+                success: false,
+                error: 'Produto inválido para gerar legenda.'
+            });
+        }
+
+        const generated = await generatePostText(product, {
+            channel: 'instagram'
+        });
+
+        const caption = String(
+            generated?.content?.body || ''
+        ).trim();
+
+        if (!caption) {
+            throw new Error('A IA não retornou uma legenda.');
+        }
+
+        return res.set('Cache-Control', 'no-store').json({
+            success: true,
+            caption
+        });
+    } catch (error) {
+        console.error('[MEDIA POST TEXT]', error);
+
+        return res.status(500).json({
+            success: false,
+            error: 'Não foi possível gerar a legenda.'
+        });
+    }
+});
 
 
 router.get(

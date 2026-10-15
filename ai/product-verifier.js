@@ -198,7 +198,6 @@ motivo = no máximo 8 palavras
             format: 'json',
 
             options: {
-                timeoutMs: 20000,
                 think: false,
                 temperature: 0,
                 num_predict: 64

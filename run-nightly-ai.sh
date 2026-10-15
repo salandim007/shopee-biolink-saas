@@ -23,14 +23,12 @@ BRAZIL_TIME="$(
 
 #
 # Janela oficial de processamento:
-# 02:00 até 06:59 no horário de São Paulo.
+# 01:00 até 06:59 no horário de São Paulo.
 #
 # O cron chama este script de hora em hora.
 # Fora da janela, ele termina sem processar.
 #
-if (( 10#$BRAZIL_HOUR < 2 || 10#$BRAZIL_HOUR > 6 )); then
-  exit 0
-fi
+# Processamento contínuo permitido 24 horas.
 
 echo "[$BRAZIL_TIME] Verificação do processamento noturno."
 
@@ -56,8 +54,12 @@ echo "Hora Brasil: $BRAZIL_TIME"
 echo "========================================"
 
 if docker exec \
+  -e POST_TEXT_MODEL=qwen3.5:4b \
+  -e TEXT_BLOCK_SIZE=20 \
+  -e TEXT_MAX_PRODUCTS=100000 \
+  -e TEXT_TIME_ZONE=America/Sao_Paulo \
   shopee-biolink \
-  node /app/ai/run-nightly-content-prep.js
+  node /app/ai/run-nightly-post-texts.js
 then
 
   printf '%s\n' \

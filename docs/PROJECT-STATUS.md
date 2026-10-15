@@ -474,3 +474,43 @@ Documento:
 - Publicação automática em grupos via Graph API não é usada neste fluxo.
 - Automação de cliques/UI permanece como plano B futuro.
 
+
+## 2026-10-13 — Geração assíncrona de vídeos MP4 validada
+
+Commit: 241f868
+
+Problema:
+- O FFmpeg gerava MP4, mas a requisição HTTP era interrompida.
+- Nginx registrava 504; posteriormente foi observado 499.
+- Os MP4s eram salvos, mas não apareciam na Central.
+
+Solução validada:
+- POST /admin/vitrine2/marketing/video-production/api/generate
+  responde 202 com jobId.
+- O backend executa generateReel() em segundo plano.
+- Cada tarefa registra status.json no diretório de saída.
+- GET /api/generate/:jobId/status informa processing,
+  completed ou failed.
+- A Central consulta o status a cada 3 segundos.
+- Ao concluir, o MP4 aparece na própria Central.
+- Teste visual aprovado pelo usuário.
+
+Arquivos principais:
+- marketing/video-production-routes.js
+- marketing/reel-generator.js
+- views/video-production.ejs
+- marketing/video-production-library.js
+
+Infraestrutura:
+- FFmpeg local no container shopee-biolink.
+- Arquivos persistentes em data/video-production/outputs.
+- Nginx Proxy Manager: timeout do domínio ajustado para 600s.
+- Kaggle não é necessário para essa geração.
+
+Pendências:
+- Simplificar capas para uso temporário, sem acúmulo.
+- Melhorar templates e storyboard.
+- Implementar recuperação automática de tarefas na interface.
+- Evoluir posteriormente para geração com IA/Kaggle.
+
+REGRA: NÃO reconstruir o gerador FFmpeg já validado.
