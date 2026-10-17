@@ -3,6 +3,33 @@
 
 const DEFAULT_MIN_IMAGES = 3;
 
+// Recursos da pagina Shopee confirmados como indevidos.
+// Nao pertencem as galerias dos produtos.
+const BLOCKED_IMAGE_IDS = new Set([
+    'br-11134233-820m9-mt9i4ccwhhq881',
+    'aed1aaab6a81b4347b440d981f0cf76f',
+    '531a1a0e62d0f9875a56390970e5a845',
+    'br-11134258-7r98o-m9rsxkghyiv667',
+    '33b3213444ab1fa40c1eb7abf8b91b11',
+    'ddf4fb18c6fa5e2d73459a7a7ea0953b',
+    '27788e45f5489f39ef1e774e9bbedb6f',
+    '2c0f5bda4ce39caff001e7ccec309bc6',
+    '3b43f8cafbf943868154166639011597'
+]);
+
+function isAllowedProductImage(value) {
+    try {
+        const url = new URL(String(value));
+        const filename = url.pathname.split('/').pop()
+            .replace(/@resize_w\d+_nl(?:\.webp)?$/i, '')
+            .replace(/_tn$/i, '');
+
+        return !BLOCKED_IMAGE_IDS.has(filename);
+    } catch {
+        return false;
+    }
+}
+
 
 function normalizeText(value) {
     if (
@@ -335,7 +362,7 @@ function createProductMediaLibrary(
             mergeUrlLists(
                 mediaInput.image,
                 mediaInput.images
-            );
+            ).filter(isAllowedProductImage);
 
         const incomingVideos =
             mergeUrlLists(
