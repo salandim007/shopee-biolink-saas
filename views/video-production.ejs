@@ -2390,7 +2390,11 @@ function renderStoryboard() {
                 selectedApprovedCoverId
         ) || null;
 
-    if (selectedCover) {
+    if (
+        selectedCover &&
+        currentProductItemId() &&
+        String(selectedCover.itemId || '') === currentProductItemId()
+    ) {
         html.push(
             `
                 <div class="story-item">
@@ -2787,21 +2791,8 @@ async function loadProductMedia() {
                 )
                 .filter(Boolean);
 
-        status.textContent =
-            'Buscando galeria completa do produto...';
-
-        const galleryImages =
-            await loadShopeeProductGallery(
-                product
-            );
-
         productPhotos =
-            [
-                ...new Set([
-                    ...baseImages,
-                    ...galleryImages
-                ])
-            ];
+            [...new Set(baseImages)];
 
         console.log(
             '[VIDEO PRODUCT PHOTOS]',
@@ -2810,7 +2801,7 @@ async function loadProductMedia() {
                     baseImages.length,
 
                 galeria:
-                    galleryImages.length,
+                    0,
 
                 total:
                     productPhotos.length
@@ -2930,7 +2921,11 @@ async function generateProductionVideo() {
                 openingId: selected.opening,
                 closingId: selected.closing,
                 musicId: selected.music,
-                coverId: selectedApprovedCoverId
+                coverId: approvedCovers.some(
+                    cover =>
+                        cover.id === selectedApprovedCoverId &&
+                        String(cover.itemId || '') === currentProductItemId()
+                ) ? selectedApprovedCoverId : null
             })
         });
 
@@ -3406,16 +3401,11 @@ function renderApprovedCovers() {
     const itemId =
         currentProductItemId();
 
-    const visible =
-        itemId
-            ? approvedCovers.filter(
-                cover =>
-                    !cover.itemId ||
-                    String(
-                        cover.itemId
-                    ) === itemId
-            )
-            : approvedCovers;
+    const visible = itemId
+        ? approvedCovers.filter(
+            cover => String(cover.itemId || '') === itemId
+        )
+        : [];
 
     count.textContent =
         `${visible.length} ${
