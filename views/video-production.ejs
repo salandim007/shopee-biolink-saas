@@ -976,6 +976,27 @@
                             onclick="selectCoverPalette('dourado', this)"
                             style="--palette:#e7cd99"
                         >Dourado</button>
+
+                        <button type="button"
+                            class="cover-palette-btn"
+                            data-palette="esmeralda"
+                            onclick="selectCoverPalette('esmeralda', this)"
+                            style="--palette:#15985d"
+                        >Esmeralda</button>
+
+                        <button type="button"
+                            class="cover-palette-btn"
+                            data-palette="magenta"
+                            onclick="selectCoverPalette('magenta', this)"
+                            style="--palette:#c04490"
+                        >Magenta</button>
+
+                        <button type="button"
+                            class="cover-palette-btn"
+                            data-palette="royal"
+                            onclick="selectCoverPalette('royal', this)"
+                            style="--palette:#3155c7"
+                        >Azul-royal</button>
                     </div>
                 </div>
 
@@ -1852,6 +1873,9 @@ let productPhotos = [];
 let selectedPhotos = [];
 let currentCover = null;
 let selectedCoverPalette = 'coral';
+let coverPreviewRequestId = 0;
+let coverPaletteTimer = null;
+let coverPreviewActive = false;
 
 let approvedCovers = [];
 let selectedApprovedCoverId = null;
@@ -1995,6 +2019,10 @@ function resetCoverPreview() {
     }
 
     currentCover = null;
+    coverPreviewActive = false;
+    coverPreviewRequestId++;
+    clearTimeout(coverPaletteTimer);
+    coverPaletteTimer = null;
 
     const approveButton =
         document.getElementById(
@@ -3351,6 +3379,29 @@ function selectCoverPalette(
             'selected'
         );
     }
+
+    if (!currentProduct || !coverPreviewActive) {
+        return;
+    }
+
+    // Invalida imediatamente qualquer resposta anterior.
+    coverPreviewRequestId++;
+    currentCover = null;
+
+    const approveButton =
+        document.getElementById('approveCoverBtn');
+
+    if (approveButton) {
+        approveButton.disabled = true;
+    }
+
+    clearTimeout(coverPaletteTimer);
+
+    // Aguarda o usuário terminar de escolher a cor.
+    coverPaletteTimer = setTimeout(() => {
+        coverPaletteTimer = null;
+        generateCoverPreview();
+    }, 250);
 }
 
 
@@ -3767,8 +3818,27 @@ async function generateCoverPreview() {
             'generatedCoverMeta'
         );
 
+    clearTimeout(coverPaletteTimer);
+    coverPaletteTimer = null;
+
+    const requestId = ++coverPreviewRequestId;
+    coverPreviewActive = true;
+    currentCover = null;
+
+    const approveButton =
+        document.getElementById('approveCoverBtn');
+
+    if (approveButton) {
+        approveButton.disabled = true;
+    }
+
+    if (!button.dataset.coverOriginalLabel) {
+        button.dataset.coverOriginalLabel =
+            button.textContent;
+    }
+
     const oldText =
-        button.textContent;
+        button.dataset.coverOriginalLabel;
 
     button.disabled = true;
     button.textContent =
@@ -3847,6 +3917,10 @@ async function generateCoverPreview() {
         const payload =
             await response.json();
 
+        if (requestId !== coverPreviewRequestId) {
+            return;
+        }
+
         if (
             !response.ok ||
             !payload.success
@@ -3918,16 +3992,19 @@ async function generateCoverPreview() {
             'Capa gerada com sucesso.'
         );
     } catch (error) {
-        console.error(error);
+        if (requestId === coverPreviewRequestId) {
+            console.error(error);
 
-        toast(
-            error.message ||
-            'Erro ao gerar capa.'
-        );
+            toast(
+                error.message ||
+                'Erro ao gerar capa.'
+            );
+        }
     } finally {
-        button.disabled = false;
-        button.textContent =
-            oldText;
+        if (requestId === coverPreviewRequestId) {
+            button.disabled = false;
+            button.textContent = oldText;
+        }
     }
 }
 

@@ -536,6 +536,13 @@ async function getProductMedia(
         title:
             text(product.title),
 
+        price:
+            product.offer?.currentPrice ??
+            product.offer?.salePrice ??
+            product.salePrice ??
+            product.price ??
+            null,
+
         originalUrl:
             identity.originalUrl,
 

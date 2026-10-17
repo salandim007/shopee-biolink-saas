@@ -271,6 +271,36 @@ const COVER_PALETTES = Object.freeze({
         band1: '#8d7048',
         band2: '#ba9663',
         accent: '#a96f27'
+    },
+
+    esmeralda: {
+        bg1: '#58c99b',
+        bg2: '#a5ead0',
+        bg3: '#e0fae9',
+        panel: '#15985d',
+        band1: '#086a4c',
+        band2: '#27ae78',
+        accent: '#075d45'
+    },
+
+    magenta: {
+        bg1: '#e892c3',
+        bg2: '#f6c9e0',
+        bg3: '#fff0f8',
+        panel: '#c04490',
+        band1: '#832c75',
+        band2: '#ba599e',
+        accent: '#86225d'
+    },
+
+    royal: {
+        bg1: '#84a9f5',
+        bg2: '#bdd1fc',
+        bg3: '#ebf1ff',
+        panel: '#3155c7',
+        band1: '#203d91',
+        band2: '#5476de',
+        accent: '#244ab5'
     }
 });
 
@@ -442,24 +472,33 @@ async function buildOfertaForteSvg(
                 filter="url(#productShadow)"
             >
                 <rect
-                    x="786"
-                    y="72"
-                    width="445"
-                    height="535"
+                    x="750"
+                    y="43"
+                    width="480"
+                    height="610"
                     rx="34"
                     fill="#ffffff"
                     stroke="#ffffff"
                     stroke-width="11"
                 />
 
-                <image
-                    href="${productImage}"
-                    x="801"
-                    y="87"
-                    width="415"
-                    height="505"
-                    preserveAspectRatio="xMidYMid meet"
-                />
+                <svg
+                    x="760"
+                    y="53"
+                    width="460"
+                    height="590"
+                    viewBox="0 0 460 590"
+                    overflow="hidden"
+                >
+                    <image
+                        href="${productImage}"
+                        x="-46"
+                        y="-59"
+                        width="552"
+                        height="708"
+                        preserveAspectRatio="xMidYMid meet"
+                    />
+                </svg>
             </g>
 
             <g
