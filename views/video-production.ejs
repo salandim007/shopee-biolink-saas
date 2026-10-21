@@ -772,25 +772,8 @@
         </div>
 
 
-        <div style="margin:0 0 18px">
-            <label for="catalogProductSearch"
-                   style="display:block;font-weight:700;margin-bottom:8px">
-                📦 Buscar no meu catálogo
-            </label>
-            <div class="product-link-row">
-                <input id="catalogProductSearch" type="search"
-                       placeholder="Nome ou código do produto">
-                <button id="catalogProductSearchBtn"
-                        class="btn-primary" type="button">
-                    Pesquisar
-                </button>
-            </div>
-            <div id="catalogProductResults"
-                 style="margin-top:12px"></div>
-        </div>
-
         <p style="color:#64748b;margin:12px 0">
-            Ou informe um link da Shopee:
+            Cole o link do produto da Shopee:
         </p>
 <div class="product-link-row">
             <input
@@ -4190,10 +4173,10 @@ async function searchCatalogProducts() {
 }
 
 document.getElementById('catalogProductSearchBtn')
-    .addEventListener('click', searchCatalogProducts);
+    ?.addEventListener('click', searchCatalogProducts);
 
 document.getElementById('catalogProductSearch')
-    .addEventListener('keydown', event => {
+    ?.addEventListener('keydown', event => {
         if (event.key === 'Enter') {
             event.preventDefault();
             searchCatalogProducts();

@@ -620,20 +620,11 @@ async function prependCoverToVideo({
         );
 
     const filterGraph = [
-        `[0:v]split=2[coverBg][coverFg]`,
-
-        `[coverBg]` +
+        `[0:v]` +
             `scale=${width}:${height}:` +
-            `force_original_aspect_ratio=increase,` +
-            `crop=${width}:${height},` +
-            `boxblur=25:1[coverBgBlur]`,
-
-        `[coverFg]` +
-            `scale=${width}:${height}:` +
-            `force_original_aspect_ratio=decrease[coverFgFit]`,
-
-        `[coverBgBlur][coverFgFit]` +
-            `overlay=(W-w)/2:(H-h)/2,` +
+            `force_original_aspect_ratio=decrease,` +
+            `pad=${width}:${height}:` +
+            `(ow-iw)/2:(oh-ih)/2:color=black,` +
             `fps=${fps},` +
             `setsar=1,` +
             `format=yuv420p,` +

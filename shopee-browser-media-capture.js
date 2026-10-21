@@ -36,7 +36,7 @@ function isGalleryCandidate(value) {
 
     return (
         /_tn(?:\?|$)/i.test(url) ||
-        /@resize_w(?:82|164)_nl(?:\.webp)?(?:\?|$)/i.test(url)
+        /@resize_w\d+_nl(?:\.webp)?(?:\?|$)/i.test(url)
     );
 }
 
@@ -285,7 +285,7 @@ async function captureShopeeMedia(
                     page.url();
 
                 if (
-                    /\/verify\/traffic\/error/i.test(
+                    /\/verify\/(?:traffic\/error|captcha)/i.test(
                         finalUrl
                     )
                 ) {
@@ -402,6 +402,12 @@ async function captureShopeeMedia(
         blocked,
 
         finalUrl,
+
+        failureReason:
+            blocked ? 'VERIFICACAO_SHOPEE' :
+            !finalUrl.includes(itemId) ? 'REDIRECIONAMENTO' :
+            finalImages.length === 0 ? 'SEM_IMAGENS' :
+            null,
 
         metadata: {
             imageCount:
