@@ -1590,6 +1590,7 @@ router.post(
 
         const reservedChannels = [];
         const previouslyPublishedReels = {};
+        const blockedReels = {};
         const previouslyPublishedRecords = {};
 
 
@@ -1611,50 +1612,57 @@ router.post(
                         });
 
 
-                if (
-                    !reservation.allowed
-                ) {
-                    if (
-                        format === 'reel' &&
-                        reservation.publication?.status === 'PUBLISHED'
-                    ) {
-                        previouslyPublishedReels[channel] = {
-                            success: true,
-                            skipped: true,
-                            mediaId: reservation.publication.mediaId || null
-                        };
-                        previouslyPublishedRecords[channel] =
-                            reservation.publication;
+                if (!reservation.allowed) {
+                    if (format === 'reel') {
+                        const publication = reservation.publication;
+                        const status = publication?.status || 'UNKNOWN';
+
+                        if (status === 'PUBLISHED') {
+                            previouslyPublishedReels[channel] = {
+                                success: true,
+                                skipped: true,
+                                mediaId: publication.mediaId || null
+                            };
+                            previouslyPublishedRecords[channel] =
+                                publication;
+                        } else {
+                            blockedReels[channel] = {
+                                success: false,
+                                blocked: true,
+                                confirmationPending:
+                                    status === 'PROCESSING',
+                                error: {
+                                    code: 'REEL_REQUIRES_VERIFICATION',
+                                    message:
+                                        'Publicacao anterior com status ' +
+                                        status +
+                                        '. Verifique antes de reenviar.'
+                                }
+                            };
+                        }
+
+                        // Nunca bloquear o outro canal.
                         continue;
                     }
-                    for (
-                        const reservedChannel
-                        of reservedChannels
-                    ) {
-                        await publicationHistoryStore
-                            .markFailed({
-                                marketplace,
-                                itemId,
-                                channel:
-                                    reservedChannel,
-                                format
-                            });
-                    }
 
+                    for (const reservedChannel of reservedChannels) {
+                        await publicationHistoryStore.markFailed({
+                            marketplace,
+                            itemId,
+                            channel: reservedChannel,
+                            format
+                        });
+                    }
 
                     return res.status(409).json({
                         success: false,
-
                         error: {
-                            code:
-                                'PUBLICATION_ALREADY_EXISTS',
-
+                            code: 'PUBLICATION_ALREADY_EXISTS',
                             message:
-                                'Este formato já foi publicado ou está em processamento.'
+                                'Este formato ja foi publicado ou ' +
+                                'esta em processamento.'
                         },
-
-                        publication:
-                            reservation.publication
+                        publication: reservation.publication
                     });
                 }
 
@@ -1670,9 +1678,12 @@ router.post(
                 reservedChannels.length === 0
             ) {
                 return res.json({
-                    success: true,
+                    success: Object.keys(blockedReels).length === 0,
                     format,
-                    channels: previouslyPublishedReels,
+                    channels: {
+                        ...previouslyPublishedReels,
+                        ...blockedReels
+                    },
                     publications: previouslyPublishedRecords
                 });
             }
@@ -1770,7 +1781,7 @@ router.post(
                 );
 
                 const channelResults =
-                    Object.assign({}, previouslyPublishedReels, Object.fromEntries(channelEntries));
+                    Object.assign({}, previouslyPublishedReels, blockedReels, Object.fromEntries(channelEntries));
 
                 result = {
                     success: Object.values(channelResults)
