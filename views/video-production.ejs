@@ -3135,6 +3135,7 @@ async function generateProductionVideo() {
 
                 toast('Verifique o resultado da publicação.');
             } finally {
+                publishButton.disabled = false;
                 publishButton.textContent =
                     '🚀 Publicar nos canais selecionados';
             }
