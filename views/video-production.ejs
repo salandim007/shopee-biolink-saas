@@ -3087,6 +3087,12 @@ async function generateProductionVideo() {
                             ': resultado não confirmado.';
                     }
 
+                    if (item.confirmationPending) {
+                        return '⚠️ ' + names[channel] +
+                            ': confirmação pendente na Meta. ' +
+                            'Verifique a rede antes de tentar novamente.';
+                    }
+
                     if (item.skipped) {
                         return '✅ ' + names[channel] +
                             ': já publicado anteriormente.';

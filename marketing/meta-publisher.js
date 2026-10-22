@@ -92,11 +92,11 @@ function createMetaPublisher(options = {}) {
         }
     }
 
-    async function postForm(url, fields, channel) {
+    async function postForm(url, fields, channel, requestTimeoutMs = timeoutMs) {
         const controller = new AbortController();
         const timeout = setTimeout(
             () => controller.abort(),
-            timeoutMs
+            requestTimeoutMs
         );
 
         let response;
@@ -785,7 +785,8 @@ function createMetaPublisher(options = {}) {
                     access_token:
                         accessToken
                 },
-                'Instagram'
+                'Instagram',
+                90000
             );
 
 

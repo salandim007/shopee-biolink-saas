@@ -1818,6 +1818,19 @@ router.post(
                                 format,
                                 mediaId
                             });
+                } else if (
+                    format === 'reel' &&
+                    ['META_TIMEOUT', 'META_NETWORK_ERROR'].includes(
+                        channelResult?.error?.code
+                    )
+                ) {
+                    // Resultado remoto incerto: nao permitir reenvio
+                    // ate confirmar se a Meta publicou o Reel.
+                    channelResult.confirmationPending = true;
+                    console.warn(
+                        '[META REEL] Confirmacao pendente:',
+                        channel, itemId
+                    );
                 } else {
                     await publicationHistoryStore
                         .markFailed({
