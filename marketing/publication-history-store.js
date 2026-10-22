@@ -380,6 +380,7 @@ async function beginPublication({
                     updated_at = CURRENT_TIMESTAMP
 
                 WHERE marketing_publications.status = 'FAILED'
+                  AND marketing_publications.format <> 'reel'
             `,
             [
                 marketplace,
