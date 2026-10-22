@@ -439,6 +439,7 @@ async function markPublished({
                   AND item_id = ?
                   AND channel = ?
                   AND format = ?
+                  AND status = 'PROCESSING'
             `,
             [
                 mediaId
