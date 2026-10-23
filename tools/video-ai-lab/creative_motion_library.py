@@ -61,7 +61,7 @@ def validate_plan(plan: dict) -> None:
         raise ValueError("Video com menos de 3 transicoes.")
     used = set()
     for index, transition in enumerate(transitions):
-        if transition.get("between_scenes") != (index, index + 1):
+        if list(transition.get("between_scenes", [])) != [index, index + 1]:
             raise ValueError("Transicao fora da ordem das cenas.")
         effect = transition.get("effect")
         if effect not in TRANSITIONS:
