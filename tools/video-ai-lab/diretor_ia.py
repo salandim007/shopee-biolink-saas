@@ -20,6 +20,8 @@ import urllib.request
 import wave
 from pathlib import Path
 
+from creative_motion_library import plan_movements
+
 BASE = Path.home() / "hyperframes-lab"
 HERE = Path(__file__).resolve().parent
 ROLES = ["capa", "beneficio", "beneficio", "beneficio", "cta"]
@@ -302,6 +304,7 @@ def build_html(plan_data, timings, srcs, run_dir):
         "tecnologico": ("285px", "1040px", "63px", "4px solid " + color_b, "rgba(7,15,26,.93)"),
     }[theme]
     composition_id = "mix-diretor-ia-piloto"
+    motion_plan = plan_movements(len(plan_data["cenas"]), seed=sum(map(ord, plan_data["conceito_criativo"])) % 4)
     blocks = []
     js = []
     for i, scene in enumerate(plan_data["cenas"]):
@@ -319,15 +322,32 @@ def build_html(plan_data, timings, srcs, run_dir):
         # Aparecimento da legenda ligeiramente ANTES da voz; desaparece APOS o fim da voz.
         visible_from = max(0, start - 0.10)
         visible_until = min(14.9, max(speech_end + 0.25, timings[i+1]["inicio_s"] - 0.09 if i < 4 else 14.85))
-        movement = scene["movimento"]
-        y_initial = 55 if movement in ("flutuar", "deslizar") else 15
-        x_initial = -85 if movement == "deslizar" else 0
-        zoom = 1.16 if movement in ("aproximar", "parallax") else 1.04
-        js += [f" t.set('#scene{i}',{{autoAlpha:0}},0);",
-               f" t.fromTo('#scene{i}',{{autoAlpha:0}},{{autoAlpha:1,duration:0.18}}, {visible_from:.3f});",
-               f" t.fromTo('#scene{i} .captions',{{autoAlpha:0,y:28}},{{autoAlpha:1,y:0,duration:0.23}}, {visible_from:.3f});",
-               f" t.fromTo('#scene{i} .product',{{x:{x_initial},y:{y_initial},scale:{zoom}}},{{x:0,y:0,scale:1,duration:{max(0.8,visible_until-visible_from):.3f},ease:'power1.out'}}, {visible_from:.3f});",
-               f" t.to('#scene{i}',{{autoAlpha:0,duration:0.16}}, {visible_until:.3f});"]
+        movement = motion_plan["scene_moves"][i]
+        # Movimentos discretos com escala uniforme (sem deformar a foto).
+        movement_values = {
+            "zoom_detalhe": (-10, 0, 1.10, 1.02),
+            "pan_lateral": (-35, 0, 1.04, 1.04),
+            "parallax_leve": (-20, 16, 1.08, 1.02),
+            "zoom_out": (0, 0, 1.09, 1.00),
+        }
+        x_initial, y_initial, zoom_start, zoom_end = movement_values[movement]
+        transition = "dissolve" if i == 0 else motion_plan["transitions"][i-1]["effect"]
+        # GSAP: transicoes distintas. Todas mantem a legenda visivel durante a fala.
+        transition_props = {
+            "reveal": ("x:-35,scale:1.04", "x:0,scale:1"),
+            "dissolve": ("x:0,scale:1", "x:0,scale:1"),
+            "slide": ("x:60,scale:1", "x:0,scale:1"),
+            "corte_ritmico": ("x:0,scale:1", "x:0,scale:1"),
+        }
+        enter_from, enter_to = transition_props[transition]
+        enter_time = 0.05 if transition == "corte_ritmico" else (0.28 if transition == "dissolve" else 0.22)
+        js += [
+            f" t.set('#scene{i}',{{autoAlpha:0}},0);",
+            f" t.fromTo('#scene{i}',{{autoAlpha:0,{enter_from}}},{{autoAlpha:1,{enter_to},duration:{enter_time:.2f}}}, {visible_from:.3f});",
+            f" t.fromTo('#scene{i} .captions',{{autoAlpha:0,y:28}},{{autoAlpha:1,y:0,duration:0.23}}, {visible_from:.3f});",
+            f" t.fromTo('#scene{i} .product',{{x:{x_initial},y:{y_initial},scale:{zoom_start}}},{{x:0,y:0,scale:{zoom_end},duration:{max(0.8,visible_until-visible_from):.3f},ease:'power1.out'}}, {visible_from:.3f});",
+            f" t.to('#scene{i}',{{autoAlpha:0,duration:0.16}}, {visible_until:.3f});",
+        ]
     template = '''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Mix de Produtos - Produzido pela IA</title>
 <style>
