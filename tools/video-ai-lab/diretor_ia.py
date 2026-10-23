@@ -323,30 +323,31 @@ def build_html(plan_data, timings, srcs, run_dir):
         visible_from = max(0, start - 0.10)
         visible_until = min(14.9, max(speech_end + 0.25, timings[i+1]["inicio_s"] - 0.09 if i < 4 else 14.85))
         movement = motion_plan["scene_moves"][i]
-        # Movimentos discretos com escala uniforme (sem deformar a foto).
+        # Movimentos mais perceptiveis. Escala uniforme, produto sempre preservado.
         movement_values = {
-            "zoom_detalhe": (-10, 0, 1.10, 1.02),
-            "pan_lateral": (-35, 0, 1.04, 1.04),
-            "parallax_leve": (-20, 16, 1.08, 1.02),
-            "zoom_out": (0, 0, 1.09, 1.00),
+            "zoom_detalhe": (-28, -14, 1.26, 1.08),
+            "pan_lateral": (-95, 0, 1.15, 1.15),
+            "parallax_leve": (-72, 38, 1.20, 1.08),
+            "zoom_out": (0, 0, 1.25, 1.02),
         }
         x_initial, y_initial, zoom_start, zoom_end = movement_values[movement]
         transition = "dissolve" if i == 0 else motion_plan["transitions"][i-1]["effect"]
-        # GSAP: transicoes distintas. Todas mantem a legenda visivel durante a fala.
-        transition_props = {
-            "reveal": ("x:-35,scale:1.04", "x:0,scale:1"),
-            "dissolve": ("x:0,scale:1", "x:0,scale:1"),
-            "slide": ("x:60,scale:1", "x:0,scale:1"),
-            "corte_ritmico": ("x:0,scale:1", "x:0,scale:1"),
+        # Efeitos claramente distintos. Corte, slide, mascara e dissolve.
+        transitions = {
+            "reveal": ("autoAlpha:1,clipPath:'inset(0 100% 0 0)'",
+                       "autoAlpha:1,clipPath:'inset(0 0% 0 0)',x:0", 0.38),
+            "dissolve": ("autoAlpha:0,x:0", "autoAlpha:1,x:0", 0.40),
+            "slide": ("autoAlpha:1,x:420", "autoAlpha:1,x:0", 0.32),
+            "corte_ritmico": ("autoAlpha:0,x:0", "autoAlpha:1,x:0", 0.03),
         }
-        enter_from, enter_to = transition_props[transition]
-        enter_time = 0.05 if transition == "corte_ritmico" else (0.28 if transition == "dissolve" else 0.22)
+        enter_from, enter_to, enter_time = transitions[transition]
+        # Nunca obscurecer a legenda enquanto a respectiva narracao esta em andamento.
         js += [
-            f" t.set('#scene{i}',{{autoAlpha:0}},0);",
-            f" t.fromTo('#scene{i}',{{autoAlpha:0,{enter_from}}},{{autoAlpha:1,{enter_to},duration:{enter_time:.2f}}}, {visible_from:.3f});",
-            f" t.fromTo('#scene{i} .captions',{{autoAlpha:0,y:28}},{{autoAlpha:1,y:0,duration:0.23}}, {visible_from:.3f});",
-            f" t.fromTo('#scene{i} .product',{{x:{x_initial},y:{y_initial},scale:{zoom_start}}},{{x:0,y:0,scale:{zoom_end},duration:{max(0.8,visible_until-visible_from):.3f},ease:'power1.out'}}, {visible_from:.3f});",
-            f" t.to('#scene{i}',{{autoAlpha:0,duration:0.16}}, {visible_until:.3f});",
+            f" t.set('#scene{i}',{{autoAlpha:0,x:0,clipPath:'inset(0 0% 0 0)'}},0);",
+            f" t.fromTo('#scene{i}',{{{enter_from}}},{{{enter_to},duration:{enter_time:.2f},immediateRender:false}}, {visible_from:.3f});",
+            f" t.fromTo('#scene{i} .captions',{{autoAlpha:0,y:28}},{{autoAlpha:1,y:0,duration:0.23,immediateRender:false}}, {visible_from:.3f});",
+            f" t.fromTo('#scene{i} .product',{{x:{x_initial},y:{y_initial},scale:{zoom_start}}},{{x:0,y:0,scale:{zoom_end},duration:{max(0.8,visible_until-visible_from):.3f},ease:'power1.out',immediateRender:false}}, {visible_from:.3f});",
+            f" t.to('#scene{i}',{{autoAlpha:0,duration:0.14}}, {visible_until:.3f});",
         ]
     template = '''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Mix de Produtos - Produzido pela IA</title>
