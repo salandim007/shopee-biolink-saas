@@ -172,6 +172,39 @@ function alreadyGenerated(
 }
 
 
+/* MIX_PAUSA_COOPERATIVA_V1: somente entre produtos, apos persistencia. */
+const _mixFs = require('fs');
+const _mixPath = require('path');
+const _mixPauseDir = _mixPath.join(__dirname, '..', 'data', 'ai', 'video-coordinator');
+async function _mixAguardarVezDoVideo() {
+    const requestFile = _mixPath.join(_mixPauseDir, 'solicitacao.json');
+    const ackFile = _mixPath.join(_mixPauseDir, 'pausa-confirmada.json');
+    let announced = null;
+    while (true) {
+        let req;
+        try {
+            req = JSON.parse(_mixFs.readFileSync(requestFile, 'utf8'));
+        } catch (e) {
+            if (e.code !== 'ENOENT') console.warn('[MIX] Solicitacao invalida; liberando catalogo:', e.message);
+            return;
+        }
+        if (!req || !/^[a-f0-9-]{36}$/.test(String(req.id || '')) ||
+            !Number.isFinite(req.expira_ms) || Date.now() > req.expira_ms) {
+            console.warn('[MIX] Pedido ausente/expirado; catalogo liberado.');
+            return;
+        }
+        if (announced !== req.id) {
+            _mixFs.mkdirSync(_mixPauseDir, {recursive:true});
+            const tmp = ackFile + '.' + process.pid + '.tmp';
+            _mixFs.writeFileSync(tmp, JSON.stringify({id:req.id, pid:process.pid, em:new Date().toISOString()}));
+            _mixFs.renameSync(tmp, ackFile);
+            console.log('[MIX] Catálogo pausado entre produtos. Pedido', req.id);
+            announced = req.id;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+}
+
 async function processOne(summary) {
     const itemId =
         String(summary.itemId);
@@ -376,6 +409,7 @@ async function main() {
             const summary
             of page.products
         ) {
+            await _mixAguardarVezDoVideo();
             if (
                 reachedStopTime()
             ) {
