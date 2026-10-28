@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR"
+data-composition-variables='[
+{"id":"image","type":"string","label":"Fotografia","default":""},
+{"id":"title","type":"string","label":"Título","default":"PRODUTO EM DESTAQUE"},
+{"id":"subtitle","type":"string","label":"Subtítulo","default":""},
+{"id":"cta","type":"string","label":"Chamada final","default":""},
+{"id":"accent","type":"color","label":"Destaque","default":"#18d99b"}
+]'>
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden}
+#scene-root{
+position:relative;width:1080px;height:1920px;
+background:linear-gradient(145deg,#061329,#06355e 65%,#061329);
+color:white;font-family:Arial,sans-serif;overflow:hidden
+}
+.brand{
+position:absolute;top:115px;width:100%;
+text-align:center;font-size:40px;font-weight:900;
+letter-spacing:5px
+}
+.photo-area{
+position:absolute;top:350px;left:70px;
+width:940px;height:1050px;
+display:flex;align-items:center;justify-content:center
+}
+#product-photo{
+max-width:100%;max-height:100%;
+object-fit:contain;filter:drop-shadow(0 25px 35px #0008)
+}
+#photo-placeholder{
+font-size:42px;color:#aac5db;text-align:center
+}
+.copy{
+position:absolute;top:1450px;left:65px;right:65px;
+text-align:center
+}
+#title{
+font-size:73px;line-height:1.1;margin:0;
+overflow-wrap:break-word
+}
+#subtitle{font-size:39px;margin-top:25px}
+#cta{
+font-size:45px;font-weight:bold;margin-top:36px;
+padding:22px;border-radius:24px;
+background:#18d99b;color:#062136
+}
+#cta:empty,#subtitle:empty{display:none}
+</style>
+</head>
+<body>
+<div id="scene-root"
+data-composition-id="cena-produto"
+data-width="1080"
+data-height="1920">
+<div class="brand">MIX DE PRODUTOS</div>
+<div class="photo-area">
+<img id="product-photo" alt="Fotografia do produto"
+style="display:none">
+<div id="photo-placeholder">FOTOGRAFIA DO PRODUTO</div>
+</div>
+<div class="copy">
+<h1 id="title"></h1>
+<div id="subtitle"></div>
+<div id="cta"></div>
+</div>
+<script>
+(function(){
+const v=window.__hyperframes.getVariables();
+document.getElementById("title").textContent=v.title||"";
+document.getElementById("subtitle").textContent=v.subtitle||"";
+document.getElementById("cta").textContent=v.cta||"";
+document.getElementById("cta").style.background=v.accent;
+if(v.image){
+ const img=document.getElementById("product-photo");
+ img.src=v.image;
+ img.style.display="block";
+ document.getElementById("photo-placeholder").style.display="none";
+}
+const tl=gsap.timeline({paused:true});
+tl.fromTo(".photo-area",
+ {scale:1.04},{scale:1,duration:3,ease:"power1.out"},0);
+window.__timelines=window.__timelines||{};
+window.__timelines["cena-produto"]=tl;
+})();
+</script>
+</div>
+</body>
+</html>

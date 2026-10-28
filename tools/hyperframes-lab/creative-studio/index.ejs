@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mix de Produtos — Estúdio Criativo IA</title>
+<style>
+:root {
+  --azul:#0874e8;
+  --verde:#12b76a;
+  --fundo:#f5f8fc;
+  --painel:#ffffff;
+  --texto:#172b4d;
+  --borda:#dce5ef;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--fundo);
+  color:var(--texto);
+}
+header {
+  background:#fff;
+  padding:20px 30px;
+  border-bottom:1px solid var(--borda);
+}
+header h1 { margin:0;color:var(--azul); }
+header p { margin:6px 0 0;color:#64748b; }
+.container {
+  display:grid;
+  grid-template-columns:1fr 1.4fr 1fr;
+  gap:18px;
+  padding:20px;
+}
+.panel {
+  background:var(--painel);
+  border:1px solid var(--borda);
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:16px;
+}
+h2 { font-size:18px;margin:0 0 16px; }
+input {
+  width:100%;
+  padding:13px;
+  border:1px solid var(--borda);
+  border-radius:8px;
+}
+button {
+  background:var(--azul);
+  color:white;
+  border:0;
+  border-radius:8px;
+  padding:13px 18px;
+  cursor:pointer;
+}
+.green { background:var(--verde); }
+.preview {
+  width:min(100%,320px);
+  aspect-ratio:9/16;
+  margin:auto;
+  background:linear-gradient(145deg,#096be0,#053b73);
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  text-align:center;
+  padding:25px;
+}
+@media(max-width:950px) {
+  .container { grid-template-columns:1fr; }
+}
+</style>
+
+<style>
+/* MIX_CREATIVE_STUDIO_VISUAL_V2 */
+body {
+  background: #f2f6fb;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+header {
+  background: linear-gradient(110deg, #ffffff, #edf7ff);
+  border-bottom: 3px solid #0b76e0;
+  box-shadow: 0 3px 14px rgba(20,50,90,.06);
+}
+header h1 {
+  color: #0874e8;
+  font-size: 28px;
+  letter-spacing: -.6px;
+}
+.container {
+  max-width: 1600px;
+  margin: auto;
+}
+.panel {
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(20,50,90,.055);
+}
+.panel h2 {
+  color: #123c70;
+}
+button {
+  font-weight: 600;
+  transition: transform .15s, box-shadow .15s;
+}
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,100,220,.2);
+}
+.green {
+  background: linear-gradient(120deg,#08ac55,#18c979);
+}
+.preview {
+  box-shadow: 0 12px 35px rgba(0,70,150,.22);
+}
+</style>
+
+
+<style>
+.studio-actions {
+  background:#fff;
+  border:1px solid #dce5ef;
+  border-radius:18px;
+  margin:20px 20px 0;
+  padding:22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:16px;
+  box-shadow:0 8px 25px rgba(20,50,90,.055);
+}
+.studio-actions h2 {margin:0 0 7px;color:#123c70}
+.studio-actions p {margin:0;color:#64748b}
+.studio-action-buttons {display:flex;gap:10px;flex-wrap:wrap}
+.studio-actions button:disabled {
+  opacity:.65;
+  cursor:not-allowed;
+}
+.studio-actions small {width:100%;color:#64748b}
+.preview h2 {color:#fff}
+</style>
+
+
+<style>
+.media-gallery {
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
+  margin-top:15px;
+}
+.media-slot {
+  aspect-ratio:1;
+  border:2px dashed #c8d7e8;
+  border-radius:10px;
+  background:#f4f8fd;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  color:#64748b;
+}
+.media-slot:first-child {
+  border-color:#0874e8;
+}
+.gallery-hint {
+  color:#64748b;
+  font-size:13px;
+}
+</style>
+
+
+<style>
+/* MIX_COVER_TEMPLATES_V1 */
+.cover-templates {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+}
+.cover-template {
+  background:#fff;
+  color:#173653;
+  border:2px solid #dce5ef;
+  padding:5px;
+  border-radius:12px;
+  min-width:0;
+}
+.cover-template:hover {box-shadow:0 4px 12px #164e8a22}
+.cover-template.selected {
+  border-color:#0874e8;
+  background:#edf6ff;
+}
+.cover-template small {
+  display:block;
+  font-size:11px;
+  margin:7px 0 3px;
+}
+.cover-art {
+  aspect-ratio:9/13;
+  border-radius:8px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding:10px 5px;
+  color:#fff;
+  font-size:12px;
+  text-align:center;
+  text-shadow:0 2px 5px #0008;
+}
+.cover-impacto {
+  background:linear-gradient(140deg,#0074f7,#00366b 60%,#00c66a);
+}
+.cover-premium {
+  background:linear-gradient(140deg,#625641,#101820 65%,#d4b26a);
+}
+.cover-tecnologico {
+  background:linear-gradient(140deg,#03152f,#0067cd 60%,#20e3ae);
+}
+.cover-art b {font-size:14px}
+</style>
+
+
+<style>
+/* MIX_PREVIEW_TEMPLATES_V1 */
+.preview {
+  transition:background .35s ease;
+}
+.preview.preview-impacto {
+  background:linear-gradient(145deg,#0874e8,#063b73 65%,#08b96a);
+}
+.preview.preview-premium {
+  background:linear-gradient(145deg,#514531,#101820 65%,#b69b58);
+}
+.preview.preview-tecnologico {
+  background:linear-gradient(145deg,#04152c,#006dd6 65%,#00bfa5);
+}
+</style>
+
+
+<style>
+/* MIX_PREVIEW_PRODUCT_V1 */
+.preview {
+  position:relative;
+  overflow:hidden;
+}
+.preview-product {
+  position:relative;
+  z-index:2;
+  width:94%;
+  max-height:56%;
+  object-fit:contain;
+  border-radius:12px;
+  box-shadow:0 12px 30px #0005;
+}
+.preview-label {
+  position:absolute;
+  z-index:3;
+  bottom:9%;
+  left:8%;
+  right:8%;
+  color:#fff;
+  font-size:17px;
+  font-weight:700;
+  text-align:center;
+  text-shadow:0 2px 8px #000;
+}
+</style>
+
+
+<style>
+/* MIX_PREVIEW_COMPACT_V1 */
+.preview {
+  width:min(100%,240px);
+  aspect-ratio:9/16;
+  height:auto;
+  min-height:0;
+}
+.preview-product {
+  width:94%;
+}
+</style>
+
+
+<style>
+/* MIX_VIDEO_PHOTO_SELECTION_V1 */
+.media-photo.video-selected {
+  outline: 3px solid #16a34a;
+  outline-offset: -3px;
+  box-shadow: inset 0 0 0 2px #fff;
+}
+.mix-video-selection-tools {
+  margin-top: 12px;
+  color: #174779;
+  font-size: 13px;
+}
+.mix-video-selection-tools label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+
+/* MIX_GALLERY_SELECTION_V1 */
+.media-photo {
+  padding:3px;
+  background:#fff;
+  overflow:hidden;
+  cursor:pointer;
+}
+.media-photo img {
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:6px;
+}
+.media-photo.selected-photo {
+  border:2px solid #0874e8;
+}
+</style>
+
+
+<style>
+/* MIX_CATALOG_TEXT_COLOR_FIX_V1 */
+.catalog-option,
+.catalog-option span {
+  color: #172b4d !important;
+}
+
+.catalog-option small {
+  color: #607080 !important;
+}
+
+.catalog-option.active,
+.catalog-option:hover {
+  background: #e7f4ff;
+}
+
+.catalog-option.active span,
+.catalog-option:hover span {
+  color: #172b4d !important;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <h1>Mix de Produtos</h1>
+  <p>Diretor Criativo IA — Estúdio de Produção</p>
+</header>
+
+
+<!-- MIX_CENTRAL_GERACAO_IA_V1 -->
+<div class="studio-actions">
+  <div>
+    <h2>Central de Geração IA</h2>
+    <p>Transforme produtos Shopee em propagandas profissionais.</p>
+  </div>
+  <div class="studio-action-buttons">
+    <button type="button" disabled>Criar Capa com IA</button>
+    <button type="button" class="green" disabled>Gerar Vídeo com IA</button>
+  </div>
+  <small>Interface demonstrativa — geração ainda não conectada.</small>
+</div>
+
+<main class="container">
+  <section>
+    <div class="panel">
+      <h2>1. Link ou Produto</h2>
+      <div class="product-tabs">
+        <button type="button" class="active-tab"
+          onclick="selectProductSource('link')">🔗 Link Shopee</button>
+        <button type="button"
+          onclick="selectProductSource('catalog')">📦 Produto do SaaS</button>
+      </div>
+      <div id="linkSource">
+        <input placeholder="Cole o link do produto Shopee">
+        <p><button type="button" disabled>Buscar produto e imagens</button></p>
+      </div>
+      <div id="catalogSource" hidden>
+        
+<!-- MIX_CATALOG_SEARCH_V1 -->
+<form id="catalogSearchForm">
+  <input
+    id="catalogSearchInput"
+    type="search"
+    placeholder="Nome, código ou ID do produto"
+    autocomplete="off"
+    required
+  >
+  <p>
+    <button type="submit">Buscar no catálogo</button>
+  </p>
+</form>
+
+<p id="catalogSearchStatus" class="gallery-hint"
+   aria-live="polite"></p>
+
+<div id="catalogSearchResults"></div>
+
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>2. Imagens e Mídias</h2>
+      <p class="gallery-hint">As fotografias do produto aparecerão aqui.</p>
+      <div style="margin-top:12px">
+        <button
+          type="button"
+          id="mixBuscarMaisFotos"
+          disabled
+          style="background:#12866c;color:white;
+                 border:0;border-radius:9px;
+                 padding:11px 15px;opacity:.6">
+          Buscar mais fotografias
+        </button>
+        <p id="mixBuscarFotosStatus"
+           class="gallery-hint"
+           aria-live="polite"></p>
+      </div>
+
+      
+<div class="mix-video-selection-tools">
+  <label>
+    <input type="checkbox" id="mixVideoSelectionMode">
+    Selecionar fotografias para o vídeo
+  </label>
+  <p id="mixVideoSelectionCount" aria-live="polite">
+    0 de 5 fotografias selecionadas
+  </p>
+</div>
+
+<div class="media-gallery">
+        <button type="button" class="media-slot media-photo selected-photo"
+        data-image="/admin/vitrine2/marketing/creative-studio/assets-demo/lenovo-1.jpg"
+        aria-label="Selecionar foto principal">
+          <img src="/admin/vitrine2/marketing/creative-studio/assets-demo/lenovo-1.jpg"
+               alt="Foto principal Lenovo LE259">
+        </button>
+        <button type="button"
+        class="media-slot media-photo"
+        data-image="/admin/vitrine2/marketing/creative-studio/assets-demo/lenovo-2.jpg"
+        aria-label="Selecionar foto 2"
+        aria-pressed="false">
+          <img src="/admin/vitrine2/marketing/creative-studio/assets-demo/lenovo-2.jpg"
+               alt="Segunda fotografia Lenovo LE259">
+        </button>
+        <div class="media-slot">Foto 3</div>
+        <div class="media-slot">Foto 4</div>
+        <div class="media-slot">Foto 5</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>3. Estilo do Vídeo</h2>
+      <button>Produto em destaque</button>
+      <button>Unboxing</button>
+    </div>
+
+    <div class="panel">
+      <h2>4. Configurações</h2>
+      <p>Formato vertical 9:16</p>
+      <p>Duração: 15 segundos</p>
+      <p>Narração: Kokoro Dora</p>
+      <button type="button" id="mixGenerateVideoButton" class="green">Gerar Vídeo com IA</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="panel">
+      <h2>Prévia do Vídeo</h2>
+      <div class="preview">
+        <img class="preview-product"
+        src="/admin/vitrine2/marketing/creative-studio/assets-demo/lenovo-1.jpg"
+        alt="Fotografia de teste Lenovo LE259">
+        <div class="preview-label">
+          MIX DE PRODUTOS
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="panel">
+      <h2>Produto Identificado</h2>
+      <p id="mixProductDetails">Aguardando seleção do produto.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Templates de Capa</h2>
+      <div class="cover-templates">
+        <button class="cover-template selected"
+                type="button" data-template="impacto">
+          <span class="cover-art cover-impacto">
+            <strong>MIX</strong><b>IMPACTO</b>
+          </span>
+          <small>Mix Impacto</small>
+        </button>
+        <button class="cover-template"
+                type="button" data-template="premium">
+          <span class="cover-art cover-premium">
+            <strong>ESTILO</strong><b>PREMIUM</b>
+          </span>
+          <small>Premium</small>
+        </button>
+        <button class="cover-template"
+                type="button" data-template="tecnologico">
+          <span class="cover-art cover-tecnologico">
+            <strong>VISUAL</strong><b>TECH</b>
+          </span>
+          <small>Tecnológico</small>
+        </button>
+      </div>
+      <p id="selectedCoverTemplate" class="gallery-hint">
+        Modelo selecionado: Mix Impacto
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>Roteiro Gerado pela IA</h2>
+      <p>O roteiro aparecerá aqui.</p>
+    </div>
+  </section>
+</main>
+
+
+<style>
+.product-tabs {display:flex;gap:8px;margin-bottom:15px}
+.product-tabs button {flex:1;background:#eaf2fc;color:#174779}
+.product-tabs button.active-tab {background:#0874e8;color:#fff}
+</style>
+<script>
+function selectProductSource(source) {
+  document.getElementById('linkSource').hidden = source !== 'link';
+  document.getElementById('catalogSource').hidden = source !== 'catalog';
+  document.querySelectorAll('.product-tabs button').forEach((button, i) => {
+    button.classList.toggle('active-tab', i === (source === 'link' ? 0 : 1));
+  });
+}
+</script>
+
+
+<script>
+document.querySelectorAll(".cover-template").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".cover-template")
+      .forEach(item => item.classList.remove("selected"));
+    button.classList.add("selected");
+    document.getElementById("selectedCoverTemplate")
+      .textContent = "Modelo selecionado: " +
+        button.querySelector("small").textContent;
+  });
+});
+</script>
+
+
+<script>
+document.querySelectorAll(".cover-template").forEach(button => {
+  button.addEventListener("click", () => {
+    const preview = document.querySelector(".preview");
+    if (!preview) return;
+
+    preview.classList.remove(
+      "preview-impacto",
+      "preview-premium",
+      "preview-tecnologico"
+    );
+
+    preview.classList.add(
+      "preview-" + button.dataset.template
+    );
+  });
+});
+</script>
+
+
+<script>
+/* MIX_GALLERY_INTERACTIVE_V1 */
+document.querySelectorAll(".media-gallery [data-image]")
+  .forEach(button => {
+    button.addEventListener("click", () => {
+      const imageUrl = button.dataset.image;
+      const previewImage = document.querySelector(".preview-product");
+
+      if (!imageUrl || !previewImage) return;
+
+      previewImage.src = imageUrl;
+
+      const thumbnail = button.querySelector("img");
+      if (thumbnail) {
+        previewImage.alt = thumbnail.alt || "Foto selecionada";
+      }
+
+      document.querySelectorAll(".media-gallery .media-photo")
+        .forEach(item => {
+          item.classList.remove("selected-photo");
+          item.setAttribute("aria-pressed", "false");
+        });
+
+      button.classList.add("selected-photo");
+      button.setAttribute("aria-pressed", "true");
+    });
+  });
+</script>
+
+
+
+<style>
+/* MIX_CATALOG_AUTOCOMPLETE_V2 */
+#catalogSearchResults {
+  max-height:340px;
+  overflow-y:auto;
+  border-radius:10px;
+}
+.catalog-option {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  padding:8px;
+  text-align:left;
+  border:0;
+  border-bottom:1px solid #e5edf2;
+  background:#fff;
+  cursor:pointer;
+}
+.catalog-option.active {
+  background:#e7f4ff;
+}
+.catalog-option img {
+  width:48px;
+  height:48px;
+  flex-shrink:0;
+  object-fit:contain;
+  border-radius:7px;
+}
+.catalog-option span {
+  flex:1;
+  min-width:0;
+  font-size:12px;
+  line-height:1.4;
+}
+.catalog-option small {
+  display:block;
+  color:#637587;
+}
+</style>
+
+<script>
+/* MIX_CATALOG_AUTOCOMPLETE_V2 */
+(() => {
+  const input = document.getElementById("catalogSearchInput");
+  const form = document.getElementById("catalogSearchForm");
+  const results = document.getElementById("catalogSearchResults");
+  const status = document.getElementById("catalogSearchStatus");
+
+  const button = form.querySelector('[type="submit"]');
+  button.hidden = true;
+  input.required = false;
+  input.setAttribute("autocomplete", "off");
+  input.setAttribute("role", "combobox");
+  input.setAttribute("aria-autocomplete", "list");
+  input.setAttribute("aria-expanded", "false");
+  results.id = "catalogSearchResults";
+  results.setAttribute("role", "listbox");
+  input.setAttribute("aria-controls", results.id);
+
+  let timer = null;
+  let controller = null;
+  let options = [];
+  let active = -1;
+  let generation = 0;
+
+  function highlight(index) {
+    active = index;
+    results.querySelectorAll(".catalog-option")
+      .forEach((button, i) => {
+        const selected = i === active;
+        button.classList.toggle("active", selected);
+        button.setAttribute("aria-selected", String(selected));
+        if (selected) button.scrollIntoView({block:"nearest"});
+      });
+  }
+
+  function choose(product) {
+    clearTimeout(timer);
+    generation++;
+    if (controller) controller.abort();
+
+    input.value = product.title || String(product.itemId);
+    results.replaceChildren();
+    options = [];
+    active = -1;
+    input.setAttribute("aria-expanded", "false");
+
+    status.textContent =
+      "Selecionado: " + (product.title || "Produto") +
+      " | ID: " + product.itemId;
+
+    window.mixSelectedCatalogProduct = product;
+    window.mixLoadSelectedProduct(product);
+  }
+
+  async function search() {
+    const term = input.value.trim();
+    const requestId = ++generation;
+
+    if (controller) controller.abort();
+    controller = null;
+
+    results.replaceChildren();
+    options = [];
+    active = -1;
+    input.setAttribute("aria-expanded", "false");
+
+    if (term.length < 2) {
+      status.textContent = "Digite pelo menos 2 caracteres.";
+      return;
+    }
+
+    status.textContent = "Pesquisando...";
+
+    controller = new AbortController();
+
+    try {
+      const params = new URLSearchParams({
+        search: term,
+        limit: "5",
+        offset: "0"
+      });
+
+      const response = await fetch(
+        "/admin/vitrine2/marketing/creative-studio/api/search-unified?" + params,
+        {
+          credentials: "same-origin",
+          signal: controller.signal
+        }
+      );
+
+      if (!response.ok)
+        throw new Error("Erro na pesquisa: HTTP " + response.status);
+
+      const data = await response.json();
+      if (requestId !== generation) return;
+      if (!data.success) throw new Error("Consulta não concluída.");
+
+      options = Array.isArray(data.products) ? data.products : [];
+      status.textContent =
+        Number(data.total || 0).toLocaleString("pt-BR") +
+        " produto(s) encontrado(s).";
+
+      options.forEach((product, i) => {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "catalog-option";
+        option.setAttribute("role", "option");
+        option.setAttribute("aria-selected", "false");
+        option.id = "mix-catalog-option-" + i;
+
+        const img = document.createElement("img");
+        const rawImage = product.image || product.images?.[0];
+
+        if (typeof rawImage === "string") {
+          try {
+            const url = new URL(rawImage, location.origin);
+            if (url.protocol === "https:" ||
+                (url.origin === location.origin &&
+                 url.protocol === "http:")) {
+              img.src = url.href;
+            }
+          } catch (_) {}
+        }
+
+        img.alt = "";
+        img.loading = "lazy";
+
+        const description = document.createElement("span");
+        description.textContent = product.title || "Produto sem título";
+
+        const id = document.createElement("small");
+        id.textContent = "ID: " + (product.itemId || "N/D");
+        description.appendChild(id);
+
+        option.append(img, description);
+        option.addEventListener("click", () => choose(product));
+        results.appendChild(option);
+      });
+
+      input.setAttribute("aria-expanded", String(options.length > 0));
+
+      if (!options.length) status.textContent = "Nenhum produto encontrado.";
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      if (requestId !== generation) return;
+      status.textContent = error.message;
+    }
+  }
+
+  input.addEventListener("input", () => {
+    clearTimeout(timer);
+    generation++;
+    if (controller) controller.abort();
+    results.replaceChildren();
+    input.setAttribute("aria-expanded", "false");
+    status.textContent = "Aguardando pesquisa...";
+    timer = setTimeout(search, 300);
+  });
+
+  input.addEventListener("keydown", event => {
+    if (event.key === "ArrowDown" && options.length) {
+      event.preventDefault();
+      highlight((active + 1) % options.length);
+    } else if (event.key === "ArrowUp" && options.length) {
+      event.preventDefault();
+      highlight(active <= 0 ? options.length - 1 : active - 1);
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      if (active >= 0 && options[active]) choose(options[active]);
+      else if (options.length) choose(options[0]);
+      else search();
+    } else if (event.key === "Escape") {
+      results.replaceChildren();
+      options = [];
+      active = -1;
+      input.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  form.addEventListener("submit", event => event.preventDefault());
+})();
+</script>
+
+
+<script>
+/* MIX_CATALOG_PRODUCT_SELECTION_V1 */
+(() => {
+  let currentRequest = 0;
+
+  window.mixLoadSelectedProduct = async function(selected) {
+    const requestId = ++currentRequest;
+    const details = document.getElementById("mixProductDetails");
+    const gallery = document.querySelector(".media-gallery");
+    const preview = document.querySelector(".preview-product");
+
+    const videoMode = document.getElementById("mixVideoSelectionMode");
+    const videoCount = document.getElementById("mixVideoSelectionCount");
+    const selectedForVideo = [];
+
+    window.mixGetSelectedVideoImages = () =>
+      requestId === currentRequest ? [...selectedForVideo] : [];
+
+    if (videoMode) videoMode.checked = false;
+    if (videoCount) {
+      videoCount.textContent = "0 de 5 fotografias selecionadas";
+    }
+
+
+    details.textContent = "Carregando produto...";
+    gallery.replaceChildren();
+    preview.removeAttribute("src");
+    preview.alt = "";
+
+    try {
+      const params = new URLSearchParams();
+
+      if (selected.shopId) {
+        params.set("shopId", selected.shopId);
+      }
+
+      // Reutiliza o orquestrador original de mídias.
+      const productUrl = selected.shopId
+        ? "/admin/vitrine2/marketing/creative-studio/api/product-media/"
+          + encodeURIComponent(selected.shopId)
+          + "/" + encodeURIComponent(selected.itemId)
+        : "/api/products-media/"
+          + encodeURIComponent(selected.itemId)
+          + "?" + params.toString();
+
+      const response = await fetch(productUrl, {
+        credentials: "same-origin"
+      });
+
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+
+      const data = await response.json();
+
+      if (!data.success || !data.product) {
+        throw new Error("Produto não encontrado.");
+      }
+
+      if (requestId !== currentRequest) return;
+
+      const product = data.product;
+
+      const images = [...new Set(
+        [
+          
+          ...(Array.isArray(product.images) ? product.images : []),
+          product.image
+        ].filter(url =>
+          typeof url === "string" &&
+          url.startsWith("https://")
+        )
+      )].slice(0, 15);
+
+      const title = product.title || "Produto sem título";
+
+      details.replaceChildren();
+
+      const heading = document.createElement("strong");
+      heading.textContent = title;
+
+      const info = document.createElement("p");
+      info.textContent =
+        "Item ID: " + product.itemId +
+        " | Fotos: " + images.length;
+
+      details.append(heading, info);
+
+      const selectImage = (url, button) => {
+        preview.src = url;
+        preview.alt = title;
+
+        gallery.querySelectorAll(".media-photo")
+          .forEach(item => {
+            const active = item === button;
+            item.classList.toggle("selected-photo", active);
+            item.setAttribute("aria-pressed", String(active));
+          });
+      };
+
+      images.slice(0, 15).forEach((url, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "media-slot media-photo";
+        button.setAttribute("aria-label", "Selecionar foto " + (index + 1));
+        button.setAttribute("aria-pressed", "false");
+
+        const image = document.createElement("img");
+        image.src = url;
+        image.alt = title + " - foto " + (index + 1);
+        image.loading = "lazy";
+
+        button.dataset.image = url;
+        button.appendChild(image);
+        gallery.appendChild(button);
+
+        button.addEventListener("click", () => {
+          selectImage(url, button);
+
+          if (!videoMode || !videoMode.checked) return;
+
+          const position = selectedForVideo.indexOf(url);
+
+          if (position >= 0) {
+            selectedForVideo.splice(position, 1);
+          } else if (selectedForVideo.length < 5) {
+            selectedForVideo.push(url);
+          } else {
+            if (videoCount) {
+              videoCount.textContent =
+                "Limite de 5 fotografias atingido.";
+            }
+            return;
+          }
+
+          gallery.querySelectorAll(".media-photo").forEach(photo => {
+            photo.classList.toggle(
+              "video-selected",
+              selectedForVideo.includes(photo.dataset.image)
+            );
+          });
+
+          if (videoCount) {
+            videoCount.textContent =
+              selectedForVideo.length +
+              " de 5 fotografias selecionadas";
+          }
+        });
+
+        if (index === 0) selectImage(url, button);
+      });
+
+      if (!images.length) {
+        details.append("Nenhuma fotografia disponível.");
+      }
+
+      window.mixSelectedCatalogProduct = product;
+
+      // MIX_STUDIO_CAPTURE_BUTTON_V1
+      const captureButton = document.getElementById("mixBuscarMaisFotos");
+      const captureStatus = document.getElementById("mixBuscarFotosStatus");
+
+      if (captureButton) {
+        captureButton.disabled = !selected.shopId || images.length >= 15;
+        captureButton.style.opacity = captureButton.disabled ? ".6" : "1";
+
+        captureButton.onclick = async () => {
+          captureButton.disabled = true;
+          captureButton.textContent = "Buscando fotografias...";
+          if (captureStatus) captureStatus.textContent =
+            "Consultando Shopee...";
+
+          try {
+            const res = await fetch(productUrl + "?enrich=1", {
+              credentials: "same-origin"
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+              throw new Error(data.error || "Falha na captura");
+            }
+
+            if (requestId !== currentRequest) return;
+
+            await window.mixLoadSelectedProduct(selected);
+
+          } catch (error) {
+            if (requestId !== currentRequest) return;
+
+            if (captureStatus) captureStatus.textContent =
+              "Falha na captura: " + error.message;
+
+            captureButton.disabled = false;
+          } finally {
+            if (requestId === currentRequest) {
+              captureButton.textContent = "Buscar mais fotografias";
+            }
+          }
+        };
+      }
+
+
+    } catch (error) {
+      if (requestId !== currentRequest) return;
+      details.textContent =
+        "Falha ao carregar produto: " + error.message;
+    }
+  };
+})();
+</script>
+
+<script>
+/* MIX_VIDEO_GENERATE_CLICK_V1 */
+(() => {
+  const button = document.getElementById("mixGenerateVideoButton");
+  if (!button) return;
+
+  const status = document.createElement("p");
+  status.id = "mixVideoGenerateStatus";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  button.insertAdjacentElement("afterend", status);
+
+  button.addEventListener("click", async () => {
+    const product = window.mixSelectedCatalogProduct;
+    const images = typeof window.mixGetSelectedVideoImages === "function"
+      ? window.mixGetSelectedVideoImages() : [];
+
+    if (!product || !product.shopId || !product.itemId) {
+      status.textContent = "Selecione um produto primeiro.";
+      return;
+    }
+
+    if (images.length < 1 || images.length > 5) {
+      status.textContent = "Selecione de 1 a 5 fotografias para o vídeo.";
+      return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Preparando trabalho de vídeo...";
+
+    try {
+      const response = await fetch(
+        "/admin/vitrine2/marketing/creative-studio/api/video-jobs",
+        {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            shopId: String(product.shopId),
+            itemId: String(product.itemId),
+            images
+          })
+        }
+      );
+
+      const responseText = await response.text();
+      let result;
+
+      try {
+        result = JSON.parse(responseText);
+      } catch (_) {
+        throw new Error(
+          "HTTP " + response.status +
+          " — resposta não é JSON (" +
+          (response.headers.get("content-type") || "sem tipo") +
+          ")."
+        );
+      }
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Falha ao criar trabalho.");
+      }
+
+      status.textContent =
+        "Trabalho recebido: " + result.jobId +
+        " — aguardando renderização HyperFrames.";
+
+    } catch (error) {
+      status.textContent = "Erro: " + error.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
