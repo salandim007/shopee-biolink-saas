@@ -99,3 +99,107 @@ Criar componentes separados:
 **Título sugerido:** `Mix de Produtos — Diretor Criativo IA | Memória e Aprendizado Contínuo`.
 
 **Próxima execução:** revisar e versionar scripts de laboratório com segurança; implantar primeiro esquema da Memória Criativa; registrar avaliação da prévia atual como `REPROVADO` com motivos objetivos; passar regras de voz e transições ao validador/renderizador; produzir uma nova versão para avaliação. **Não voltar a diagnosticar funções já comprovadas** sem erro novo.
+
+---
+
+# MARCO DE CONTINUIDADE — 28/10/2026
+
+## Novo Estúdio Criativo IA — homologação
+
+Local:
+`/opt/shopee-biolink-homologacao`
+
+O Estúdio já possui:
+- Pesquisa integrada ao catálogo.
+- Galeria de até 15 fotografias reais.
+- Captura adicional autenticada da Shopee.
+- Seleção de até 5 fotografias.
+- Criação de trabalhos persistentes em `job.json`.
+
+## Primeiro trabalho real
+
+Job:
+`0551cff8-37a9-4565-9fd2-6423a09da46f`
+
+Produto:
+Relógio Technos Golf.
+
+Fotografias:
+5 arquivos selecionados, 3 imagens distintas.
+
+Resultado:
+MP4 H.264, 1080x1920, 15 segundos.
+
+Motor:
+HyperFrames 0.8.186.
+
+Arquivo:
+`/opt/shopee-biolink-homologacao/data/creative-studio/jobs/0551cff8-37a9-4565-9fd2-6423a09da46f/mix-impacto-v1.mp4`
+
+Avaliação:
+REPROVADO CRIATIVAMENTE.
+
+Motivos:
+- Qualidade inferior à esperada.
+- Animações simples.
+- Não explorou suficientemente o HyperFrames.
+- Ausência de narração e áudio no novo fluxo.
+- Imagens repetidas.
+
+## Recursos anteriores encontrados
+
+Código:
+`/home/admin/hyperframes-lab/agente-video-piloto/diretor_ia.py`
+
+Biblioteca de movimentos:
+`/home/admin/hyperframes-lab/agente-video-piloto/creative_motion_library.py`
+
+Recursos existentes no código:
+- Planejamento pelo Qwen.
+- Narração Kokoro ONNX.
+- Voz pf_dora, pt-br, velocidade 0.85.
+- Legendas sincronizadas com a fala.
+- Renderização HyperFrames.
+- Montagem de áudio por FFmpeg.
+
+O piloto anterior também foi REPROVADO CRIATIVAMENTE.
+
+As versões antigas devem ser preservadas.
+
+## Problema identificado
+
+O piloto antigo aceita somente:
+`imagem_1` e `imagem_2`.
+
+O Estúdio atual seleciona até cinco fotografias.
+
+A integração entre os dois sistemas ainda não foi realizada.
+
+## DECISÃO
+
+Não reconstruir o sistema de áudio, narração ou legendas.
+
+Reutilizar os componentes existentes e adaptar a entrada
+de fotografias do piloto para os arquivos selecionados
+pelo novo Estúdio.
+
+Não substituir o motor HyperFrames.
+
+Melhorar posteriormente a direção criativa e os efeitos.
+
+## PRÓXIMA ETAPA
+
+1. Preservar esta documentação no Git.
+2. Atualizar a Skill HyperFrames com o histórico.
+3. Adaptar a entrada de imagens do piloto.
+4. Integrar o áudio e as legendas existentes.
+5. Produzir nova versão do vídeo.
+6. Solicitar aprovação humana.
+
+ATENÇÃO:
+A homologação contém alterações que podem não estar
+no GitHub. Não executar git pull, reset ou checkout
+sem auditoria prévia.
+
+Produção não deve ser reiniciada ou modificada
+para realizar testes de vídeo.
