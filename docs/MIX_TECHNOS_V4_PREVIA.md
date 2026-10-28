@@ -59,3 +59,9 @@ Compare com o MP4 anterior antes de aprovar. O tempo-alvo não autoriza acelerar
 Se falhar, guardar o caminho impresso e o log; consultar STATUS.txt e ffprobe.json, se existente. O job original fica intacto.
 O runner não integra ainda a fila da interface, o coordenador de pausa ou a memória SQLite. São etapas posteriores à aprovação desta prova visual.
 Não afirmar publicação ou melhoria de conversão antes de existir evidência.
+
+## Ocorrência e correção em 28/10/2026
+A execução 20261028-233250-technos-v4-861e6eac não produziu WAV; posteriormente nenhum processo V4/TTS foi encontrado, mas STATUS.txt permaneceu PROCESSING. A causa de término não foi confirmada; não atribuir automaticamente ao Ollama ou à memória. Havia dois processos de catálogo ativos e nenhuma pausa solicitada.
+O runner agora salva tts-01.log a tts-05.log, limita cada subprocesso TTS a 300s e encerra seu próprio grupo de processos em timeout/interrupção. SIGTERM e Ctrl+C passam a registrar FAILED e a causa no STATUS.txt; SIGKILL ou queda da máquina ainda podem deixar estado desatualizado.
+Testes adicionais locais exercitaram saída TTS com sucesso, erro, timeout e restauração do executor original. Estes testes usam subprocessos simulados; ainda falta validar o Kokoro real na VPS.
+Antes de nova renderização, verificar ajuda da CLI TTS e dependências instaladas e coordenar recursos com o catálogo. O log adicional não corrige por si só a causa da falha TTS.
