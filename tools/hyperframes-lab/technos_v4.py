@@ -14,6 +14,7 @@ import html
 import importlib.util
 import json
 import os
+import signal
 from pathlib import Path
 import subprocess
 import sys
@@ -45,6 +46,48 @@ def load_pilot():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def tts_with_logs(pilot, run_dir, plan, timeout=300):
+    """Wrap only the existing TTS command; log and terminate its own process group."""
+    original = pilot.exec_cmd
+    counter = 0
+
+    def logged_command(argv, **kwargs):
+        nonlocal counter
+        if 'tts' not in argv or not any(Path(str(a)).name == 'hyperframes' for a in argv):
+            return original(argv, **kwargs)
+        counter += 1
+        logfile = run_dir / f'tts-{counter:02d}.log'
+        print(f'[TTS LOG] {logfile} (limite: {timeout}s)', flush=True)
+        with logfile.open('w', encoding='utf-8') as output:
+            process = subprocess.Popen(argv, stdout=output, stderr=subprocess.STDOUT,
+                                       env=kwargs.get('env'), start_new_session=True)
+            try:
+                code = process.wait(timeout=timeout)
+            except BaseException:
+                try:
+                    os.killpg(process.pid, signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    try:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    process.wait()
+                raise
+        if code:
+            raise RuntimeError(f'TTS terminou com codigo {code}. Consulte {logfile}.')
+        return subprocess.CompletedProcess(argv, code)
+
+    pilot.exec_cmd = logged_command
+    try:
+        return pilot.tts(run_dir, plan)
+    finally:
+        pilot.exec_cmd = original
 
 
 def plan_for_job(job):
@@ -202,7 +245,7 @@ def main():
         status = run_dir / 'STATUS.txt'
         status.write_text('PROCESSING\n', encoding='utf-8')
         try:
-            durations = pilot.tts(run_dir, plan)
+            durations = tts_with_logs(pilot, run_dir, plan)
             timings = pilot.timing(durations)
             # Complete the previous phrase before the next scene becomes visible.
             for a, b in zip(timings, timings[1:]):
@@ -214,8 +257,8 @@ def main():
             pilot.render_video(run_dir, folder)
             pilot.mix_audio(run_dir, timings)
             qa(pilot, run_dir, timings)
-        except Exception:
-            status.write_text('FAILED\nConsulte o log. Nada aprovado ou publicado.\n', encoding='utf-8')
+        except (Exception, KeyboardInterrupt) as error:
+            status.write_text(f'FAILED\n{type(error).__name__}: {str(error)[:1000]}\nNada aprovado ou publicado.\n', encoding='utf-8')
             raise
         status.write_text('AWAITING_APPROVAL\nTecnico OK; revisao visual e factual pendentes. Nada publicado.\n', encoding='utf-8')
         print('[MP4]', run_dir / 'preview-aguarda-aprovacao.mp4', flush=True)
@@ -224,8 +267,12 @@ def main():
 
 
 if __name__ == '__main__':
+    def interrupted(signum, frame):
+        raise RuntimeError(f'Execucao interrompida pelo sinal {signum}; verifique timeout ou encerramento externo.')
+
+    signal.signal(signal.SIGTERM, interrupted)
     try:
         main()
-    except Exception as error:
+    except (Exception, KeyboardInterrupt) as error:
         print('[ERRO]', str(error), file=sys.stderr)
         sys.exit(1)
